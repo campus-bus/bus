@@ -164,7 +164,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX1_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 453,
     "arrivalMinutes": 457.55,
     "arrivalTime": "07:37:33",
@@ -450,7 +450,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX1_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 453,
     "arrivalMinutes": 487.55,
     "arrivalTime": "08:07:33",
@@ -736,7 +736,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX1_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 453,
     "arrivalMinutes": 517.55,
     "arrivalTime": "08:37:33",
@@ -1022,7 +1022,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX1_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 453,
     "arrivalMinutes": 547.55,
     "arrivalTime": "09:07:33",
@@ -1308,7 +1308,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX1_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 453,
     "arrivalMinutes": 583.55,
     "arrivalTime": "09:43:33",
@@ -1594,7 +1594,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX1_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 453,
     "arrivalMinutes": 622.55,
     "arrivalTime": "10:22:33",
@@ -1723,10 +1723,10 @@
     "tripSeq": 7,
     "departureTime": "11:15",
     "departureMinutes": 675,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 1,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 0,
     "arrivalMinutes": 675,
     "arrivalTime": "11:15:00",
@@ -1735,7 +1735,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0007",
@@ -1745,7 +1745,7 @@
     "tripSeq": 7,
     "departureTime": "11:15",
     "departureMinutes": 675,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 2,
     "stopName": "理学院",
@@ -1757,7 +1757,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0007",
@@ -1767,7 +1767,7 @@
     "tripSeq": 7,
     "departureTime": "11:15",
     "departureMinutes": 675,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 3,
     "stopName": "二食堂",
@@ -1779,7 +1779,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0007",
@@ -1789,7 +1789,7 @@
     "tripSeq": 7,
     "departureTime": "11:15",
     "departureMinutes": 675,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 4,
     "stopName": "一食堂",
@@ -1801,7 +1801,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0007",
@@ -1811,7 +1811,7 @@
     "tripSeq": 7,
     "departureTime": "11:15",
     "departureMinutes": 675,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 5,
     "stopName": "305教学楼",
@@ -1823,7 +1823,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0007",
@@ -1833,7 +1833,7 @@
     "tripSeq": 7,
     "departureTime": "11:15",
     "departureMinutes": 675,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 6,
     "stopName": "5号宿舍楼",
@@ -1845,7 +1845,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0007",
@@ -1855,7 +1855,7 @@
     "tripSeq": 7,
     "departureTime": "11:15",
     "departureMinutes": 675,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 7,
     "stopName": "二食堂北",
@@ -1867,7 +1867,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0007",
@@ -1877,7 +1877,7 @@
     "tripSeq": 7,
     "departureTime": "11:15",
     "departureMinutes": 675,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 8,
     "stopName": "理学院",
@@ -1889,7 +1889,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0007",
@@ -1899,10 +1899,10 @@
     "tripSeq": 7,
     "departureTime": "11:15",
     "departureMinutes": 675,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 9,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 1009,
     "arrivalMinutes": 691.8166666666667,
     "arrivalTime": "11:31:49",
@@ -1911,7 +1911,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0008",
@@ -1921,10 +1921,10 @@
     "tripSeq": 8,
     "departureTime": "11:30",
     "departureMinutes": 690,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 1,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 0,
     "arrivalMinutes": 690,
     "arrivalTime": "11:30:00",
@@ -1933,7 +1933,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0008",
@@ -1943,7 +1943,7 @@
     "tripSeq": 8,
     "departureTime": "11:30",
     "departureMinutes": 690,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 2,
     "stopName": "理学院",
@@ -1955,7 +1955,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0008",
@@ -1965,7 +1965,7 @@
     "tripSeq": 8,
     "departureTime": "11:30",
     "departureMinutes": 690,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 3,
     "stopName": "二食堂",
@@ -1977,7 +1977,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0008",
@@ -1987,7 +1987,7 @@
     "tripSeq": 8,
     "departureTime": "11:30",
     "departureMinutes": 690,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 4,
     "stopName": "一食堂",
@@ -1999,7 +1999,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0008",
@@ -2009,7 +2009,7 @@
     "tripSeq": 8,
     "departureTime": "11:30",
     "departureMinutes": 690,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 5,
     "stopName": "305教学楼",
@@ -2021,7 +2021,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0008",
@@ -2031,7 +2031,7 @@
     "tripSeq": 8,
     "departureTime": "11:30",
     "departureMinutes": 690,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 6,
     "stopName": "5号宿舍楼",
@@ -2043,7 +2043,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0008",
@@ -2053,7 +2053,7 @@
     "tripSeq": 8,
     "departureTime": "11:30",
     "departureMinutes": 690,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 7,
     "stopName": "二食堂北",
@@ -2065,7 +2065,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0008",
@@ -2075,7 +2075,7 @@
     "tripSeq": 8,
     "departureTime": "11:30",
     "departureMinutes": 690,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 8,
     "stopName": "理学院",
@@ -2087,7 +2087,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0008",
@@ -2097,10 +2097,10 @@
     "tripSeq": 8,
     "departureTime": "11:30",
     "departureMinutes": 690,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 9,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 1009,
     "arrivalMinutes": 706.8166666666667,
     "arrivalTime": "11:46:49",
@@ -2109,7 +2109,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0009",
@@ -2119,10 +2119,10 @@
     "tripSeq": 9,
     "departureTime": "11:50",
     "departureMinutes": 710,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 1,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 0,
     "arrivalMinutes": 710,
     "arrivalTime": "11:50:00",
@@ -2131,7 +2131,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0009",
@@ -2141,7 +2141,7 @@
     "tripSeq": 9,
     "departureTime": "11:50",
     "departureMinutes": 710,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 2,
     "stopName": "理学院",
@@ -2153,7 +2153,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0009",
@@ -2163,7 +2163,7 @@
     "tripSeq": 9,
     "departureTime": "11:50",
     "departureMinutes": 710,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 3,
     "stopName": "二食堂",
@@ -2175,7 +2175,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0009",
@@ -2185,7 +2185,7 @@
     "tripSeq": 9,
     "departureTime": "11:50",
     "departureMinutes": 710,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 4,
     "stopName": "一食堂",
@@ -2197,7 +2197,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0009",
@@ -2207,7 +2207,7 @@
     "tripSeq": 9,
     "departureTime": "11:50",
     "departureMinutes": 710,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 5,
     "stopName": "305教学楼",
@@ -2219,7 +2219,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0009",
@@ -2229,7 +2229,7 @@
     "tripSeq": 9,
     "departureTime": "11:50",
     "departureMinutes": 710,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 6,
     "stopName": "5号宿舍楼",
@@ -2241,7 +2241,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0009",
@@ -2251,7 +2251,7 @@
     "tripSeq": 9,
     "departureTime": "11:50",
     "departureMinutes": 710,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 7,
     "stopName": "二食堂北",
@@ -2263,7 +2263,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0009",
@@ -2273,7 +2273,7 @@
     "tripSeq": 9,
     "departureTime": "11:50",
     "departureMinutes": 710,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 8,
     "stopName": "理学院",
@@ -2285,7 +2285,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0009",
@@ -2295,10 +2295,10 @@
     "tripSeq": 9,
     "departureTime": "11:50",
     "departureMinutes": 710,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 9,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 1009,
     "arrivalMinutes": 726.8166666666667,
     "arrivalTime": "12:06:49",
@@ -2307,7 +2307,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0010",
@@ -2317,10 +2317,10 @@
     "tripSeq": 10,
     "departureTime": "12:10",
     "departureMinutes": 730,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 1,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 0,
     "arrivalMinutes": 730,
     "arrivalTime": "12:10:00",
@@ -2329,7 +2329,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0010",
@@ -2339,7 +2339,7 @@
     "tripSeq": 10,
     "departureTime": "12:10",
     "departureMinutes": 730,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 2,
     "stopName": "理学院",
@@ -2351,7 +2351,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0010",
@@ -2361,7 +2361,7 @@
     "tripSeq": 10,
     "departureTime": "12:10",
     "departureMinutes": 730,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 3,
     "stopName": "二食堂",
@@ -2373,7 +2373,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0010",
@@ -2383,7 +2383,7 @@
     "tripSeq": 10,
     "departureTime": "12:10",
     "departureMinutes": 730,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 4,
     "stopName": "一食堂",
@@ -2395,7 +2395,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0010",
@@ -2405,7 +2405,7 @@
     "tripSeq": 10,
     "departureTime": "12:10",
     "departureMinutes": 730,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 5,
     "stopName": "305教学楼",
@@ -2417,7 +2417,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0010",
@@ -2427,7 +2427,7 @@
     "tripSeq": 10,
     "departureTime": "12:10",
     "departureMinutes": 730,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 6,
     "stopName": "5号宿舍楼",
@@ -2439,7 +2439,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0010",
@@ -2449,7 +2449,7 @@
     "tripSeq": 10,
     "departureTime": "12:10",
     "departureMinutes": 730,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 7,
     "stopName": "二食堂北",
@@ -2461,7 +2461,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0010",
@@ -2471,7 +2471,7 @@
     "tripSeq": 10,
     "departureTime": "12:10",
     "departureMinutes": 730,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 8,
     "stopName": "理学院",
@@ -2483,7 +2483,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0010",
@@ -2493,10 +2493,10 @@
     "tripSeq": 10,
     "departureTime": "12:10",
     "departureMinutes": 730,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 9,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 1009,
     "arrivalMinutes": 746.8166666666667,
     "arrivalTime": "12:26:49",
@@ -2505,7 +2505,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0011",
@@ -2515,10 +2515,10 @@
     "tripSeq": 11,
     "departureTime": "12:30",
     "departureMinutes": 750,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 1,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 0,
     "arrivalMinutes": 750,
     "arrivalTime": "12:30:00",
@@ -2527,7 +2527,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0011",
@@ -2537,7 +2537,7 @@
     "tripSeq": 11,
     "departureTime": "12:30",
     "departureMinutes": 750,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 2,
     "stopName": "理学院",
@@ -2549,7 +2549,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0011",
@@ -2559,7 +2559,7 @@
     "tripSeq": 11,
     "departureTime": "12:30",
     "departureMinutes": 750,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 3,
     "stopName": "二食堂",
@@ -2571,7 +2571,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0011",
@@ -2581,7 +2581,7 @@
     "tripSeq": 11,
     "departureTime": "12:30",
     "departureMinutes": 750,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 4,
     "stopName": "一食堂",
@@ -2593,7 +2593,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0011",
@@ -2603,7 +2603,7 @@
     "tripSeq": 11,
     "departureTime": "12:30",
     "departureMinutes": 750,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 5,
     "stopName": "305教学楼",
@@ -2615,7 +2615,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0011",
@@ -2625,7 +2625,7 @@
     "tripSeq": 11,
     "departureTime": "12:30",
     "departureMinutes": 750,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 6,
     "stopName": "5号宿舍楼",
@@ -2637,7 +2637,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0011",
@@ -2647,7 +2647,7 @@
     "tripSeq": 11,
     "departureTime": "12:30",
     "departureMinutes": 750,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 7,
     "stopName": "二食堂北",
@@ -2659,7 +2659,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0011",
@@ -2669,7 +2669,7 @@
     "tripSeq": 11,
     "departureTime": "12:30",
     "departureMinutes": 750,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 8,
     "stopName": "理学院",
@@ -2681,7 +2681,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0011",
@@ -2691,10 +2691,10 @@
     "tripSeq": 11,
     "departureTime": "12:30",
     "departureMinutes": 750,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 9,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 1009,
     "arrivalMinutes": 766.8166666666667,
     "arrivalTime": "12:46:49",
@@ -2703,7 +2703,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0012",
@@ -2870,7 +2870,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX1_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 453,
     "arrivalMinutes": 477.55,
     "arrivalTime": "07:57:33",
@@ -3156,7 +3156,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX1_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 453,
     "arrivalMinutes": 507.55,
     "arrivalTime": "08:27:33",
@@ -3442,7 +3442,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX1_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 453,
     "arrivalMinutes": 537.55,
     "arrivalTime": "08:57:33",
@@ -3728,7 +3728,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX1_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 453,
     "arrivalMinutes": 571.55,
     "arrivalTime": "09:31:33",
@@ -4014,7 +4014,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX1_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 453,
     "arrivalMinutes": 607.55,
     "arrivalTime": "10:07:33",
@@ -4300,7 +4300,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX1_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 453,
     "arrivalMinutes": 652.55,
     "arrivalTime": "10:52:33",
@@ -4586,7 +4586,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX1_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 453,
     "arrivalMinutes": 687.55,
     "arrivalTime": "11:27:33",
@@ -4872,7 +4872,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX1_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 453,
     "arrivalMinutes": 727.55,
     "arrivalTime": "12:07:33",
@@ -5158,7 +5158,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX1_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 453,
     "arrivalMinutes": 752.55,
     "arrivalTime": "12:32:33",
@@ -5444,7 +5444,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX1_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 453,
     "arrivalMinutes": 847.55,
     "arrivalTime": "14:07:33",
@@ -5730,7 +5730,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX1_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 453,
     "arrivalMinutes": 883.55,
     "arrivalTime": "14:43:33",
@@ -6016,7 +6016,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX1_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 453,
     "arrivalMinutes": 927.55,
     "arrivalTime": "15:27:33",
@@ -6302,7 +6302,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX1_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 453,
     "arrivalMinutes": 997.55,
     "arrivalTime": "16:37:33",
@@ -6588,7 +6588,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX1_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 453,
     "arrivalMinutes": 1042.55,
     "arrivalTime": "17:22:33",
@@ -6874,7 +6874,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX1_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 453,
     "arrivalMinutes": 1087.55,
     "arrivalTime": "18:07:33",
@@ -7160,7 +7160,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX1_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 453,
     "arrivalMinutes": 467.55,
     "arrivalTime": "07:47:33",
@@ -7446,7 +7446,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX1_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 453,
     "arrivalMinutes": 497.55,
     "arrivalTime": "08:17:33",
@@ -7732,7 +7732,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX1_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 453,
     "arrivalMinutes": 527.55,
     "arrivalTime": "08:47:33",
@@ -8018,7 +8018,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX1_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 453,
     "arrivalMinutes": 559.55,
     "arrivalTime": "09:19:33",
@@ -8304,7 +8304,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX1_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 453,
     "arrivalMinutes": 595.55,
     "arrivalTime": "09:55:33",
@@ -8590,7 +8590,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX1_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 453,
     "arrivalMinutes": 637.55,
     "arrivalTime": "10:37:33",
@@ -8876,7 +8876,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX1_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 453,
     "arrivalMinutes": 667.55,
     "arrivalTime": "11:07:33",
@@ -9162,7 +9162,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX1_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 453,
     "arrivalMinutes": 707.55,
     "arrivalTime": "11:47:33",
@@ -9448,7 +9448,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX1_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 453,
     "arrivalMinutes": 737.55,
     "arrivalTime": "12:17:33",
@@ -9734,7 +9734,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX1_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 453,
     "arrivalMinutes": 767.55,
     "arrivalTime": "12:47:33",
@@ -10020,7 +10020,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX1_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 453,
     "arrivalMinutes": 859.55,
     "arrivalTime": "14:19:33",
@@ -10306,7 +10306,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX1_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 453,
     "arrivalMinutes": 895.55,
     "arrivalTime": "14:55:33",
@@ -10592,7 +10592,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX1_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 453,
     "arrivalMinutes": 947.55,
     "arrivalTime": "15:47:33",
@@ -10878,7 +10878,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX1_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 453,
     "arrivalMinutes": 1027.55,
     "arrivalTime": "17:07:33",
@@ -11164,7 +11164,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX1_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 453,
     "arrivalMinutes": 1057.55,
     "arrivalTime": "17:37:33",
@@ -11293,10 +11293,10 @@
     "tripSeq": 1,
     "departureTime": "16:15",
     "departureMinutes": 975,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 1,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 0,
     "arrivalMinutes": 975,
     "arrivalTime": "16:15:00",
@@ -11305,7 +11305,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0042",
@@ -11315,7 +11315,7 @@
     "tripSeq": 1,
     "departureTime": "16:15",
     "departureMinutes": 975,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 2,
     "stopName": "理学院",
@@ -11327,7 +11327,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0042",
@@ -11337,7 +11337,7 @@
     "tripSeq": 1,
     "departureTime": "16:15",
     "departureMinutes": 975,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 3,
     "stopName": "二食堂",
@@ -11349,7 +11349,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0042",
@@ -11359,7 +11359,7 @@
     "tripSeq": 1,
     "departureTime": "16:15",
     "departureMinutes": 975,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 4,
     "stopName": "一食堂",
@@ -11371,7 +11371,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0042",
@@ -11381,7 +11381,7 @@
     "tripSeq": 1,
     "departureTime": "16:15",
     "departureMinutes": 975,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 5,
     "stopName": "305教学楼",
@@ -11393,7 +11393,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0042",
@@ -11403,7 +11403,7 @@
     "tripSeq": 1,
     "departureTime": "16:15",
     "departureMinutes": 975,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 6,
     "stopName": "5号宿舍楼",
@@ -11415,7 +11415,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0042",
@@ -11425,7 +11425,7 @@
     "tripSeq": 1,
     "departureTime": "16:15",
     "departureMinutes": 975,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 7,
     "stopName": "二食堂北",
@@ -11437,7 +11437,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0042",
@@ -11447,7 +11447,7 @@
     "tripSeq": 1,
     "departureTime": "16:15",
     "departureMinutes": 975,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 8,
     "stopName": "理学院",
@@ -11459,7 +11459,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0042",
@@ -11469,10 +11469,10 @@
     "tripSeq": 1,
     "departureTime": "16:15",
     "departureMinutes": 975,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 9,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 1009,
     "arrivalMinutes": 991.8166666666667,
     "arrivalTime": "16:31:49",
@@ -11481,7 +11481,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0043",
@@ -11491,10 +11491,10 @@
     "tripSeq": 2,
     "departureTime": "16:30",
     "departureMinutes": 990,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 1,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 0,
     "arrivalMinutes": 990,
     "arrivalTime": "16:30:00",
@@ -11503,7 +11503,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0043",
@@ -11513,7 +11513,7 @@
     "tripSeq": 2,
     "departureTime": "16:30",
     "departureMinutes": 990,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 2,
     "stopName": "理学院",
@@ -11525,7 +11525,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0043",
@@ -11535,7 +11535,7 @@
     "tripSeq": 2,
     "departureTime": "16:30",
     "departureMinutes": 990,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 3,
     "stopName": "二食堂",
@@ -11547,7 +11547,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0043",
@@ -11557,7 +11557,7 @@
     "tripSeq": 2,
     "departureTime": "16:30",
     "departureMinutes": 990,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 4,
     "stopName": "一食堂",
@@ -11569,7 +11569,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0043",
@@ -11579,7 +11579,7 @@
     "tripSeq": 2,
     "departureTime": "16:30",
     "departureMinutes": 990,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 5,
     "stopName": "305教学楼",
@@ -11591,7 +11591,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0043",
@@ -11601,7 +11601,7 @@
     "tripSeq": 2,
     "departureTime": "16:30",
     "departureMinutes": 990,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 6,
     "stopName": "5号宿舍楼",
@@ -11613,7 +11613,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0043",
@@ -11623,7 +11623,7 @@
     "tripSeq": 2,
     "departureTime": "16:30",
     "departureMinutes": 990,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 7,
     "stopName": "二食堂北",
@@ -11635,7 +11635,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0043",
@@ -11645,7 +11645,7 @@
     "tripSeq": 2,
     "departureTime": "16:30",
     "departureMinutes": 990,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 8,
     "stopName": "理学院",
@@ -11657,7 +11657,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0043",
@@ -11667,10 +11667,10 @@
     "tripSeq": 2,
     "departureTime": "16:30",
     "departureMinutes": 990,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 9,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 1009,
     "arrivalMinutes": 1006.8166666666667,
     "arrivalTime": "16:46:49",
@@ -11679,7 +11679,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0044",
@@ -11689,10 +11689,10 @@
     "tripSeq": 3,
     "departureTime": "16:50",
     "departureMinutes": 1010,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 1,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 0,
     "arrivalMinutes": 1010,
     "arrivalTime": "16:50:00",
@@ -11701,7 +11701,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0044",
@@ -11711,7 +11711,7 @@
     "tripSeq": 3,
     "departureTime": "16:50",
     "departureMinutes": 1010,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 2,
     "stopName": "理学院",
@@ -11723,7 +11723,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0044",
@@ -11733,7 +11733,7 @@
     "tripSeq": 3,
     "departureTime": "16:50",
     "departureMinutes": 1010,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 3,
     "stopName": "二食堂",
@@ -11745,7 +11745,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0044",
@@ -11755,7 +11755,7 @@
     "tripSeq": 3,
     "departureTime": "16:50",
     "departureMinutes": 1010,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 4,
     "stopName": "一食堂",
@@ -11767,7 +11767,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0044",
@@ -11777,7 +11777,7 @@
     "tripSeq": 3,
     "departureTime": "16:50",
     "departureMinutes": 1010,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 5,
     "stopName": "305教学楼",
@@ -11789,7 +11789,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0044",
@@ -11799,7 +11799,7 @@
     "tripSeq": 3,
     "departureTime": "16:50",
     "departureMinutes": 1010,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 6,
     "stopName": "5号宿舍楼",
@@ -11811,7 +11811,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0044",
@@ -11821,7 +11821,7 @@
     "tripSeq": 3,
     "departureTime": "16:50",
     "departureMinutes": 1010,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 7,
     "stopName": "二食堂北",
@@ -11833,7 +11833,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0044",
@@ -11843,7 +11843,7 @@
     "tripSeq": 3,
     "departureTime": "16:50",
     "departureMinutes": 1010,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 8,
     "stopName": "理学院",
@@ -11855,7 +11855,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0044",
@@ -11865,10 +11865,10 @@
     "tripSeq": 3,
     "departureTime": "16:50",
     "departureMinutes": 1010,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 9,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 1009,
     "arrivalMinutes": 1026.8166666666666,
     "arrivalTime": "17:06:49",
@@ -11877,7 +11877,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0045",
@@ -11887,10 +11887,10 @@
     "tripSeq": 4,
     "departureTime": "17:10",
     "departureMinutes": 1030,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 1,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 0,
     "arrivalMinutes": 1030,
     "arrivalTime": "17:10:00",
@@ -11899,7 +11899,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0045",
@@ -11909,7 +11909,7 @@
     "tripSeq": 4,
     "departureTime": "17:10",
     "departureMinutes": 1030,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 2,
     "stopName": "理学院",
@@ -11921,7 +11921,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0045",
@@ -11931,7 +11931,7 @@
     "tripSeq": 4,
     "departureTime": "17:10",
     "departureMinutes": 1030,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 3,
     "stopName": "二食堂",
@@ -11943,7 +11943,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0045",
@@ -11953,7 +11953,7 @@
     "tripSeq": 4,
     "departureTime": "17:10",
     "departureMinutes": 1030,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 4,
     "stopName": "一食堂",
@@ -11965,7 +11965,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0045",
@@ -11975,7 +11975,7 @@
     "tripSeq": 4,
     "departureTime": "17:10",
     "departureMinutes": 1030,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 5,
     "stopName": "305教学楼",
@@ -11987,7 +11987,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0045",
@@ -11997,7 +11997,7 @@
     "tripSeq": 4,
     "departureTime": "17:10",
     "departureMinutes": 1030,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 6,
     "stopName": "5号宿舍楼",
@@ -12009,7 +12009,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0045",
@@ -12019,7 +12019,7 @@
     "tripSeq": 4,
     "departureTime": "17:10",
     "departureMinutes": 1030,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 7,
     "stopName": "二食堂北",
@@ -12031,7 +12031,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0045",
@@ -12041,7 +12041,7 @@
     "tripSeq": 4,
     "departureTime": "17:10",
     "departureMinutes": 1030,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 8,
     "stopName": "理学院",
@@ -12053,7 +12053,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0045",
@@ -12063,10 +12063,10 @@
     "tripSeq": 4,
     "departureTime": "17:10",
     "departureMinutes": 1030,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 9,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 1009,
     "arrivalMinutes": 1046.8166666666666,
     "arrivalTime": "17:26:49",
@@ -12075,7 +12075,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0046",
@@ -12085,10 +12085,10 @@
     "tripSeq": 5,
     "departureTime": "17:30",
     "departureMinutes": 1050,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 1,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 0,
     "arrivalMinutes": 1050,
     "arrivalTime": "17:30:00",
@@ -12097,7 +12097,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0046",
@@ -12107,7 +12107,7 @@
     "tripSeq": 5,
     "departureTime": "17:30",
     "departureMinutes": 1050,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 2,
     "stopName": "理学院",
@@ -12119,7 +12119,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0046",
@@ -12129,7 +12129,7 @@
     "tripSeq": 5,
     "departureTime": "17:30",
     "departureMinutes": 1050,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 3,
     "stopName": "二食堂",
@@ -12141,7 +12141,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0046",
@@ -12151,7 +12151,7 @@
     "tripSeq": 5,
     "departureTime": "17:30",
     "departureMinutes": 1050,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 4,
     "stopName": "一食堂",
@@ -12163,7 +12163,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0046",
@@ -12173,7 +12173,7 @@
     "tripSeq": 5,
     "departureTime": "17:30",
     "departureMinutes": 1050,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 5,
     "stopName": "305教学楼",
@@ -12185,7 +12185,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0046",
@@ -12195,7 +12195,7 @@
     "tripSeq": 5,
     "departureTime": "17:30",
     "departureMinutes": 1050,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 6,
     "stopName": "5号宿舍楼",
@@ -12207,7 +12207,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0046",
@@ -12217,7 +12217,7 @@
     "tripSeq": 5,
     "departureTime": "17:30",
     "departureMinutes": 1050,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 7,
     "stopName": "二食堂北",
@@ -12229,7 +12229,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0046",
@@ -12239,7 +12239,7 @@
     "tripSeq": 5,
     "departureTime": "17:30",
     "departureMinutes": 1050,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 8,
     "stopName": "理学院",
@@ -12251,7 +12251,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0046",
@@ -12261,10 +12261,10 @@
     "tripSeq": 5,
     "departureTime": "17:30",
     "departureMinutes": 1050,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 9,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 1009,
     "arrivalMinutes": 1066.8166666666666,
     "arrivalTime": "17:46:49",
@@ -12273,7 +12273,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0047",
@@ -12283,10 +12283,10 @@
     "tripSeq": 6,
     "departureTime": "17:50",
     "departureMinutes": 1070,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 1,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 0,
     "arrivalMinutes": 1070,
     "arrivalTime": "17:50:00",
@@ -12295,7 +12295,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0047",
@@ -12305,7 +12305,7 @@
     "tripSeq": 6,
     "departureTime": "17:50",
     "departureMinutes": 1070,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 2,
     "stopName": "理学院",
@@ -12317,7 +12317,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0047",
@@ -12327,7 +12327,7 @@
     "tripSeq": 6,
     "departureTime": "17:50",
     "departureMinutes": 1070,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 3,
     "stopName": "二食堂",
@@ -12339,7 +12339,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0047",
@@ -12349,7 +12349,7 @@
     "tripSeq": 6,
     "departureTime": "17:50",
     "departureMinutes": 1070,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 4,
     "stopName": "一食堂",
@@ -12361,7 +12361,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0047",
@@ -12371,7 +12371,7 @@
     "tripSeq": 6,
     "departureTime": "17:50",
     "departureMinutes": 1070,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 5,
     "stopName": "305教学楼",
@@ -12383,7 +12383,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0047",
@@ -12393,7 +12393,7 @@
     "tripSeq": 6,
     "departureTime": "17:50",
     "departureMinutes": 1070,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 6,
     "stopName": "5号宿舍楼",
@@ -12405,7 +12405,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0047",
@@ -12415,7 +12415,7 @@
     "tripSeq": 6,
     "departureTime": "17:50",
     "departureMinutes": 1070,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 7,
     "stopName": "二食堂北",
@@ -12427,7 +12427,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0047",
@@ -12437,7 +12437,7 @@
     "tripSeq": 6,
     "departureTime": "17:50",
     "departureMinutes": 1070,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 8,
     "stopName": "理学院",
@@ -12449,7 +12449,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0047",
@@ -12459,10 +12459,10 @@
     "tripSeq": 6,
     "departureTime": "17:50",
     "departureMinutes": 1070,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX1_DINING",
     "stopSeq": 9,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 1009,
     "arrivalMinutes": 1086.8166666666666,
     "arrivalTime": "18:06:49",
@@ -12471,7 +12471,7 @@
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "departureId": "S0048",
@@ -12638,7 +12638,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX1_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 453,
     "arrivalMinutes": 1117.55,
     "arrivalTime": "18:37:33",
@@ -12924,7 +12924,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX1_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 453,
     "arrivalMinutes": 1147.55,
     "arrivalTime": "19:07:33",
@@ -13210,7 +13210,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX1_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 453,
     "arrivalMinutes": 1177.55,
     "arrivalTime": "19:37:33",
@@ -13496,7 +13496,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX1_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 453,
     "arrivalMinutes": 1207.55,
     "arrivalTime": "20:07:33",
@@ -13782,7 +13782,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX1_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 453,
     "arrivalMinutes": 1237.55,
     "arrivalTime": "20:37:33",
@@ -14068,7 +14068,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX1_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 453,
     "arrivalMinutes": 1267.55,
     "arrivalTime": "21:07:33",
@@ -14354,7 +14354,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX1_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 453,
     "arrivalMinutes": 1297.55,
     "arrivalTime": "21:37:33",
@@ -14640,7 +14640,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX1_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 453,
     "arrivalMinutes": 1327.55,
     "arrivalTime": "22:07:33",
@@ -14926,7 +14926,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX1_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 453,
     "arrivalMinutes": 1357.55,
     "arrivalTime": "22:37:33",
@@ -15212,7 +15212,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX1_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 453,
     "arrivalMinutes": 871.55,
     "arrivalTime": "14:31:33",
@@ -15498,7 +15498,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX1_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 453,
     "arrivalMinutes": 907.55,
     "arrivalTime": "15:07:33",
@@ -15784,7 +15784,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX1_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 453,
     "arrivalMinutes": 967.55,
     "arrivalTime": "16:07:33",
@@ -16070,7 +16070,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX1_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 453,
     "arrivalMinutes": 1012.55,
     "arrivalTime": "16:52:33",
@@ -16356,7 +16356,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX1_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 453,
     "arrivalMinutes": 1072.55,
     "arrivalTime": "17:52:33",
@@ -16642,7 +16642,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX1_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 453,
     "arrivalMinutes": 1102.55,
     "arrivalTime": "18:22:33",
@@ -16928,7 +16928,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX1_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 453,
     "arrivalMinutes": 1132.55,
     "arrivalTime": "18:52:33",
@@ -17214,7 +17214,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX1_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 453,
     "arrivalMinutes": 1162.55,
     "arrivalTime": "19:22:33",
@@ -17500,7 +17500,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX1_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 453,
     "arrivalMinutes": 1192.55,
     "arrivalTime": "19:52:33",
@@ -17786,7 +17786,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX1_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 453,
     "arrivalMinutes": 1222.55,
     "arrivalTime": "20:22:33",
@@ -18072,7 +18072,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX1_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 453,
     "arrivalMinutes": 1252.55,
     "arrivalTime": "20:52:33",
@@ -18358,7 +18358,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX1_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 453,
     "arrivalMinutes": 1282.55,
     "arrivalTime": "21:22:33",
@@ -18644,7 +18644,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX1_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 453,
     "arrivalMinutes": 1312.55,
     "arrivalTime": "21:52:33",
@@ -18930,7 +18930,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX1_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 453,
     "arrivalMinutes": 1342.55,
     "arrivalTime": "22:22:33",
@@ -27554,7 +27554,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 7,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 365,
     "arrivalMinutes": 461.0833333333333,
     "arrivalTime": "07:41:05",
@@ -27576,7 +27576,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 393,
     "arrivalMinutes": 461.55,
     "arrivalTime": "07:41:33",
@@ -27840,7 +27840,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 7,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 365,
     "arrivalMinutes": 491.0833333333333,
     "arrivalTime": "08:11:05",
@@ -27862,7 +27862,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 393,
     "arrivalMinutes": 491.55,
     "arrivalTime": "08:11:33",
@@ -28126,7 +28126,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 7,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 365,
     "arrivalMinutes": 521.0833333333334,
     "arrivalTime": "08:41:05",
@@ -28148,7 +28148,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 393,
     "arrivalMinutes": 521.55,
     "arrivalTime": "08:41:33",
@@ -28412,7 +28412,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 7,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 365,
     "arrivalMinutes": 551.0833333333334,
     "arrivalTime": "09:11:05",
@@ -28434,7 +28434,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 393,
     "arrivalMinutes": 551.55,
     "arrivalTime": "09:11:33",
@@ -28563,10 +28563,10 @@
     "tripSeq": 5,
     "departureTime": "10:50",
     "departureMinutes": 650,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 1,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 0,
     "arrivalMinutes": 650,
     "arrivalTime": "10:50:00",
@@ -28575,7 +28575,7 @@
     "driver": "刘虎",
     "vehicleNo": "3号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0113",
@@ -28585,7 +28585,7 @@
     "tripSeq": 5,
     "departureTime": "10:50",
     "departureMinutes": 650,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 2,
     "stopName": "理学院",
@@ -28597,7 +28597,7 @@
     "driver": "刘虎",
     "vehicleNo": "3号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0113",
@@ -28607,7 +28607,7 @@
     "tripSeq": 5,
     "departureTime": "10:50",
     "departureMinutes": 650,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 3,
     "stopName": "二食堂",
@@ -28619,7 +28619,7 @@
     "driver": "刘虎",
     "vehicleNo": "3号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0113",
@@ -28629,7 +28629,7 @@
     "tripSeq": 5,
     "departureTime": "10:50",
     "departureMinutes": 650,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 4,
     "stopName": "图书馆",
@@ -28641,7 +28641,7 @@
     "driver": "刘虎",
     "vehicleNo": "3号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0113",
@@ -28651,7 +28651,7 @@
     "tripSeq": 5,
     "departureTime": "10:50",
     "departureMinutes": 650,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 5,
     "stopName": "305教学楼",
@@ -28663,7 +28663,7 @@
     "driver": "刘虎",
     "vehicleNo": "3号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0113",
@@ -28673,7 +28673,7 @@
     "tripSeq": 5,
     "departureTime": "10:50",
     "departureMinutes": 650,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 6,
     "stopName": "研究生宿舍楼",
@@ -28685,7 +28685,7 @@
     "driver": "刘虎",
     "vehicleNo": "3号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0113",
@@ -28695,7 +28695,7 @@
     "tripSeq": 5,
     "departureTime": "10:50",
     "departureMinutes": 650,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 7,
     "stopName": "一食堂",
@@ -28707,7 +28707,7 @@
     "driver": "刘虎",
     "vehicleNo": "3号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0113",
@@ -28717,7 +28717,7 @@
     "tripSeq": 5,
     "departureTime": "10:50",
     "departureMinutes": 650,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 8,
     "stopName": "2号宿舍楼",
@@ -28729,7 +28729,7 @@
     "driver": "刘虎",
     "vehicleNo": "3号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0113",
@@ -28739,7 +28739,7 @@
     "tripSeq": 5,
     "departureTime": "10:50",
     "departureMinutes": 650,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 9,
     "stopName": "军体活动中心",
@@ -28751,7 +28751,7 @@
     "driver": "刘虎",
     "vehicleNo": "3号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0113",
@@ -28761,7 +28761,7 @@
     "tripSeq": 5,
     "departureTime": "10:50",
     "departureMinutes": 650,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 10,
     "stopName": "网球场",
@@ -28773,7 +28773,7 @@
     "driver": "刘虎",
     "vehicleNo": "3号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0113",
@@ -28783,7 +28783,7 @@
     "tripSeq": 5,
     "departureTime": "10:50",
     "departureMinutes": 650,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 11,
     "stopName": "激光所",
@@ -28795,7 +28795,7 @@
     "driver": "刘虎",
     "vehicleNo": "3号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0113",
@@ -28805,10 +28805,10 @@
     "tripSeq": 5,
     "departureTime": "10:50",
     "departureMinutes": 650,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 12,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 889,
     "arrivalMinutes": 664.8166666666667,
     "arrivalTime": "11:04:49",
@@ -28817,7 +28817,7 @@
     "driver": "刘虎",
     "vehicleNo": "3号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0113",
@@ -28827,10 +28827,10 @@
     "tripSeq": 5,
     "departureTime": "10:50",
     "departureMinutes": 650,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 13,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 917,
     "arrivalMinutes": 665.2833333333333,
     "arrivalTime": "11:05:17",
@@ -28839,7 +28839,7 @@
     "driver": "刘虎",
     "vehicleNo": "3号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0114",
@@ -28984,7 +28984,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 7,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 365,
     "arrivalMinutes": 686.0833333333334,
     "arrivalTime": "11:26:05",
@@ -29006,7 +29006,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 393,
     "arrivalMinutes": 686.55,
     "arrivalTime": "11:26:33",
@@ -29270,7 +29270,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 7,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 365,
     "arrivalMinutes": 731.0833333333334,
     "arrivalTime": "12:11:05",
@@ -29292,7 +29292,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 393,
     "arrivalMinutes": 731.55,
     "arrivalTime": "12:11:33",
@@ -29556,7 +29556,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 7,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 365,
     "arrivalMinutes": 856.0833333333334,
     "arrivalTime": "14:16:05",
@@ -29578,7 +29578,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 393,
     "arrivalMinutes": 856.55,
     "arrivalTime": "14:16:33",
@@ -29842,7 +29842,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 7,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 365,
     "arrivalMinutes": 886.0833333333334,
     "arrivalTime": "14:46:05",
@@ -29864,7 +29864,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 393,
     "arrivalMinutes": 886.55,
     "arrivalTime": "14:46:33",
@@ -30128,7 +30128,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 7,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 365,
     "arrivalMinutes": 916.0833333333334,
     "arrivalTime": "15:16:05",
@@ -30150,7 +30150,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 393,
     "arrivalMinutes": 916.55,
     "arrivalTime": "15:16:33",
@@ -30414,7 +30414,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 7,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 365,
     "arrivalMinutes": 966.0833333333334,
     "arrivalTime": "16:06:05",
@@ -30436,7 +30436,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 393,
     "arrivalMinutes": 966.55,
     "arrivalTime": "16:06:33",
@@ -30700,7 +30700,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 7,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 365,
     "arrivalMinutes": 1001.0833333333334,
     "arrivalTime": "16:41:05",
@@ -30722,7 +30722,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 393,
     "arrivalMinutes": 1001.55,
     "arrivalTime": "16:41:33",
@@ -30986,7 +30986,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 7,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 365,
     "arrivalMinutes": 1026.0833333333333,
     "arrivalTime": "17:06:05",
@@ -31008,7 +31008,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 393,
     "arrivalMinutes": 1026.55,
     "arrivalTime": "17:06:33",
@@ -31272,7 +31272,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 7,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 365,
     "arrivalMinutes": 481.0833333333333,
     "arrivalTime": "08:01:05",
@@ -31294,7 +31294,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 393,
     "arrivalMinutes": 481.55,
     "arrivalTime": "08:01:33",
@@ -31558,7 +31558,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 7,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 365,
     "arrivalMinutes": 511.0833333333333,
     "arrivalTime": "08:31:05",
@@ -31580,7 +31580,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 393,
     "arrivalMinutes": 511.55,
     "arrivalTime": "08:31:33",
@@ -31844,7 +31844,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 7,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 365,
     "arrivalMinutes": 541.0833333333334,
     "arrivalTime": "09:01:05",
@@ -31866,7 +31866,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 393,
     "arrivalMinutes": 541.55,
     "arrivalTime": "09:01:33",
@@ -32130,7 +32130,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 7,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 365,
     "arrivalMinutes": 581.0833333333334,
     "arrivalTime": "09:41:05",
@@ -32152,7 +32152,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 393,
     "arrivalMinutes": 581.55,
     "arrivalTime": "09:41:33",
@@ -32416,7 +32416,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 7,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 365,
     "arrivalMinutes": 616.0833333333334,
     "arrivalTime": "10:16:05",
@@ -32438,7 +32438,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 393,
     "arrivalMinutes": 616.55,
     "arrivalTime": "10:16:33",
@@ -32567,10 +32567,10 @@
     "tripSeq": 6,
     "departureTime": "10:45",
     "departureMinutes": 645,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 1,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 0,
     "arrivalMinutes": 645,
     "arrivalTime": "10:45:00",
@@ -32579,7 +32579,7 @@
     "driver": "刘晓燕",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0127",
@@ -32589,7 +32589,7 @@
     "tripSeq": 6,
     "departureTime": "10:45",
     "departureMinutes": 645,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 2,
     "stopName": "理学院",
@@ -32601,7 +32601,7 @@
     "driver": "刘晓燕",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0127",
@@ -32611,7 +32611,7 @@
     "tripSeq": 6,
     "departureTime": "10:45",
     "departureMinutes": 645,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 3,
     "stopName": "二食堂",
@@ -32623,7 +32623,7 @@
     "driver": "刘晓燕",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0127",
@@ -32633,7 +32633,7 @@
     "tripSeq": 6,
     "departureTime": "10:45",
     "departureMinutes": 645,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 4,
     "stopName": "图书馆",
@@ -32645,7 +32645,7 @@
     "driver": "刘晓燕",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0127",
@@ -32655,7 +32655,7 @@
     "tripSeq": 6,
     "departureTime": "10:45",
     "departureMinutes": 645,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 5,
     "stopName": "305教学楼",
@@ -32667,7 +32667,7 @@
     "driver": "刘晓燕",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0127",
@@ -32677,7 +32677,7 @@
     "tripSeq": 6,
     "departureTime": "10:45",
     "departureMinutes": 645,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 6,
     "stopName": "研究生宿舍楼",
@@ -32689,7 +32689,7 @@
     "driver": "刘晓燕",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0127",
@@ -32699,7 +32699,7 @@
     "tripSeq": 6,
     "departureTime": "10:45",
     "departureMinutes": 645,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 7,
     "stopName": "一食堂",
@@ -32711,7 +32711,7 @@
     "driver": "刘晓燕",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0127",
@@ -32721,7 +32721,7 @@
     "tripSeq": 6,
     "departureTime": "10:45",
     "departureMinutes": 645,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 8,
     "stopName": "2号宿舍楼",
@@ -32733,7 +32733,7 @@
     "driver": "刘晓燕",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0127",
@@ -32743,7 +32743,7 @@
     "tripSeq": 6,
     "departureTime": "10:45",
     "departureMinutes": 645,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 9,
     "stopName": "军体活动中心",
@@ -32755,7 +32755,7 @@
     "driver": "刘晓燕",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0127",
@@ -32765,7 +32765,7 @@
     "tripSeq": 6,
     "departureTime": "10:45",
     "departureMinutes": 645,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 10,
     "stopName": "网球场",
@@ -32777,7 +32777,7 @@
     "driver": "刘晓燕",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0127",
@@ -32787,7 +32787,7 @@
     "tripSeq": 6,
     "departureTime": "10:45",
     "departureMinutes": 645,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 11,
     "stopName": "激光所",
@@ -32799,7 +32799,7 @@
     "driver": "刘晓燕",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0127",
@@ -32809,10 +32809,10 @@
     "tripSeq": 6,
     "departureTime": "10:45",
     "departureMinutes": 645,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 12,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 889,
     "arrivalMinutes": 659.8166666666667,
     "arrivalTime": "10:59:49",
@@ -32821,7 +32821,7 @@
     "driver": "刘晓燕",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0127",
@@ -32831,10 +32831,10 @@
     "tripSeq": 6,
     "departureTime": "10:45",
     "departureMinutes": 645,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 13,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 917,
     "arrivalMinutes": 660.2833333333333,
     "arrivalTime": "11:00:17",
@@ -32843,7 +32843,7 @@
     "driver": "刘晓燕",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0128",
@@ -32988,7 +32988,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 7,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 365,
     "arrivalMinutes": 701.0833333333334,
     "arrivalTime": "11:41:05",
@@ -33010,7 +33010,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 393,
     "arrivalMinutes": 701.55,
     "arrivalTime": "11:41:33",
@@ -33274,7 +33274,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 7,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 365,
     "arrivalMinutes": 746.0833333333334,
     "arrivalTime": "12:26:05",
@@ -33296,7 +33296,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 393,
     "arrivalMinutes": 746.55,
     "arrivalTime": "12:26:33",
@@ -33560,7 +33560,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 7,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 365,
     "arrivalMinutes": 871.0833333333334,
     "arrivalTime": "14:31:05",
@@ -33582,7 +33582,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 393,
     "arrivalMinutes": 871.55,
     "arrivalTime": "14:31:33",
@@ -33846,7 +33846,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 7,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 365,
     "arrivalMinutes": 906.0833333333334,
     "arrivalTime": "15:06:05",
@@ -33868,7 +33868,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 393,
     "arrivalMinutes": 906.55,
     "arrivalTime": "15:06:33",
@@ -34132,7 +34132,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 7,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 365,
     "arrivalMinutes": 951.0833333333334,
     "arrivalTime": "15:51:05",
@@ -34154,7 +34154,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 393,
     "arrivalMinutes": 951.55,
     "arrivalTime": "15:51:33",
@@ -34418,7 +34418,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 7,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 365,
     "arrivalMinutes": 1036.0833333333333,
     "arrivalTime": "17:16:05",
@@ -34440,7 +34440,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 393,
     "arrivalMinutes": 1036.55,
     "arrivalTime": "17:16:33",
@@ -34704,7 +34704,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 7,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 365,
     "arrivalMinutes": 1066.0833333333333,
     "arrivalTime": "17:46:05",
@@ -34726,7 +34726,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 393,
     "arrivalMinutes": 1066.55,
     "arrivalTime": "17:46:33",
@@ -34990,7 +34990,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 7,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 365,
     "arrivalMinutes": 471.0833333333333,
     "arrivalTime": "07:51:05",
@@ -35012,7 +35012,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 393,
     "arrivalMinutes": 471.55,
     "arrivalTime": "07:51:33",
@@ -35276,7 +35276,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 7,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 365,
     "arrivalMinutes": 501.0833333333333,
     "arrivalTime": "08:21:05",
@@ -35298,7 +35298,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 393,
     "arrivalMinutes": 501.55,
     "arrivalTime": "08:21:33",
@@ -35562,7 +35562,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 7,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 365,
     "arrivalMinutes": 531.0833333333334,
     "arrivalTime": "08:51:05",
@@ -35584,7 +35584,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 393,
     "arrivalMinutes": 531.55,
     "arrivalTime": "08:51:33",
@@ -35848,7 +35848,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 7,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 365,
     "arrivalMinutes": 566.0833333333334,
     "arrivalTime": "09:26:05",
@@ -35870,7 +35870,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 393,
     "arrivalMinutes": 566.55,
     "arrivalTime": "09:26:33",
@@ -36134,7 +36134,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 7,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 365,
     "arrivalMinutes": 596.0833333333334,
     "arrivalTime": "09:56:05",
@@ -36156,7 +36156,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 393,
     "arrivalMinutes": 596.55,
     "arrivalTime": "09:56:33",
@@ -36420,7 +36420,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 7,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 365,
     "arrivalMinutes": 636.0833333333334,
     "arrivalTime": "10:36:05",
@@ -36442,7 +36442,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 393,
     "arrivalMinutes": 636.55,
     "arrivalTime": "10:36:33",
@@ -36706,7 +36706,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 7,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 365,
     "arrivalMinutes": 666.0833333333334,
     "arrivalTime": "11:06:05",
@@ -36728,7 +36728,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 393,
     "arrivalMinutes": 666.55,
     "arrivalTime": "11:06:33",
@@ -36992,7 +36992,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 7,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 365,
     "arrivalMinutes": 711.0833333333334,
     "arrivalTime": "11:51:05",
@@ -37014,7 +37014,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 393,
     "arrivalMinutes": 711.55,
     "arrivalTime": "11:51:33",
@@ -37278,7 +37278,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 7,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 365,
     "arrivalMinutes": 756.0833333333334,
     "arrivalTime": "12:36:05",
@@ -37300,7 +37300,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 393,
     "arrivalMinutes": 756.55,
     "arrivalTime": "12:36:33",
@@ -37564,7 +37564,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 7,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 365,
     "arrivalMinutes": 931.0833333333334,
     "arrivalTime": "15:31:05",
@@ -37586,7 +37586,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 393,
     "arrivalMinutes": 931.55,
     "arrivalTime": "15:31:33",
@@ -37850,7 +37850,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 7,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 365,
     "arrivalMinutes": 986.0833333333334,
     "arrivalTime": "16:26:05",
@@ -37872,7 +37872,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 393,
     "arrivalMinutes": 986.55,
     "arrivalTime": "16:26:33",
@@ -38001,10 +38001,10 @@
     "tripSeq": 12,
     "departureTime": "16:50",
     "departureMinutes": 1010,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 1,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 0,
     "arrivalMinutes": 1010,
     "arrivalTime": "16:50:00",
@@ -38013,7 +38013,7 @@
     "driver": "郭海燕",
     "vehicleNo": "5号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0146",
@@ -38023,7 +38023,7 @@
     "tripSeq": 12,
     "departureTime": "16:50",
     "departureMinutes": 1010,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 2,
     "stopName": "理学院",
@@ -38035,7 +38035,7 @@
     "driver": "郭海燕",
     "vehicleNo": "5号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0146",
@@ -38045,7 +38045,7 @@
     "tripSeq": 12,
     "departureTime": "16:50",
     "departureMinutes": 1010,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 3,
     "stopName": "二食堂",
@@ -38057,7 +38057,7 @@
     "driver": "郭海燕",
     "vehicleNo": "5号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0146",
@@ -38067,7 +38067,7 @@
     "tripSeq": 12,
     "departureTime": "16:50",
     "departureMinutes": 1010,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 4,
     "stopName": "图书馆",
@@ -38079,7 +38079,7 @@
     "driver": "郭海燕",
     "vehicleNo": "5号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0146",
@@ -38089,7 +38089,7 @@
     "tripSeq": 12,
     "departureTime": "16:50",
     "departureMinutes": 1010,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 5,
     "stopName": "305教学楼",
@@ -38101,7 +38101,7 @@
     "driver": "郭海燕",
     "vehicleNo": "5号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0146",
@@ -38111,7 +38111,7 @@
     "tripSeq": 12,
     "departureTime": "16:50",
     "departureMinutes": 1010,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 6,
     "stopName": "研究生宿舍楼",
@@ -38123,7 +38123,7 @@
     "driver": "郭海燕",
     "vehicleNo": "5号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0146",
@@ -38133,7 +38133,7 @@
     "tripSeq": 12,
     "departureTime": "16:50",
     "departureMinutes": 1010,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 7,
     "stopName": "一食堂",
@@ -38145,7 +38145,7 @@
     "driver": "郭海燕",
     "vehicleNo": "5号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0146",
@@ -38155,7 +38155,7 @@
     "tripSeq": 12,
     "departureTime": "16:50",
     "departureMinutes": 1010,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 8,
     "stopName": "2号宿舍楼",
@@ -38167,7 +38167,7 @@
     "driver": "郭海燕",
     "vehicleNo": "5号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0146",
@@ -38177,7 +38177,7 @@
     "tripSeq": 12,
     "departureTime": "16:50",
     "departureMinutes": 1010,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 9,
     "stopName": "军体活动中心",
@@ -38189,7 +38189,7 @@
     "driver": "郭海燕",
     "vehicleNo": "5号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0146",
@@ -38199,7 +38199,7 @@
     "tripSeq": 12,
     "departureTime": "16:50",
     "departureMinutes": 1010,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 10,
     "stopName": "网球场",
@@ -38211,7 +38211,7 @@
     "driver": "郭海燕",
     "vehicleNo": "5号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0146",
@@ -38221,7 +38221,7 @@
     "tripSeq": 12,
     "departureTime": "16:50",
     "departureMinutes": 1010,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 11,
     "stopName": "激光所",
@@ -38233,7 +38233,7 @@
     "driver": "郭海燕",
     "vehicleNo": "5号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0146",
@@ -38243,10 +38243,10 @@
     "tripSeq": 12,
     "departureTime": "16:50",
     "departureMinutes": 1010,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 12,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 889,
     "arrivalMinutes": 1024.8166666666666,
     "arrivalTime": "17:04:49",
@@ -38255,7 +38255,7 @@
     "driver": "郭海燕",
     "vehicleNo": "5号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0146",
@@ -38265,10 +38265,10 @@
     "tripSeq": 12,
     "departureTime": "16:50",
     "departureMinutes": 1010,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 13,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 917,
     "arrivalMinutes": 1025.2833333333333,
     "arrivalTime": "17:05:17",
@@ -38277,7 +38277,7 @@
     "driver": "郭海燕",
     "vehicleNo": "5号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0147",
@@ -38422,7 +38422,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 7,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 365,
     "arrivalMinutes": 1056.0833333333333,
     "arrivalTime": "17:36:05",
@@ -38444,7 +38444,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 393,
     "arrivalMinutes": 1056.55,
     "arrivalTime": "17:36:33",
@@ -38708,7 +38708,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 7,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 365,
     "arrivalMinutes": 1081.0833333333333,
     "arrivalTime": "18:01:05",
@@ -38730,7 +38730,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 393,
     "arrivalMinutes": 1081.55,
     "arrivalTime": "18:01:33",
@@ -38994,7 +38994,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 7,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 365,
     "arrivalMinutes": 1106.0833333333333,
     "arrivalTime": "18:26:05",
@@ -39016,7 +39016,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 393,
     "arrivalMinutes": 1106.55,
     "arrivalTime": "18:26:33",
@@ -39280,7 +39280,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 7,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 365,
     "arrivalMinutes": 1136.0833333333333,
     "arrivalTime": "18:56:05",
@@ -39302,7 +39302,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 393,
     "arrivalMinutes": 1136.55,
     "arrivalTime": "18:56:33",
@@ -39566,7 +39566,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 7,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 365,
     "arrivalMinutes": 1166.0833333333333,
     "arrivalTime": "19:26:05",
@@ -39588,7 +39588,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 393,
     "arrivalMinutes": 1166.55,
     "arrivalTime": "19:26:33",
@@ -39852,7 +39852,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 7,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 365,
     "arrivalMinutes": 1196.0833333333333,
     "arrivalTime": "19:56:05",
@@ -39874,7 +39874,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 393,
     "arrivalMinutes": 1196.55,
     "arrivalTime": "19:56:33",
@@ -40138,7 +40138,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 7,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 365,
     "arrivalMinutes": 1226.0833333333333,
     "arrivalTime": "20:26:05",
@@ -40160,7 +40160,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 393,
     "arrivalMinutes": 1226.55,
     "arrivalTime": "20:26:33",
@@ -40424,7 +40424,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 7,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 365,
     "arrivalMinutes": 1256.0833333333333,
     "arrivalTime": "20:56:05",
@@ -40446,7 +40446,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 393,
     "arrivalMinutes": 1256.55,
     "arrivalTime": "20:56:33",
@@ -40710,7 +40710,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 7,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 365,
     "arrivalMinutes": 1286.0833333333333,
     "arrivalTime": "21:26:05",
@@ -40732,7 +40732,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 393,
     "arrivalMinutes": 1286.55,
     "arrivalTime": "21:26:33",
@@ -40996,7 +40996,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 7,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 365,
     "arrivalMinutes": 1316.0833333333333,
     "arrivalTime": "21:56:05",
@@ -41018,7 +41018,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 393,
     "arrivalMinutes": 1316.55,
     "arrivalTime": "21:56:33",
@@ -41282,7 +41282,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 7,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 365,
     "arrivalMinutes": 501.0833333333333,
     "arrivalTime": "08:21:05",
@@ -41304,7 +41304,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 393,
     "arrivalMinutes": 501.55,
     "arrivalTime": "08:21:33",
@@ -41568,7 +41568,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 7,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 365,
     "arrivalMinutes": 526.0833333333334,
     "arrivalTime": "08:46:05",
@@ -41590,7 +41590,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 393,
     "arrivalMinutes": 526.55,
     "arrivalTime": "08:46:33",
@@ -41854,7 +41854,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 7,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 365,
     "arrivalMinutes": 551.0833333333334,
     "arrivalTime": "09:11:05",
@@ -41876,7 +41876,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 393,
     "arrivalMinutes": 551.55,
     "arrivalTime": "09:11:33",
@@ -42140,7 +42140,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 7,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 365,
     "arrivalMinutes": 576.0833333333334,
     "arrivalTime": "09:36:05",
@@ -42162,7 +42162,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 393,
     "arrivalMinutes": 576.55,
     "arrivalTime": "09:36:33",
@@ -42426,7 +42426,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 7,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 365,
     "arrivalMinutes": 601.0833333333334,
     "arrivalTime": "10:01:05",
@@ -42448,7 +42448,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 393,
     "arrivalMinutes": 601.55,
     "arrivalTime": "10:01:33",
@@ -42712,7 +42712,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 7,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 365,
     "arrivalMinutes": 626.0833333333334,
     "arrivalTime": "10:26:05",
@@ -42734,7 +42734,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 393,
     "arrivalMinutes": 626.55,
     "arrivalTime": "10:26:33",
@@ -42863,10 +42863,10 @@
     "tripSeq": 1,
     "departureTime": "11:25",
     "departureMinutes": 685,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 1,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 0,
     "arrivalMinutes": 685,
     "arrivalTime": "11:25:00",
@@ -42875,7 +42875,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0180",
@@ -42885,7 +42885,7 @@
     "tripSeq": 1,
     "departureTime": "11:25",
     "departureMinutes": 685,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 2,
     "stopName": "理学院",
@@ -42897,7 +42897,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0180",
@@ -42907,7 +42907,7 @@
     "tripSeq": 1,
     "departureTime": "11:25",
     "departureMinutes": 685,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 3,
     "stopName": "二食堂",
@@ -42919,7 +42919,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0180",
@@ -42929,7 +42929,7 @@
     "tripSeq": 1,
     "departureTime": "11:25",
     "departureMinutes": 685,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 4,
     "stopName": "图书馆",
@@ -42941,7 +42941,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0180",
@@ -42951,7 +42951,7 @@
     "tripSeq": 1,
     "departureTime": "11:25",
     "departureMinutes": 685,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 5,
     "stopName": "305教学楼",
@@ -42963,7 +42963,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0180",
@@ -42973,7 +42973,7 @@
     "tripSeq": 1,
     "departureTime": "11:25",
     "departureMinutes": 685,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 6,
     "stopName": "研究生宿舍楼",
@@ -42985,7 +42985,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0180",
@@ -42995,7 +42995,7 @@
     "tripSeq": 1,
     "departureTime": "11:25",
     "departureMinutes": 685,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 7,
     "stopName": "一食堂",
@@ -43007,7 +43007,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0180",
@@ -43017,7 +43017,7 @@
     "tripSeq": 1,
     "departureTime": "11:25",
     "departureMinutes": 685,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 8,
     "stopName": "2号宿舍楼",
@@ -43029,7 +43029,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0180",
@@ -43039,7 +43039,7 @@
     "tripSeq": 1,
     "departureTime": "11:25",
     "departureMinutes": 685,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 9,
     "stopName": "军体活动中心",
@@ -43051,7 +43051,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0180",
@@ -43061,7 +43061,7 @@
     "tripSeq": 1,
     "departureTime": "11:25",
     "departureMinutes": 685,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 10,
     "stopName": "网球场",
@@ -43073,7 +43073,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0180",
@@ -43083,7 +43083,7 @@
     "tripSeq": 1,
     "departureTime": "11:25",
     "departureMinutes": 685,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 11,
     "stopName": "激光所",
@@ -43095,7 +43095,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0180",
@@ -43105,10 +43105,10 @@
     "tripSeq": 1,
     "departureTime": "11:25",
     "departureMinutes": 685,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 12,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 889,
     "arrivalMinutes": 699.8166666666667,
     "arrivalTime": "11:39:49",
@@ -43117,7 +43117,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0180",
@@ -43127,10 +43127,10 @@
     "tripSeq": 1,
     "departureTime": "11:25",
     "departureMinutes": 685,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 13,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 917,
     "arrivalMinutes": 700.2833333333333,
     "arrivalTime": "11:40:17",
@@ -43139,7 +43139,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0181",
@@ -43149,10 +43149,10 @@
     "tripSeq": 2,
     "departureTime": "11:55",
     "departureMinutes": 715,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 1,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 0,
     "arrivalMinutes": 715,
     "arrivalTime": "11:55:00",
@@ -43161,7 +43161,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0181",
@@ -43171,7 +43171,7 @@
     "tripSeq": 2,
     "departureTime": "11:55",
     "departureMinutes": 715,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 2,
     "stopName": "理学院",
@@ -43183,7 +43183,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0181",
@@ -43193,7 +43193,7 @@
     "tripSeq": 2,
     "departureTime": "11:55",
     "departureMinutes": 715,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 3,
     "stopName": "二食堂",
@@ -43205,7 +43205,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0181",
@@ -43215,7 +43215,7 @@
     "tripSeq": 2,
     "departureTime": "11:55",
     "departureMinutes": 715,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 4,
     "stopName": "图书馆",
@@ -43227,7 +43227,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0181",
@@ -43237,7 +43237,7 @@
     "tripSeq": 2,
     "departureTime": "11:55",
     "departureMinutes": 715,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 5,
     "stopName": "305教学楼",
@@ -43249,7 +43249,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0181",
@@ -43259,7 +43259,7 @@
     "tripSeq": 2,
     "departureTime": "11:55",
     "departureMinutes": 715,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 6,
     "stopName": "研究生宿舍楼",
@@ -43271,7 +43271,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0181",
@@ -43281,7 +43281,7 @@
     "tripSeq": 2,
     "departureTime": "11:55",
     "departureMinutes": 715,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 7,
     "stopName": "一食堂",
@@ -43293,7 +43293,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0181",
@@ -43303,7 +43303,7 @@
     "tripSeq": 2,
     "departureTime": "11:55",
     "departureMinutes": 715,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 8,
     "stopName": "2号宿舍楼",
@@ -43315,7 +43315,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0181",
@@ -43325,7 +43325,7 @@
     "tripSeq": 2,
     "departureTime": "11:55",
     "departureMinutes": 715,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 9,
     "stopName": "军体活动中心",
@@ -43337,7 +43337,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0181",
@@ -43347,7 +43347,7 @@
     "tripSeq": 2,
     "departureTime": "11:55",
     "departureMinutes": 715,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 10,
     "stopName": "网球场",
@@ -43359,7 +43359,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0181",
@@ -43369,7 +43369,7 @@
     "tripSeq": 2,
     "departureTime": "11:55",
     "departureMinutes": 715,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 11,
     "stopName": "激光所",
@@ -43381,7 +43381,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0181",
@@ -43391,10 +43391,10 @@
     "tripSeq": 2,
     "departureTime": "11:55",
     "departureMinutes": 715,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 12,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 889,
     "arrivalMinutes": 729.8166666666667,
     "arrivalTime": "12:09:49",
@@ -43403,7 +43403,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0181",
@@ -43413,10 +43413,10 @@
     "tripSeq": 2,
     "departureTime": "11:55",
     "departureMinutes": 715,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 13,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 917,
     "arrivalMinutes": 730.2833333333333,
     "arrivalTime": "12:10:17",
@@ -43425,7 +43425,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0182",
@@ -43435,10 +43435,10 @@
     "tripSeq": 3,
     "departureTime": "12:25",
     "departureMinutes": 745,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 1,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 0,
     "arrivalMinutes": 745,
     "arrivalTime": "12:25:00",
@@ -43447,7 +43447,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0182",
@@ -43457,7 +43457,7 @@
     "tripSeq": 3,
     "departureTime": "12:25",
     "departureMinutes": 745,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 2,
     "stopName": "理学院",
@@ -43469,7 +43469,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0182",
@@ -43479,7 +43479,7 @@
     "tripSeq": 3,
     "departureTime": "12:25",
     "departureMinutes": 745,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 3,
     "stopName": "二食堂",
@@ -43491,7 +43491,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0182",
@@ -43501,7 +43501,7 @@
     "tripSeq": 3,
     "departureTime": "12:25",
     "departureMinutes": 745,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 4,
     "stopName": "图书馆",
@@ -43513,7 +43513,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0182",
@@ -43523,7 +43523,7 @@
     "tripSeq": 3,
     "departureTime": "12:25",
     "departureMinutes": 745,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 5,
     "stopName": "305教学楼",
@@ -43535,7 +43535,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0182",
@@ -43545,7 +43545,7 @@
     "tripSeq": 3,
     "departureTime": "12:25",
     "departureMinutes": 745,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 6,
     "stopName": "研究生宿舍楼",
@@ -43557,7 +43557,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0182",
@@ -43567,7 +43567,7 @@
     "tripSeq": 3,
     "departureTime": "12:25",
     "departureMinutes": 745,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 7,
     "stopName": "一食堂",
@@ -43579,7 +43579,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0182",
@@ -43589,7 +43589,7 @@
     "tripSeq": 3,
     "departureTime": "12:25",
     "departureMinutes": 745,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 8,
     "stopName": "2号宿舍楼",
@@ -43601,7 +43601,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0182",
@@ -43611,7 +43611,7 @@
     "tripSeq": 3,
     "departureTime": "12:25",
     "departureMinutes": 745,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 9,
     "stopName": "军体活动中心",
@@ -43623,7 +43623,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0182",
@@ -43633,7 +43633,7 @@
     "tripSeq": 3,
     "departureTime": "12:25",
     "departureMinutes": 745,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 10,
     "stopName": "网球场",
@@ -43645,7 +43645,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0182",
@@ -43655,7 +43655,7 @@
     "tripSeq": 3,
     "departureTime": "12:25",
     "departureMinutes": 745,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 11,
     "stopName": "激光所",
@@ -43667,7 +43667,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0182",
@@ -43677,10 +43677,10 @@
     "tripSeq": 3,
     "departureTime": "12:25",
     "departureMinutes": 745,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 12,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 889,
     "arrivalMinutes": 759.8166666666667,
     "arrivalTime": "12:39:49",
@@ -43689,7 +43689,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0182",
@@ -43699,10 +43699,10 @@
     "tripSeq": 3,
     "departureTime": "12:25",
     "departureMinutes": 745,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 13,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 917,
     "arrivalMinutes": 760.2833333333333,
     "arrivalTime": "12:40:17",
@@ -43711,7 +43711,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0183",
@@ -43856,7 +43856,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 7,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 365,
     "arrivalMinutes": 866.0833333333334,
     "arrivalTime": "14:26:05",
@@ -43878,7 +43878,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 393,
     "arrivalMinutes": 866.55,
     "arrivalTime": "14:26:33",
@@ -44142,7 +44142,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 7,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 365,
     "arrivalMinutes": 891.0833333333334,
     "arrivalTime": "14:51:05",
@@ -44164,7 +44164,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 393,
     "arrivalMinutes": 891.55,
     "arrivalTime": "14:51:33",
@@ -44428,7 +44428,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 7,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 365,
     "arrivalMinutes": 916.0833333333334,
     "arrivalTime": "15:16:05",
@@ -44450,7 +44450,7 @@
     "departureStation": "研究生宿舍楼",
     "routeKey": "HX3_NORMAL",
     "stopSeq": 8,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 393,
     "arrivalMinutes": 916.55,
     "arrivalTime": "15:16:33",
@@ -44579,10 +44579,10 @@
     "tripSeq": 7,
     "departureTime": "16:50",
     "departureMinutes": 1010,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 1,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 0,
     "arrivalMinutes": 1010,
     "arrivalTime": "16:50:00",
@@ -44591,7 +44591,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0186",
@@ -44601,7 +44601,7 @@
     "tripSeq": 7,
     "departureTime": "16:50",
     "departureMinutes": 1010,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 2,
     "stopName": "理学院",
@@ -44613,7 +44613,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0186",
@@ -44623,7 +44623,7 @@
     "tripSeq": 7,
     "departureTime": "16:50",
     "departureMinutes": 1010,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 3,
     "stopName": "二食堂",
@@ -44635,7 +44635,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0186",
@@ -44645,7 +44645,7 @@
     "tripSeq": 7,
     "departureTime": "16:50",
     "departureMinutes": 1010,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 4,
     "stopName": "图书馆",
@@ -44657,7 +44657,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0186",
@@ -44667,7 +44667,7 @@
     "tripSeq": 7,
     "departureTime": "16:50",
     "departureMinutes": 1010,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 5,
     "stopName": "305教学楼",
@@ -44679,7 +44679,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0186",
@@ -44689,7 +44689,7 @@
     "tripSeq": 7,
     "departureTime": "16:50",
     "departureMinutes": 1010,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 6,
     "stopName": "研究生宿舍楼",
@@ -44701,7 +44701,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0186",
@@ -44711,7 +44711,7 @@
     "tripSeq": 7,
     "departureTime": "16:50",
     "departureMinutes": 1010,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 7,
     "stopName": "一食堂",
@@ -44723,7 +44723,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0186",
@@ -44733,7 +44733,7 @@
     "tripSeq": 7,
     "departureTime": "16:50",
     "departureMinutes": 1010,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 8,
     "stopName": "2号宿舍楼",
@@ -44745,7 +44745,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0186",
@@ -44755,7 +44755,7 @@
     "tripSeq": 7,
     "departureTime": "16:50",
     "departureMinutes": 1010,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 9,
     "stopName": "军体活动中心",
@@ -44767,7 +44767,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0186",
@@ -44777,7 +44777,7 @@
     "tripSeq": 7,
     "departureTime": "16:50",
     "departureMinutes": 1010,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 10,
     "stopName": "网球场",
@@ -44789,7 +44789,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0186",
@@ -44799,7 +44799,7 @@
     "tripSeq": 7,
     "departureTime": "16:50",
     "departureMinutes": 1010,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 11,
     "stopName": "激光所",
@@ -44811,7 +44811,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0186",
@@ -44821,10 +44821,10 @@
     "tripSeq": 7,
     "departureTime": "16:50",
     "departureMinutes": 1010,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 12,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 889,
     "arrivalMinutes": 1024.8166666666666,
     "arrivalTime": "17:04:49",
@@ -44833,7 +44833,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0186",
@@ -44843,10 +44843,10 @@
     "tripSeq": 7,
     "departureTime": "16:50",
     "departureMinutes": 1010,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 13,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 917,
     "arrivalMinutes": 1025.2833333333333,
     "arrivalTime": "17:05:17",
@@ -44855,7 +44855,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0187",
@@ -44865,10 +44865,10 @@
     "tripSeq": 8,
     "departureTime": "17:20",
     "departureMinutes": 1040,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 1,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 0,
     "arrivalMinutes": 1040,
     "arrivalTime": "17:20:00",
@@ -44877,7 +44877,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0187",
@@ -44887,7 +44887,7 @@
     "tripSeq": 8,
     "departureTime": "17:20",
     "departureMinutes": 1040,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 2,
     "stopName": "理学院",
@@ -44899,7 +44899,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0187",
@@ -44909,7 +44909,7 @@
     "tripSeq": 8,
     "departureTime": "17:20",
     "departureMinutes": 1040,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 3,
     "stopName": "二食堂",
@@ -44921,7 +44921,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0187",
@@ -44931,7 +44931,7 @@
     "tripSeq": 8,
     "departureTime": "17:20",
     "departureMinutes": 1040,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 4,
     "stopName": "图书馆",
@@ -44943,7 +44943,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0187",
@@ -44953,7 +44953,7 @@
     "tripSeq": 8,
     "departureTime": "17:20",
     "departureMinutes": 1040,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 5,
     "stopName": "305教学楼",
@@ -44965,7 +44965,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0187",
@@ -44975,7 +44975,7 @@
     "tripSeq": 8,
     "departureTime": "17:20",
     "departureMinutes": 1040,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 6,
     "stopName": "研究生宿舍楼",
@@ -44987,7 +44987,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0187",
@@ -44997,7 +44997,7 @@
     "tripSeq": 8,
     "departureTime": "17:20",
     "departureMinutes": 1040,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 7,
     "stopName": "一食堂",
@@ -45009,7 +45009,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0187",
@@ -45019,7 +45019,7 @@
     "tripSeq": 8,
     "departureTime": "17:20",
     "departureMinutes": 1040,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 8,
     "stopName": "2号宿舍楼",
@@ -45031,7 +45031,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0187",
@@ -45041,7 +45041,7 @@
     "tripSeq": 8,
     "departureTime": "17:20",
     "departureMinutes": 1040,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 9,
     "stopName": "军体活动中心",
@@ -45053,7 +45053,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0187",
@@ -45063,7 +45063,7 @@
     "tripSeq": 8,
     "departureTime": "17:20",
     "departureMinutes": 1040,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 10,
     "stopName": "网球场",
@@ -45075,7 +45075,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0187",
@@ -45085,7 +45085,7 @@
     "tripSeq": 8,
     "departureTime": "17:20",
     "departureMinutes": 1040,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 11,
     "stopName": "激光所",
@@ -45097,7 +45097,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0187",
@@ -45107,10 +45107,10 @@
     "tripSeq": 8,
     "departureTime": "17:20",
     "departureMinutes": 1040,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 12,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 889,
     "arrivalMinutes": 1054.8166666666666,
     "arrivalTime": "17:34:49",
@@ -45119,7 +45119,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0187",
@@ -45129,10 +45129,10 @@
     "tripSeq": 8,
     "departureTime": "17:20",
     "departureMinutes": 1040,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 13,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 917,
     "arrivalMinutes": 1055.2833333333333,
     "arrivalTime": "17:35:17",
@@ -45141,7 +45141,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0188",
@@ -45151,10 +45151,10 @@
     "tripSeq": 9,
     "departureTime": "17:50",
     "departureMinutes": 1070,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 1,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 0,
     "arrivalMinutes": 1070,
     "arrivalTime": "17:50:00",
@@ -45163,7 +45163,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0188",
@@ -45173,7 +45173,7 @@
     "tripSeq": 9,
     "departureTime": "17:50",
     "departureMinutes": 1070,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 2,
     "stopName": "理学院",
@@ -45185,7 +45185,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0188",
@@ -45195,7 +45195,7 @@
     "tripSeq": 9,
     "departureTime": "17:50",
     "departureMinutes": 1070,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 3,
     "stopName": "二食堂",
@@ -45207,7 +45207,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0188",
@@ -45217,7 +45217,7 @@
     "tripSeq": 9,
     "departureTime": "17:50",
     "departureMinutes": 1070,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 4,
     "stopName": "图书馆",
@@ -45229,7 +45229,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0188",
@@ -45239,7 +45239,7 @@
     "tripSeq": 9,
     "departureTime": "17:50",
     "departureMinutes": 1070,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 5,
     "stopName": "305教学楼",
@@ -45251,7 +45251,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0188",
@@ -45261,7 +45261,7 @@
     "tripSeq": 9,
     "departureTime": "17:50",
     "departureMinutes": 1070,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 6,
     "stopName": "研究生宿舍楼",
@@ -45273,7 +45273,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0188",
@@ -45283,7 +45283,7 @@
     "tripSeq": 9,
     "departureTime": "17:50",
     "departureMinutes": 1070,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 7,
     "stopName": "一食堂",
@@ -45295,7 +45295,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0188",
@@ -45305,7 +45305,7 @@
     "tripSeq": 9,
     "departureTime": "17:50",
     "departureMinutes": 1070,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 8,
     "stopName": "2号宿舍楼",
@@ -45317,7 +45317,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0188",
@@ -45327,7 +45327,7 @@
     "tripSeq": 9,
     "departureTime": "17:50",
     "departureMinutes": 1070,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 9,
     "stopName": "军体活动中心",
@@ -45339,7 +45339,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0188",
@@ -45349,7 +45349,7 @@
     "tripSeq": 9,
     "departureTime": "17:50",
     "departureMinutes": 1070,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 10,
     "stopName": "网球场",
@@ -45361,7 +45361,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0188",
@@ -45371,7 +45371,7 @@
     "tripSeq": 9,
     "departureTime": "17:50",
     "departureMinutes": 1070,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 11,
     "stopName": "激光所",
@@ -45383,7 +45383,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0188",
@@ -45393,10 +45393,10 @@
     "tripSeq": 9,
     "departureTime": "17:50",
     "departureMinutes": 1070,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 12,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 889,
     "arrivalMinutes": 1084.8166666666666,
     "arrivalTime": "18:04:49",
@@ -45405,7 +45405,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0188",
@@ -45415,10 +45415,10 @@
     "tripSeq": 9,
     "departureTime": "17:50",
     "departureMinutes": 1070,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 13,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 917,
     "arrivalMinutes": 1085.2833333333333,
     "arrivalTime": "18:05:17",
@@ -45427,7 +45427,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0189",
@@ -45437,10 +45437,10 @@
     "tripSeq": 10,
     "departureTime": "21:00",
     "departureMinutes": 1260,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 1,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 0,
     "arrivalMinutes": 1260,
     "arrivalTime": "21:00:00",
@@ -45449,7 +45449,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0189",
@@ -45459,7 +45459,7 @@
     "tripSeq": 10,
     "departureTime": "21:00",
     "departureMinutes": 1260,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 2,
     "stopName": "理学院",
@@ -45471,7 +45471,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0189",
@@ -45481,7 +45481,7 @@
     "tripSeq": 10,
     "departureTime": "21:00",
     "departureMinutes": 1260,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 3,
     "stopName": "二食堂",
@@ -45493,7 +45493,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0189",
@@ -45503,7 +45503,7 @@
     "tripSeq": 10,
     "departureTime": "21:00",
     "departureMinutes": 1260,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 4,
     "stopName": "图书馆",
@@ -45515,7 +45515,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0189",
@@ -45525,7 +45525,7 @@
     "tripSeq": 10,
     "departureTime": "21:00",
     "departureMinutes": 1260,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 5,
     "stopName": "305教学楼",
@@ -45537,7 +45537,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0189",
@@ -45547,7 +45547,7 @@
     "tripSeq": 10,
     "departureTime": "21:00",
     "departureMinutes": 1260,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 6,
     "stopName": "研究生宿舍楼",
@@ -45559,7 +45559,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0189",
@@ -45569,7 +45569,7 @@
     "tripSeq": 10,
     "departureTime": "21:00",
     "departureMinutes": 1260,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 7,
     "stopName": "一食堂",
@@ -45581,7 +45581,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0189",
@@ -45591,7 +45591,7 @@
     "tripSeq": 10,
     "departureTime": "21:00",
     "departureMinutes": 1260,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 8,
     "stopName": "2号宿舍楼",
@@ -45603,7 +45603,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0189",
@@ -45613,7 +45613,7 @@
     "tripSeq": 10,
     "departureTime": "21:00",
     "departureMinutes": 1260,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 9,
     "stopName": "军体活动中心",
@@ -45625,7 +45625,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0189",
@@ -45635,7 +45635,7 @@
     "tripSeq": 10,
     "departureTime": "21:00",
     "departureMinutes": 1260,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 10,
     "stopName": "网球场",
@@ -45647,7 +45647,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0189",
@@ -45657,7 +45657,7 @@
     "tripSeq": 10,
     "departureTime": "21:00",
     "departureMinutes": 1260,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 11,
     "stopName": "激光所",
@@ -45669,7 +45669,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0189",
@@ -45679,10 +45679,10 @@
     "tripSeq": 10,
     "departureTime": "21:00",
     "departureMinutes": 1260,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 12,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 889,
     "arrivalMinutes": 1274.8166666666666,
     "arrivalTime": "21:14:49",
@@ -45691,7 +45691,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0189",
@@ -45701,10 +45701,10 @@
     "tripSeq": 10,
     "departureTime": "21:00",
     "departureMinutes": 1260,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 13,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 917,
     "arrivalMinutes": 1275.2833333333333,
     "arrivalTime": "21:15:17",
@@ -45713,7 +45713,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0190",
@@ -45723,10 +45723,10 @@
     "tripSeq": 11,
     "departureTime": "21:25",
     "departureMinutes": 1285,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 1,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 0,
     "arrivalMinutes": 1285,
     "arrivalTime": "21:25:00",
@@ -45735,7 +45735,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0190",
@@ -45745,7 +45745,7 @@
     "tripSeq": 11,
     "departureTime": "21:25",
     "departureMinutes": 1285,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 2,
     "stopName": "理学院",
@@ -45757,7 +45757,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0190",
@@ -45767,7 +45767,7 @@
     "tripSeq": 11,
     "departureTime": "21:25",
     "departureMinutes": 1285,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 3,
     "stopName": "二食堂",
@@ -45779,7 +45779,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0190",
@@ -45789,7 +45789,7 @@
     "tripSeq": 11,
     "departureTime": "21:25",
     "departureMinutes": 1285,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 4,
     "stopName": "图书馆",
@@ -45801,7 +45801,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0190",
@@ -45811,7 +45811,7 @@
     "tripSeq": 11,
     "departureTime": "21:25",
     "departureMinutes": 1285,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 5,
     "stopName": "305教学楼",
@@ -45823,7 +45823,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0190",
@@ -45833,7 +45833,7 @@
     "tripSeq": 11,
     "departureTime": "21:25",
     "departureMinutes": 1285,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 6,
     "stopName": "研究生宿舍楼",
@@ -45845,7 +45845,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0190",
@@ -45855,7 +45855,7 @@
     "tripSeq": 11,
     "departureTime": "21:25",
     "departureMinutes": 1285,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 7,
     "stopName": "一食堂",
@@ -45867,7 +45867,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0190",
@@ -45877,7 +45877,7 @@
     "tripSeq": 11,
     "departureTime": "21:25",
     "departureMinutes": 1285,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 8,
     "stopName": "2号宿舍楼",
@@ -45889,7 +45889,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0190",
@@ -45899,7 +45899,7 @@
     "tripSeq": 11,
     "departureTime": "21:25",
     "departureMinutes": 1285,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 9,
     "stopName": "军体活动中心",
@@ -45911,7 +45911,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0190",
@@ -45921,7 +45921,7 @@
     "tripSeq": 11,
     "departureTime": "21:25",
     "departureMinutes": 1285,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 10,
     "stopName": "网球场",
@@ -45933,7 +45933,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0190",
@@ -45943,7 +45943,7 @@
     "tripSeq": 11,
     "departureTime": "21:25",
     "departureMinutes": 1285,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 11,
     "stopName": "激光所",
@@ -45955,7 +45955,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0190",
@@ -45965,10 +45965,10 @@
     "tripSeq": 11,
     "departureTime": "21:25",
     "departureMinutes": 1285,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 12,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 889,
     "arrivalMinutes": 1299.8166666666666,
     "arrivalTime": "21:39:49",
@@ -45977,7 +45977,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0190",
@@ -45987,10 +45987,10 @@
     "tripSeq": 11,
     "departureTime": "21:25",
     "departureMinutes": 1285,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 13,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 917,
     "arrivalMinutes": 1300.2833333333333,
     "arrivalTime": "21:40:17",
@@ -45999,7 +45999,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0191",
@@ -46009,10 +46009,10 @@
     "tripSeq": 12,
     "departureTime": "21:50",
     "departureMinutes": 1310,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 1,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 0,
     "arrivalMinutes": 1310,
     "arrivalTime": "21:50:00",
@@ -46021,7 +46021,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0191",
@@ -46031,7 +46031,7 @@
     "tripSeq": 12,
     "departureTime": "21:50",
     "departureMinutes": 1310,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 2,
     "stopName": "理学院",
@@ -46043,7 +46043,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0191",
@@ -46053,7 +46053,7 @@
     "tripSeq": 12,
     "departureTime": "21:50",
     "departureMinutes": 1310,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 3,
     "stopName": "二食堂",
@@ -46065,7 +46065,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0191",
@@ -46075,7 +46075,7 @@
     "tripSeq": 12,
     "departureTime": "21:50",
     "departureMinutes": 1310,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 4,
     "stopName": "图书馆",
@@ -46087,7 +46087,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0191",
@@ -46097,7 +46097,7 @@
     "tripSeq": 12,
     "departureTime": "21:50",
     "departureMinutes": 1310,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 5,
     "stopName": "305教学楼",
@@ -46109,7 +46109,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0191",
@@ -46119,7 +46119,7 @@
     "tripSeq": 12,
     "departureTime": "21:50",
     "departureMinutes": 1310,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 6,
     "stopName": "研究生宿舍楼",
@@ -46131,7 +46131,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0191",
@@ -46141,7 +46141,7 @@
     "tripSeq": 12,
     "departureTime": "21:50",
     "departureMinutes": 1310,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 7,
     "stopName": "一食堂",
@@ -46153,7 +46153,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0191",
@@ -46163,7 +46163,7 @@
     "tripSeq": 12,
     "departureTime": "21:50",
     "departureMinutes": 1310,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 8,
     "stopName": "2号宿舍楼",
@@ -46175,7 +46175,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0191",
@@ -46185,7 +46185,7 @@
     "tripSeq": 12,
     "departureTime": "21:50",
     "departureMinutes": 1310,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 9,
     "stopName": "军体活动中心",
@@ -46197,7 +46197,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0191",
@@ -46207,7 +46207,7 @@
     "tripSeq": 12,
     "departureTime": "21:50",
     "departureMinutes": 1310,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 10,
     "stopName": "网球场",
@@ -46219,7 +46219,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0191",
@@ -46229,7 +46229,7 @@
     "tripSeq": 12,
     "departureTime": "21:50",
     "departureMinutes": 1310,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 11,
     "stopName": "激光所",
@@ -46241,7 +46241,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0191",
@@ -46251,10 +46251,10 @@
     "tripSeq": 12,
     "departureTime": "21:50",
     "departureMinutes": 1310,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 12,
-    "stopName": "高超楼",
+    "stopName": "空天楼",
     "cumulativeSeconds": 889,
     "arrivalMinutes": 1324.8166666666666,
     "arrivalTime": "22:04:49",
@@ -46263,7 +46263,7 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "departureId": "S0191",
@@ -46273,10 +46273,10 @@
     "tripSeq": 12,
     "departureTime": "21:50",
     "departureMinutes": 1310,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "routeKey": "HX3_GAOCHAO",
     "stopSeq": 13,
-    "stopName": "系统楼",
+    "stopName": "高超楼",
     "cumulativeSeconds": 917,
     "arrivalMinutes": 1325.2833333333333,
     "arrivalTime": "22:05:17",
@@ -46285,6 +46285,6 @@
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   }
 ]

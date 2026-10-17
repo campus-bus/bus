@@ -69,7 +69,7 @@ function todayStr(): string {
 }
 const planDate = ref(todayStr())
 const planOrigin = ref('研究生宿舍楼')
-const planDest = ref('系统楼')
+const planDest = ref('高超楼')
 const planDeadline = ref('20:00')
 const planResults = ref<PlanResult[]>([])
 const planShowAll = ref(false)
@@ -183,7 +183,7 @@ function togglePlanExpand(recordId: string) {
           <div class="plan-card-top" @click="togglePlanExpand(r.departure.recordId)">
             <RouteBadge :route="r.departure.route" :dining="r.departure.routeKey === 'HX1_DINING'" />
             <span class="plan-shift">{{ r.departure.shiftName }}</span>
-            <span class="plan-from" v-if="r.departure.isGaochaoDeparture">系统楼发车</span>
+            <span class="plan-from" v-if="r.departure.isGaochaoDeparture">高超楼发车</span>
             <van-icon name="arrow-down" class="plan-arrow" :class="{ rotated: planExpandedId === r.departure.recordId }" />
           </div>
           <div class="plan-card-body">
@@ -245,7 +245,7 @@ function togglePlanExpand(recordId: string) {
                 <div class="dep-left">
                   <RouteBadge :route="dep.route" :dining="isDining(dep)" />
                   <span class="dep-time">{{ dep.departureTime }}</span>
-                  <span class="dep-station" v-if="dep.isGaochaoDeparture">系统楼发车</span>
+                  <span class="dep-station" v-if="dep.isGaochaoDeparture">高超楼发车</span>
                 </div>
                 <div class="dep-right">
                   <span v-if="dep.confidence === 'speculative'" class="tag-spec">待确认</span>
@@ -265,7 +265,7 @@ function togglePlanExpand(recordId: string) {
               <div class="dep-left">
                 <RouteBadge :route="dep.route" :dining="isDining(dep)" />
                 <span class="dep-time">{{ dep.departureTime }}</span>
-                <span class="dep-station" v-if="dep.isGaochaoDeparture">系统楼发车</span>
+                <span class="dep-station" v-if="dep.isGaochaoDeparture">高超楼发车</span>
                 <span class="dep-shift-tag">{{ dep.shiftName }}</span>
               </div>
               <div class="dep-right">

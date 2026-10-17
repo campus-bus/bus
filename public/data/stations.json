@@ -42,7 +42,7 @@
     "serviceRoutes": "HX1_NORMAL"
   },
   {
-    "name": "系统楼",
+    "name": "高超楼",
     "lat": 28.270657,
     "lng": 113.036702,
     "serviceRoutes": "HX1_NORMAL,HX3_NORMAL,HX1_DINING,HX3_GAOCHAO"
@@ -102,7 +102,7 @@
     "serviceRoutes": "HX3_NORMAL,HX3_GAOCHAO"
   },
   {
-    "name": "高超楼",
+    "name": "空天楼",
     "lat": 28.27085,
     "lng": 113.037833,
     "serviceRoutes": "HX3_NORMAL,HX3_GAOCHAO"

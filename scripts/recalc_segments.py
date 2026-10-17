@@ -34,20 +34,26 @@ for rp in route_params:
         old_seg[key] = s["finalSegmentSeconds"]
 
 # ─── 3. 站名修正 ───
+# 站名沿革：
+#   2026-06-23 前：环线1路/就餐专线的"系统楼"曾记作"高超楼"，"网球场"曾记作"教勤连"
+#   2026-10-17 起：旧「高超楼」改名「空天楼」，旧「系统楼」改名「高超楼」
+#   数据库已于 2026-10-17 批量更新为新名，此函数兜底可能存在的未更新旧记录。
 def correct_station(route, seg_from, seg_to):
-    """修正历史站名"""
-    f, t = seg_from, seg_to
-    # 环线1路/就餐专线: 高超楼→系统楼
-    if route in ("环线1路", "就餐专线"):
-        if f == "高超楼": f = "系统楼"
-        if t == "高超楼": t = "系统楼"
-    # 环线3路: 教勤连→网球场
-    if route in ("环线3路", "环线3路(系统楼发车)"):
-        if f == "教勤连": f = "网球场"
-        if t == "教勤连": t = "网球场"
-        # 环线3路 GAOCHAO: 首发站 高超楼→系统楼
-        # (高超楼 在 HX3 路线上是独立站点，不需要改)
-    return f, t
+    """修正历史站名（对原始值直接映射，不链式）"""
+    def map_one(name):
+        # 旧"系统楼"（任何路线）→ 现行"高超楼"
+        if name == "系统楼":
+            return "高超楼"
+        # 旧"教勤连" → 网球场
+        if name == "教勤连":
+            return "网球场"
+        # 旧"高超楼"（仅环线3路系列存在的独立站，激光所之后）→ 空天楼
+        # 注意：环线1路/就餐专线的旧"高超楼"在 2026-06-23 已统一改为"系统楼"，
+        # 数据库中不可能再出现，故此处按环3口径映射为空天楼是安全的。
+        if name == "高超楼" and route in ("环线3路", "环线3路(系统楼发车)", "环线3路(高超楼发车)"):
+            return "空天楼"
+        return name
+    return map_one(seg_from), map_one(seg_to)
 
 # ─── 4. 按 (routeKey, from, to) 分组实测数据 ───
 # route name → routeKey mapping
@@ -55,7 +61,8 @@ name_to_key = {
     "环线1路": "HX1_NORMAL",
     "环线2路": "HX2_NORMAL",
     "环线3路": "HX3_NORMAL",
-    "环线3路(系统楼发车)": "HX3_GAOCHAO",
+    "环线3路(系统楼发车)": "HX3_GAOCHAO",   # 旧称（2026-10-17 前记录）
+    "环线3路(高超楼发车)": "HX3_GAOCHAO",   # 现行称
     "就餐专线": "HX1_DINING",
 }
 
@@ -195,7 +202,7 @@ route_names_display = {
     "HX1_DINING": "就餐专线（公交）",
     "HX2_NORMAL": "环线2路（接驳车）",
     "HX3_NORMAL": "环线3路（接驳车）",
-    "HX3_GAOCHAO": "环线3路系统楼发车（接驳车）",
+    "HX3_GAOCHAO": "环线3路高超楼发车（接驳车）",
 }
 
 for rk, stops in route_stops_seq.items():

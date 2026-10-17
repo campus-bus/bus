@@ -442,7 +442,7 @@ const nearbyStopArrivals = computed(() => {
                 <span class="bus-shift">{{ item.departure.shiftName }}</span>
               </div>
               <span v-if="item.departure.isGaochaoDeparture" class="tags-col">
-                <span class="bus-from">系统楼发车</span>
+                <span class="bus-from">高超楼发车</span>
                 <span class="depart-tag" :class="item.departed ? 'gone' : 'wait'">{{ item.departed ? '已发车' : '未发车' }}</span>
               </span>
               <span v-else class="depart-tag" :class="item.departed ? 'gone' : 'wait'">{{ item.departed ? '已发车' : '未发车' }}</span>
@@ -480,7 +480,7 @@ const nearbyStopArrivals = computed(() => {
             <span class="bus-shift">{{ item.departure?.shiftName }}</span>
           </div>
           <span v-if="item.departure?.isGaochaoDeparture" class="tags-col">
-            <span class="bus-from">系统楼发车</span>
+            <span class="bus-from">高超楼发车</span>
             <span class="depart-tag" :class="item.departed ? 'gone' : 'wait'">{{ item.departed ? '已发车' : '未发车' }}</span>
           </span>
           <span v-else class="depart-tag" :class="item.departed ? 'gone' : 'wait'">{{ item.departed ? '已发车' : '未发车' }}</span>
@@ -532,7 +532,7 @@ const nearbyStopArrivals = computed(() => {
                 <RouteBadge :route="item.departure.route" :dining="item.departure.routeKey === 'HX1_DINING'" />
                 <span class="bus-shift">{{ item.departure.shiftName }}</span>
               </div>
-              <span class="bus-from" v-if="item.departure.isGaochaoDeparture">系统楼发车</span>
+              <span class="bus-from" v-if="item.departure.isGaochaoDeparture">高超楼发车</span>
             </div>
             <div class="bus-card-right">
               <div class="departure-time">{{ item.departure.departureTime }}</div>

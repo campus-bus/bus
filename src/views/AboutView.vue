@@ -44,7 +44,7 @@ const scheduleStore = useScheduleStore()
       <ul>
         <li>环线1路仅在<strong>工作日</strong>运行</li>
         <li>标有"就餐"的车次走就餐专线，站点与普通环线1路不同</li>
-        <li>系统楼是系统工程学院所在地，就餐专线和环线3路部分车次在此发车</li>
+        <li>高超楼是系统工程学院所在地，就餐专线和环线3路部分车次在此发车</li>
       </ul>
     </div>
     <div class="section feedback">

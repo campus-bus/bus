@@ -109,14 +109,14 @@
     "tripSeq": 7,
     "departureTime": "11:15",
     "departureMinutes": 675,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "isGaochaoDeparture": true,
     "routeKey": "HX1_DINING",
-    "patternName": "环线1路就餐专线（系统楼发车）",
+    "patternName": "环线1路就餐专线（高超楼发车）",
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "recordId": "S0008",
@@ -126,14 +126,14 @@
     "tripSeq": 8,
     "departureTime": "11:30",
     "departureMinutes": 690,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "isGaochaoDeparture": true,
     "routeKey": "HX1_DINING",
-    "patternName": "环线1路就餐专线（系统楼发车）",
+    "patternName": "环线1路就餐专线（高超楼发车）",
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "recordId": "S0009",
@@ -143,14 +143,14 @@
     "tripSeq": 9,
     "departureTime": "11:50",
     "departureMinutes": 710,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "isGaochaoDeparture": true,
     "routeKey": "HX1_DINING",
-    "patternName": "环线1路就餐专线（系统楼发车）",
+    "patternName": "环线1路就餐专线（高超楼发车）",
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "recordId": "S0010",
@@ -160,14 +160,14 @@
     "tripSeq": 10,
     "departureTime": "12:10",
     "departureMinutes": 730,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "isGaochaoDeparture": true,
     "routeKey": "HX1_DINING",
-    "patternName": "环线1路就餐专线（系统楼发车）",
+    "patternName": "环线1路就餐专线（高超楼发车）",
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "recordId": "S0011",
@@ -177,14 +177,14 @@
     "tripSeq": 11,
     "departureTime": "12:30",
     "departureMinutes": 750,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "isGaochaoDeparture": true,
     "routeKey": "HX1_DINING",
-    "patternName": "环线1路就餐专线（系统楼发车）",
+    "patternName": "环线1路就餐专线（高超楼发车）",
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "recordId": "S0012",
@@ -704,14 +704,14 @@
     "tripSeq": 1,
     "departureTime": "16:15",
     "departureMinutes": 975,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "isGaochaoDeparture": true,
     "routeKey": "HX1_DINING",
-    "patternName": "环线1路就餐专线（系统楼发车）",
+    "patternName": "环线1路就餐专线（高超楼发车）",
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "recordId": "S0043",
@@ -721,14 +721,14 @@
     "tripSeq": 2,
     "departureTime": "16:30",
     "departureMinutes": 990,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "isGaochaoDeparture": true,
     "routeKey": "HX1_DINING",
-    "patternName": "环线1路就餐专线（系统楼发车）",
+    "patternName": "环线1路就餐专线（高超楼发车）",
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "recordId": "S0044",
@@ -738,14 +738,14 @@
     "tripSeq": 3,
     "departureTime": "16:50",
     "departureMinutes": 1010,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "isGaochaoDeparture": true,
     "routeKey": "HX1_DINING",
-    "patternName": "环线1路就餐专线（系统楼发车）",
+    "patternName": "环线1路就餐专线（高超楼发车）",
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "recordId": "S0045",
@@ -755,14 +755,14 @@
     "tripSeq": 4,
     "departureTime": "17:10",
     "departureMinutes": 1030,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "isGaochaoDeparture": true,
     "routeKey": "HX1_DINING",
-    "patternName": "环线1路就餐专线（系统楼发车）",
+    "patternName": "环线1路就餐专线（高超楼发车）",
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "recordId": "S0046",
@@ -772,14 +772,14 @@
     "tripSeq": 5,
     "departureTime": "17:30",
     "departureMinutes": 1050,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "isGaochaoDeparture": true,
     "routeKey": "HX1_DINING",
-    "patternName": "环线1路就餐专线（系统楼发车）",
+    "patternName": "环线1路就餐专线（高超楼发车）",
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "recordId": "S0047",
@@ -789,14 +789,14 @@
     "tripSeq": 6,
     "departureTime": "17:50",
     "departureMinutes": 1070,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "isGaochaoDeparture": true,
     "routeKey": "HX1_DINING",
-    "patternName": "环线1路就餐专线（系统楼发车）",
+    "patternName": "环线1路就餐专线（高超楼发车）",
     "driver": "",
     "vehicleNo": "",
     "confidence": "confirmed",
-    "remark": "原图打勾：从高超楼（系统工程学院旁）发车，并按就餐专线运行"
+    "remark": "原图打勾：从空天楼（系统工程学院旁）发车，并按就餐专线运行"
   },
   {
     "recordId": "S0048",
@@ -1911,14 +1911,14 @@
     "tripSeq": 5,
     "departureTime": "10:50",
     "departureMinutes": 650,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "isGaochaoDeparture": true,
     "routeKey": "HX3_GAOCHAO",
-    "patternName": "环线3路系统楼发车路线",
+    "patternName": "环线3路高超楼发车路线",
     "driver": "刘虎",
     "vehicleNo": "3号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "recordId": "S0114",
@@ -2149,14 +2149,14 @@
     "tripSeq": 6,
     "departureTime": "10:45",
     "departureMinutes": 645,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "isGaochaoDeparture": true,
     "routeKey": "HX3_GAOCHAO",
-    "patternName": "环线3路系统楼发车路线",
+    "patternName": "环线3路高超楼发车路线",
     "driver": "刘晓燕",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "recordId": "S0128",
@@ -2472,14 +2472,14 @@
     "tripSeq": 12,
     "departureTime": "16:50",
     "departureMinutes": 1010,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "isGaochaoDeparture": true,
     "routeKey": "HX3_GAOCHAO",
-    "patternName": "环线3路系统楼发车路线",
+    "patternName": "环线3路高超楼发车路线",
     "driver": "郭海燕",
     "vehicleNo": "5号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "recordId": "S0147",
@@ -2761,14 +2761,14 @@
     "tripSeq": 1,
     "departureTime": "11:25",
     "departureMinutes": 685,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "isGaochaoDeparture": true,
     "routeKey": "HX3_GAOCHAO",
-    "patternName": "环线3路系统楼发车路线",
+    "patternName": "环线3路高超楼发车路线",
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "recordId": "S0181",
@@ -2778,14 +2778,14 @@
     "tripSeq": 2,
     "departureTime": "11:55",
     "departureMinutes": 715,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "isGaochaoDeparture": true,
     "routeKey": "HX3_GAOCHAO",
-    "patternName": "环线3路系统楼发车路线",
+    "patternName": "环线3路高超楼发车路线",
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "recordId": "S0182",
@@ -2795,14 +2795,14 @@
     "tripSeq": 3,
     "departureTime": "12:25",
     "departureMinutes": 745,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "isGaochaoDeparture": true,
     "routeKey": "HX3_GAOCHAO",
-    "patternName": "环线3路系统楼发车路线",
+    "patternName": "环线3路高超楼发车路线",
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "recordId": "S0183",
@@ -2863,14 +2863,14 @@
     "tripSeq": 7,
     "departureTime": "16:50",
     "departureMinutes": 1010,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "isGaochaoDeparture": true,
     "routeKey": "HX3_GAOCHAO",
-    "patternName": "环线3路系统楼发车路线",
+    "patternName": "环线3路高超楼发车路线",
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "recordId": "S0187",
@@ -2880,14 +2880,14 @@
     "tripSeq": 8,
     "departureTime": "17:20",
     "departureMinutes": 1040,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "isGaochaoDeparture": true,
     "routeKey": "HX3_GAOCHAO",
-    "patternName": "环线3路系统楼发车路线",
+    "patternName": "环线3路高超楼发车路线",
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "recordId": "S0188",
@@ -2897,14 +2897,14 @@
     "tripSeq": 9,
     "departureTime": "17:50",
     "departureMinutes": 1070,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "isGaochaoDeparture": true,
     "routeKey": "HX3_GAOCHAO",
-    "patternName": "环线3路系统楼发车路线",
+    "patternName": "环线3路高超楼发车路线",
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "recordId": "S0189",
@@ -2914,14 +2914,14 @@
     "tripSeq": 10,
     "departureTime": "21:00",
     "departureMinutes": 1260,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "isGaochaoDeparture": true,
     "routeKey": "HX3_GAOCHAO",
-    "patternName": "环线3路系统楼发车路线",
+    "patternName": "环线3路高超楼发车路线",
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "recordId": "S0190",
@@ -2931,14 +2931,14 @@
     "tripSeq": 11,
     "departureTime": "21:25",
     "departureMinutes": 1285,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "isGaochaoDeparture": true,
     "routeKey": "HX3_GAOCHAO",
-    "patternName": "环线3路系统楼发车路线",
+    "patternName": "环线3路高超楼发车路线",
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   },
   {
     "recordId": "S0191",
@@ -2948,13 +2948,13 @@
     "tripSeq": 12,
     "departureTime": "21:50",
     "departureMinutes": 1310,
-    "departureStation": "系统楼",
+    "departureStation": "高超楼",
     "isGaochaoDeparture": true,
     "routeKey": "HX3_GAOCHAO",
-    "patternName": "环线3路系统楼发车路线",
+    "patternName": "环线3路高超楼发车路线",
     "driver": "夏文新",
     "vehicleNo": "4号车",
     "confidence": "confirmed",
-    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为高超楼站点发车"
+    "remark": "原图红色字体/打勾；按用户说明，系统工程学院发车折算为空天楼站点发车"
   }
 ]
