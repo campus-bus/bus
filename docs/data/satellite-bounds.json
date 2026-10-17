@@ -7,7 +7,7 @@
   "tileSize": 256,
   "imageWidth": 2816,
   "imageHeight": 2816,
-  "gcj02Bounds": {
+  "wgs84Bounds": {
     "north": 28.27743502704632,
     "south": 28.251843795986936,
     "west": 113.02841104366003,

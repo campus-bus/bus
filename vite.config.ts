@@ -31,7 +31,7 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
-  base: '/loop-ride-assistant/',
+  base: '/bus/',
   server: {
     host: '0.0.0.0',
     port: 5173,
