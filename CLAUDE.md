@@ -14,6 +14,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **地图**：静态卫星底图（ESRI World Imagery 瓦片拼接，JPEG ~6MB）+ SVG 路线/站点叠加层，零 API 调用
 - **数据库**：Supabase（measurements 表，存储用户乘车记录）
 - **部署**：GitHub Pages（`docs/` 目录），`npm run deploy` → commit → push master。直接推 master 即可（无需 dev-time-sim 分支）
+- **线上地址**：https://campus-bus.github.io/bus/ （2026-10-17 起；仓库托管于 campus-bus 组织，旧地址 liusizheng.github.io/loop-ride-assistant 已失效）
 
 ## 项目目录结构
 
