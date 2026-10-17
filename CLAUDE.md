@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 项目概述
 
-校园环线坐车 PWA —— 为国防科大校园师生提供校园环线公交车（环线1路、环线2路、环线3路、就餐专线）的发车时刻查询、到站时间预测、地图可视化、行程规划和乘车记录服务。
+校园环线坐车 PWA —— 为校园师生提供校园环线公交车（环线1路、环线2路、环线3路、就餐专线）的发车时刻查询、到站时间预测、地图可视化、行程规划和乘车记录服务。
 
 ## 技术栈
 
@@ -105,7 +105,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## 数据源
 
 核心数据文件：
-- `校园环线时刻表_秒级可校准版.xlsx` — 最终数据工作簿，包含 16 个工作表
+- `data/excel/校园环线时刻表_秒级可校准版.xlsx` — 最终数据工作簿，包含 16 个工作表
 - `public/data/` — 小程序运行时读取的 JSON 数据文件
 
 ### public/data/ JSON 文件

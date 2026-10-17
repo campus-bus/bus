@@ -3,7 +3,7 @@
 
 数据提取脚本：从 Excel 提取校园环线时刻表数据，生成 JSON 供 PWA 使用。
 
-输入: data/excel/国防科大校园环线时刻表_秒级可校准版 (1).xlsx
+输入: data/excel/校园环线时刻表_秒级可校准版.xlsx
 输出: data/departures.json, data/route_params.json, data/stations.json, data/arrival_predictions.json
 
 归档原因：
@@ -18,7 +18,7 @@ import os
 import math
 from collections import OrderedDict
 
-EXCEL_FILE = "data/excel/国防科大校园环线时刻表_秒级可校准版 (1).xlsx"
+EXCEL_FILE = "data/excel/校园环线时刻表_秒级可校准版.xlsx"
 OUTPUT_DIR = "public/data"
 WAYPOINT_FILE = "data/geo/站点经纬度信息路径细化.txt"
 
