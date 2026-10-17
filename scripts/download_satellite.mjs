@@ -142,14 +142,14 @@ async function main() {
 
   // 更新 bounds 元数据
   const boundsFile = path.join(__dirname, '..', 'public', 'data', 'satellite-bounds.json');
-  const gcj02Bounds = {
+  const wgs84Bounds = {
     north: BOUNDS.north, south: BOUNDS.south, west: BOUNDS.west, east: BOUNDS.east,
   };
   fs.writeFileSync(boundsFile, JSON.stringify({
     topLeftTile: { x: topLeft.x, y: topLeft.y },
     zoom: ZOOM, tileSize: TILE_SIZE,
     imageWidth: totalWidth, imageHeight: totalHeight,
-    gcj02Bounds,
+    wgs84Bounds,
   }, null, 2) + '\n');
 
   const sizeMB = (fs.statSync(OUTPUT).size / 1024 / 1024).toFixed(1);

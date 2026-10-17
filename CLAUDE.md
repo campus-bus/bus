@@ -15,6 +15,30 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **数据库**：Supabase（measurements 表，存储用户乘车记录）
 - **部署**：GitHub Pages（`docs/` 目录），`npm run deploy` → commit → push master。直接推 master 即可（无需 dev-time-sim 分支）
 
+## 项目目录结构
+
+```
+环线坐车小程序/
+├── src/                    # 前端源码（views/stores/composables/utils/components/types/router）
+├── public/                 # 运行时静态资源（data/*.json 数据、icons/ 公交图标）
+├── scripts/                # 活跃数据脚本（预测重生成、路段重估、卫星图下载）
+│   └── archive/            # 一次性历史脚本（仅供参考，勿运行）
+├── data/                   # 数据资料（不入运行时）
+│   ├── excel/              # 时刻表主数据工作簿
+│   ├── geo/                # 站点经纬度 txt（regenerate_from_txt.js 输入）
+│   ├── images/             # 原始时刻表/路线图照片
+│   ├── screenshots/        # 开发过程截图
+│   └── backups/            # 已移除数据的备份
+├── documentation/          # 开发文档（制作日志、路段预估方法）
+├── docs/                   # GitHub Pages 部署产物（npm run deploy 生成，勿手改）
+├── dist/                   # vite build 产物（已 gitignore）
+├── CLAUDE.md               # 本文件：AI 开发指南
+├── README.md               # 项目说明
+└── CHANGELOG.md            # 数据变更记录
+```
+
+各文件夹内均有 `README.md` 说明本文件夹职责，新接手的 Agent 可逐级阅读。
+
 ## 关键代码文件速查
 
 | 文件 | 职责 |
@@ -33,7 +57,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | `src/types/index.ts` | 全部 TypeScript 类型定义 |
 | `vite.config.ts` | Vite 配置（含 basicSsl 插件） |
 - **PWA**：vite-plugin-pwa，workbox generateSW 模式
-- **坐标系**：GCJ-02 ↔ WGS-84 转换（卫星瓦片用 WGS-84，站点数据用 GCJ-02）
+- **坐标系**：全项目统一 WGS-84（卫星瓦片、站点数据、GPS 定位均为 WGS-84，无坐标转换）
 
 ## 已实现的功能
 
@@ -94,7 +118,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | `route_stops.json` | 各路线站点坐标（含 lat, lng） |
 | `stations.json` | 所有站点字典（含 name, lat, lng, serviceRoutes） |
 | `route_paths.json` | 各路线折线坐标（用于地图绘制和离开检测） |
-| `satellite-bounds.json` | 卫星底图元数据（topLeftTile, zoom, tileSize, imageWidth, imageHeight, gcj02Bounds） |
+| `satellite-bounds.json` | 卫星底图元数据（topLeftTile, zoom, tileSize, imageWidth, imageHeight, wgs84Bounds） |
 | `campus-satellite.jpg` | 卫星底图 JPEG（2816×2816px，~1.5MB，ESRI 瓦片拼接） |
 
 ### 卫星底图工具
@@ -102,7 +126,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | 文件 | 用途 |
 |---|---|
 | `scripts/download_satellite.mjs` | 从 ESRI 下载卫星瓦片并拼接（锚点：北门北3km + 305教学楼南3km + 理学院西2km + 东门东2km） |
-| `src/utils/map_project.ts` | GCJ-02 → WGS-84 → 底图像素坐标投影（用于 SVG 叠加层定位） |
+| `src/utils/map_project.ts` | WGS-84 → 底图像素坐标投影（用于 SVG 叠加层定位） |
 
 ### 静态卫星地图架构
 
@@ -124,15 +148,15 @@ MapView.vue
 **卫星底图参数**：
 - 尺寸：2816 × 2816 px（正方形，zoom 17，11×11 瓦片拼接）
 - 边距：南北 600m，东西 800m
-- 瓦片参数：topLeftTile {x:106689, y:54795}，zoom 17，tileSize 256
+- 瓦片参数：topLeftTile {x:106688, y:54795}，zoom 17，tileSize 256
 - 压缩：JPEG quality 75，约 1.5MB
 - PWA 缓存上限：`maximumFileSizeToCacheInBytes: 10MB`
 
 **坐标投影（map_project.ts）**：
-1. GCJ-02 → WGS-84（反转偏移算法）
-2. WGS-84 → Web Mercator 瓦片坐标（zoom 17）
-3. 减去图片左上角瓦片偏移 → 底图像素坐标
-- 导出：`gcj02ToPixel(lng, lat)` 和 `gcj02ToWgs84(lng, lat)`
+1. WGS-84 → Web Mercator 瓦片坐标（zoom 17）
+2. 减去图片左上角瓦片偏移 → 底图像素坐标
+- 导出：`wgs84ToPixel(lng, lat)`
+- 站点/路线/GPS 数据均为 WGS-84，卫星底图同为 WGS-84，全程无坐标转换
 
 **交互行为**：
 - 拖拽：pointer events 实现单指拖拽
@@ -148,9 +172,11 @@ MapView.vue
 **定位功能**：使用浏览器原生 `navigator.geolocation`，**不调用任何第三方 API**。GPS 返回 WGS-84，经 `wgs84ToGcj02()` 转换后用于地图定位。
 
 **已废弃/删除的文件**：
-- `src/utils/amap.ts` — 高德 SDK 加载器（已无引用）
-- `src/utils/geo.ts` 中 GCJ-02 转换函数 — 已废弃，全部使用 WGS-84
+- `src/utils/amap.ts` — 高德 SDK 加载器（已删除）
+- `src/utils/geo.ts` 中 GCJ-02 转换函数 — 已删除，全部使用 WGS-84
+- `src/utils/map_project.ts` 中 `gcj02ToPixel`/`gcj02ToWgs84` — 已删除（2026-10-17 清理，无任何调用）
 - `src/components/common/AutoRecordPanel.vue` — UI 已隐藏（`UploadView.vue` 中不再引用）
+- `scripts/extract_data.py`、`scripts/fix_*.js`、`scripts/add_missing_stations.js` — 一次性历史脚本，已移至 `scripts/archive/`（2026-10-17）
 
 ### Excel 中关键工作表
 
@@ -177,7 +203,7 @@ MapView.vue
 | HX1_DINING | 就餐专线 | 系统楼 | 系统楼→理学院→二食堂→一食堂→305教学楼→5号宿舍楼→二食堂北→系统楼 |
 | HX2_NORMAL | 环线2路 | 研究生宿舍楼 | 研究生宿舍楼→一食堂→门诊部→1号宿舍楼→军体活动中心→水上训练中心→二食堂→5号宿舍楼→305教学楼→研究生宿舍楼 |
 | HX3_NORMAL | 环线3路普通 | 研究生宿舍楼 | 研究生宿舍楼→一食堂→2号宿舍楼→军体活动中心→网球场→激光所→高超楼→系统楼→理学院→二食堂→图书馆→305教学楼→研究生宿舍楼 |
-| HX3_GAOCHAO | 环线3路系统楼发车 | 系统楼 | 系统楼→理学院→二食堂→图书馆→305教学楼→研究生宿舍楼→一食堂→2号宿舍楼→军体活动中心→网球场→激光所→系统楼 |
+| HX3_GAOCHAO | 环线3路系统楼发车 | 系统楼 | 系统楼→理学院→二食堂→图书馆→305教学楼→研究生宿舍楼→一食堂→2号宿舍楼→军体活动中心→网球场→激光所→高超楼→系统楼 |
 
 ### 发车站点口径
 - 图片中红色字体和打钩车次 = 系统工程学院发车 = **系统楼发车**
@@ -187,7 +213,8 @@ MapView.vue
 ### 环线1路打钩车次 = 就餐专线
 - 环线1路中标注【系统/高超楼】的车次不走普通环线1路，而是走**就餐专线**
 - 就餐专线时间：11:30–12:30，16:30–18:00
-- 涉及车次：11:30、11:50、12:10、12:30、16:30、16:50、17:10、17:30、17:50
+- 涉及车次：11:15、11:30、11:50、12:10、12:30、16:15、16:30、16:50、17:10、17:30、17:50
+- 注：11:15（第一班 S0007）和 16:15（夜2 S0042）于 2026-07-22 合并至就餐专线，见 `CHANGELOG.md`
 
 ### 推测数据（需标注"待确认"）
 - 工作日环线2路第一班 17:10（推测）
@@ -200,7 +227,7 @@ MapView.vue
 - **实测数据**：33 条用户乘车记录（Supabase measurements 表），覆盖环线1路/2路/3路全部路段及就餐专线前半段
 - **推测数据**：17:10、21:30（仅工作日环线2路，已从实测初步验证）、所有预测到站时间、所有站间运行秒数（基于 33 条实测，环线2路部分段仅 N=1，置信度较低）
 - **原则**：不随意修改原始发车时刻，除非用户提供新的确认数据
-- **路段预估方法**：详见 `路段运行时间预估方法.md` — 公交/接驳车分开统计，N≥5去头尾均值，N≤4直接均值，N=0参照查找
+- **路段预估方法**：详见 `documentation/路段运行时间预估方法.md` — 公交/接驳车分开统计，N≥5去头尾均值，N≤4直接均值，N=0参照查找
 - **预估版本**：v2.0（2026-07-07，基于 33 条实测重新计算全部路线）
 
 ## 数据模型
@@ -296,11 +323,7 @@ MapView.vue
 npm run deploy    # vite build → dist/，然后复制 dist/ → docs/
 git add -A
 git commit -m "deploy: ..."
-git push          # 推到 dev-time-sim
-git checkout master
-git merge dev-time-sim --no-edit
-git push          # 推到 master，GitHub Pages 自动部署
-git checkout dev-time-sim
+git push          # 直接推 master，GitHub Pages 自动部署
 ```
 
 注意：`npm run build` 只输出到 `dist/`，GitHub Pages 读取的是 `docs/`，必须用 `npm run deploy`。
@@ -317,7 +340,7 @@ git checkout dev-time-sim
 
 用户实际乘车时可记录每站到站时间，计算站间实际秒数，填入 Excel 的 `秒级路线参数_可调整` 的"手动采用秒"列。自动记录功能已实现 GPS 自动采集段耗时并上传至 Supabase，可用于后续校准。
 
-**路段预估方法已标准化**，详见 `docs/路段运行时间预估方法.md`。该文档记录了：
+**路段预估方法已标准化**，详见 `documentation/路段运行时间预估方法.md`。该文档记录了：
 - 公交/接驳车分开统计的车型分类规则
 - N≥5去头尾取均值 / N≤4直接均值 的算法
 - 跨路线、跨车型的参照优先级
@@ -369,13 +392,13 @@ git checkout dev-time-sim
 
 | 班次 | 发车时间 |
 |------|----------|
-| 第一班 | 7:30, 8:00, 8:30, 9:00, 9:36, 10:15, 11:15【系统】, 11:30【系统】, 11:50【系统】, 12:10【系统】, 12:30【系统】 |
+| 第一班 | 7:30, 8:00, 8:30, 9:00, 9:36, 10:15, **11:15【系统·就餐】**, 11:30【系统】, 11:50【系统】, 12:10【系统】, 12:30【系统】 |
 | 第二班 | 7:40, 8:10, 8:40, 9:12, 9:48, 10:30, 11:00, 11:40, 12:10, 12:40, 14:12, 14:48, 15:40, 17:00, 17:30 |
 | 第三班 | 7:50, 8:20, 8:50, 9:24, 10:00, 10:45, 11:20, 12:00, 12:25, 14:00, 14:36, 15:20, 16:30, 17:15, 18:00 |
 | 第四班（夜1） | 14:24, 15:00, 16:00, 16:45, 17:45, 18:15, 18:45, 19:15, 19:45, 20:15, 20:45, 21:15, 21:45, 22:15 |
-| 第五班（夜2） | 16:15【系统】, 16:30【系统】, 16:50【系统】, 17:10【系统】, 17:30【系统】, 17:50【系统】, 18:30, 19:00, 19:30, 20:00, 20:30, 21:00, 21:30, 22:00, 22:30 |
+| 第五班（夜2） | **16:15【系统·就餐】**, 16:30【系统】, 16:50【系统】, 17:10【系统】, 17:30【系统】, 17:50【系统】, 18:30, 19:00, 19:30, 20:00, 20:30, 21:00, 21:30, 22:00, 22:30 |
 
-【系统】= 高超楼发车，走就餐专线
+【系统】= 系统楼发车，走就餐专线（原"高超楼发车"口径）；【系统·就餐】= 后并入就餐专线的车次
 
 ### 环线2路（仅工作日）
 
@@ -383,7 +406,7 @@ git checkout dev-time-sim
 - 第一班：7:35, 7:50, 8:05, 8:20, 8:35, 8:50, 9:10, 9:40, 10:10, 10:40, 11:15, 11:40, 12:00, 12:15, 12:30, 14:10, 16:20, 16:50, **17:10**（推测）
 - 第二班：14:25, 14:40, 15:00, 15:20, 15:40, 16:00, 16:35, 17:05, 17:35, 18:10, 18:25, 18:45, 19:15, 19:30, 19:50, 20:10, 20:40, 21:05, **21:30**（推测）
 
-> **2026-07-07 更新**：环线2路自即日起不再于周末/节假日运营。原周末班次（第一班 13趟 + 第二班 4趟，共 17 条发车记录）已从 `departures.json` 移除，备份于 `data_backups/hx2_weekend_departures_removed_2026-07-07.json`。
+> **2026-07-07 更新**：环线2路自即日起不再于周末/节假日运营。原周末班次（第一班 13趟 + 第二班 4趟，共 17 条发车记录）已从 `departures.json` 移除，备份于 `data/backups/hx2_weekend_departures_removed_2026-07-07.json`。
 
 ### 环线3路（工作日 + 周末）
 
@@ -487,7 +510,7 @@ git checkout dev-time-sim
 20. **细节完善**：StopInfoPanel 实时读秒 + 发车状态显示；手动记录增加 HX3_GAOCHAO；自动记录隐藏；公告栏更新；桌面定位修复；环线起终点同站差异化处理
 21. **Bug 修复**：车次突然消失 — `<keep-alive>` 保持 Tab 页状态避免 `selectedStop` 丢失；步行过滤器改为警告图标而非隐藏车次；MapView 切后台暂停 rAF 省电
 22. **路段预估更新 (v2.0)**：基于 33 条实测记录重新计算全部 5 条路线站间秒数；环线2路全部 9 段首次获得实测数据（全程 586→511s, -75s）；新增 `scripts/recalc_segments.py` 和 `scripts/apply_new_params.py` 辅助脚本
-23. **环线2路仅工作日**：移除 17 条周末/节假日发车记录，备份于 `data_backups/`；新增 `CHANGELOG.md` 记录所有数据变更
+23. **环线2路仅工作日**：移除 17 条周末/节假日发车记录，备份于 `data/backups/`；新增 `CHANGELOG.md` 记录所有数据变更
 
 关键决策：
 - 系统工程学院发车统一按高超楼处理
@@ -514,5 +537,5 @@ git checkout dev-time-sim
 13. dev server 使用 `@vitejs/plugin-basic-ssl` HTTPS，桌面 Chrome 需接受自签名证书才能使用定位
 14. Supabase visits 表 RLS 允许匿名 INSERT/SELECT，无需 service_role key
 15. 就餐专线 ×1.44 倍率（相比同路段普通公交），激光所→高超楼→系统楼 时间比 79:21
-16. 数据变更记录在 `CHANGELOG.md`；移除的历史发车记录备份在 `data_backups/` 目录
+16. 数据变更记录在 `CHANGELOG.md`；移除的历史发车记录备份在 `data/backups/` 目录
 17. 重新计算路段预估：运行 `python scripts/recalc_segments.py` 查看最新结果，`python scripts/apply_new_params.py` 写回 route_params.json，然后 `node scripts/regenerate_predictions.js` 重新生成预测

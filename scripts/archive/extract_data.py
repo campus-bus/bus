@@ -1,8 +1,15 @@
 """
+⚠️ 已归档：一次性历史脚本（Excel → JSON 初始数据提取），请勿直接运行。
+
 数据提取脚本：从 Excel 提取校园环线时刻表数据，生成 JSON 供 PWA 使用。
 
-输入: 国防科大校园环线时刻表_秒级可校准版 (1).xlsx
+输入: data/excel/国防科大校园环线时刻表_秒级可校准版 (1).xlsx
 输出: data/departures.json, data/route_params.json, data/stations.json, data/arrival_predictions.json
+
+归档原因：
+1. 初始数据已生成完毕，后续数据维护通过 regenerate_predictions.js / recalc_segments.py / apply_new_params.py 完成
+2. 本脚本内含已废弃的 WGS-84→GCJ-02 坐标转换逻辑（项目已全面改用 WGS-84，见 CLAUDE.md 坐标系说明）
+3. 路径常量已更新为整理后的新位置，仅供历史参考
 """
 
 import openpyxl
@@ -11,9 +18,9 @@ import os
 import math
 from collections import OrderedDict
 
-EXCEL_FILE = "国防科大校园环线时刻表_秒级可校准版 (1).xlsx"
+EXCEL_FILE = "data/excel/国防科大校园环线时刻表_秒级可校准版 (1).xlsx"
 OUTPUT_DIR = "public/data"
-WAYPOINT_FILE = "站点经纬度信息路径细化.txt"
+WAYPOINT_FILE = "data/geo/站点经纬度信息路径细化.txt"
 
 # ─── 物理模型参数 ───
 SPEED_KMH = 25.0          # 校园限速 km/h

@@ -1,5 +1,8 @@
-// 按照 txt 文件重新生成 route_stops.json 和 route_paths.json
+// 按照 txt 文件重新生成 route_stops.json、route_paths.json 和 stations.json
 // 每条路线独立处理，不混用同名站点坐标
+//
+// 坐标口径：txt 源文件与 public/data/*.json 全部为 WGS-84（与卫星底图同口径），
+// 直接存储，不做任何坐标转换。GCJ-02 转换已于静态卫星地图改造后废弃。
 
 import fs from 'fs';
 import path from 'path';
@@ -9,39 +12,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const DATA_DIR = path.join(__dirname, '..', 'public', 'data');
-const TXT_FILE = path.join(__dirname, '..', '站点经纬度信息路径细化.txt');
-
-// WGS-84 → GCJ-02 坐标转换
-function wgs84ToGcj02(lng, lat) {
-  const a = 6378245.0;
-  const ee = 0.006693421622965943;
-
-  function transformLat(x, y) {
-    let ret = -100.0 + 2.0 * x + 3.0 * y + 0.2 * y * y + 0.1 * x * y + 0.2 * Math.sqrt(Math.abs(x));
-    ret += (20.0 * Math.sin(6.0 * x * Math.PI) + 20.0 * Math.sin(2.0 * x * Math.PI)) * 2.0 / 3.0;
-    ret += (20.0 * Math.sin(y * Math.PI) + 40.0 * Math.sin(y / 3.0 * Math.PI)) * 2.0 / 3.0;
-    ret += (160.0 * Math.sin(y / 12.0 * Math.PI) + 320.0 * Math.sin(y * Math.PI / 30.0)) * 2.0 / 3.0;
-    return ret;
-  }
-
-  function transformLng(x, y) {
-    let ret = 300.0 + x + 2.0 * y + 0.1 * x * x + 0.1 * x * y + 0.1 * Math.sqrt(Math.abs(x));
-    ret += (20.0 * Math.sin(6.0 * x * Math.PI) + 20.0 * Math.sin(2.0 * x * Math.PI)) * 2.0 / 3.0;
-    ret += (20.0 * Math.sin(x * Math.PI) + 40.0 * Math.sin(x / 3.0 * Math.PI)) * 2.0 / 3.0;
-    ret += (150.0 * Math.sin(x / 12.0 * Math.PI) + 320.0 * Math.sin(x * Math.PI / 30.0)) * 2.0 / 3.0;
-    return ret;
-  }
-
-  const dlat = transformLat(lng - 105.0, lat - 35.0);
-  const dlng = transformLng(lng - 105.0, lat - 35.0);
-  const radlat = lat / 180.0 * Math.PI;
-  const magic = Math.sin(radlat);
-  const magic2 = 1 - ee * magic * magic;
-  const sqrtmagic = Math.sqrt(magic2);
-  const dlat2 = (dlat * 180.0) / ((a * (1 - ee)) / (magic2 * sqrtmagic) * Math.PI);
-  const dlng2 = (dlng * 180.0) / (a / sqrtmagic * Math.cos(radlat) * Math.PI);
-  return [lng + dlng2, lat + dlat2];
-}
+const TXT_FILE = path.join(__dirname, '..', 'data', 'geo', '站点经纬度信息路径细化.txt');
 
 // 路线键映射
 const ROUTE_KEY_MAP = {
@@ -94,9 +65,8 @@ for (const line of lines) {
     const lat = parseFloat(coordMatch[1]);
     const lng = parseFloat(coordMatch[2]);
 
-    // 转换为 GCJ-02
-    const [gcjLng, gcjLat] = wgs84ToGcj02(lng, lat);
-    routePaths[currentRouteKey].push([gcjLng, gcjLat]);
+    // WGS-84 坐标直接存储（path 元素为 [lng, lat]）
+    routePaths[currentRouteKey].push([lng, lat]);
 
     // 检查是否是站点行（不以 > 开头）
     if (!trimmed.startsWith('>')) {
@@ -114,11 +84,11 @@ for (const line of lines) {
 
           if (expectedStops && currentStopIndex < expectedStops.length) {
             if (stationName === expectedStops[currentStopIndex]) {
+              // 输出格式与线上数据一致：{ name, lat, lng }（顺序即站序，无冗余字段）
               routeStops[currentRouteKey].push({
                 name: stationName,
-                lat: gcjLat,
-                lng: gcjLng,
-                stopSeq: currentStopSeq,
+                lat: lat,
+                lng: lng,
               });
               console.log('  ✅ 找到站点: ' + stationName + ' (seq=' + currentStopSeq + ')');
               currentStopSeq++;
@@ -134,10 +104,36 @@ for (const line of lines) {
   }
 }
 
-// 验证结果
+// ─── 派生 HX3_GAOCHAO 的 route_stops ───
+// GAOCHAO 与 HX3_NORMAL 走同一物理环（坐标复用），仅起点为系统楼。
+// txt 中无其独立坐标，按 GAOCHAO 站序从 NORMAL 同名站取坐标派生。
+// 已验证：线上 GAOCHAO 全部坐标与 NORMAL 同名站一致（2026-10-17 对比）。
+const HX3_GAOCHAO_SEQ = ['系统楼', '理学院', '二食堂', '图书馆', '305教学楼', '研究生宿舍楼', '一食堂', '2号宿舍楼', '军体活动中心', '网球场', '激光所', '高超楼', '系统楼'];
+
+if (routeStops['HX3_NORMAL'] && routeStops['HX3_NORMAL'].length > 0) {
+  const normalByName = new Map(routeStops['HX3_NORMAL'].map(s => [s.name, s]));
+  const gaochaoStops = [];
+  let allFound = true;
+  for (const name of HX3_GAOCHAO_SEQ) {
+    const src = normalByName.get(name);
+    if (!src) {
+      console.log('  ⚠️  派生 HX3_GAOCHAO 失败：HX3_NORMAL 中不存在站点 ' + name);
+      allFound = false;
+      break;
+    }
+    gaochaoStops.push({ name: src.name, lat: src.lat, lng: src.lng });
+  }
+  if (allFound) {
+    routeStops['HX3_GAOCHAO'] = gaochaoStops;
+    console.log('✅ 已派生 HX3_GAOCHAO 站点（' + gaochaoStops.length + ' 站，坐标复用 HX3_NORMAL）');
+  }
+}
+
+// 验证结果（含派生的 HX3_GAOCHAO）
+const ALL_EXPECTED = { ...ROUTE_STOP_SEQUENCES, 'HX3_GAOCHAO': HX3_GAOCHAO_SEQ };
 console.log('\n📊 验证结果：\n');
 for (const [routeKey, stops] of Object.entries(routeStops)) {
-  const expected = ROUTE_STOP_SEQUENCES[routeKey];
+  const expected = ALL_EXPECTED[routeKey];
   const actual = stops.map(s => s.name);
 
   console.log(routeKey + ':');
@@ -170,6 +166,7 @@ fs.writeFileSync(
 console.log('✅ 已保存 route_paths.json');
 
 // 更新 stations.json（汇总所有站点，取第一个出现的坐标）
+// serviceRoutes：按 routeStops 键顺序（HX1,HX2,HX3,DINING,GAOCHAO）去重拼接，逗号无空格（与线上格式一致）
 const stationsDict = {};
 for (const [routeKey, stops] of Object.entries(routeStops)) {
   for (const stop of stops) {
@@ -181,12 +178,30 @@ for (const [routeKey, stops] of Object.entries(routeStops)) {
         serviceRoutes: routeKey,
       };
     } else {
-      stationsDict[stop.name].serviceRoutes += ', ' + routeKey;
+      const existing = stationsDict[stop.name].serviceRoutes.split(',');
+      if (!existing.includes(routeKey)) {
+        stationsDict[stop.name].serviceRoutes += ',' + routeKey;
+      }
     }
   }
 }
 
-const stations = Object.values(stationsDict);
+// 若 stations.json 已存在，保留线上人工校准的坐标（同名站在不同路线坐标略有差异，
+// 线上值为历史人工选定），仅更新 serviceRoutes 并补充新增站点
+let existingStations = [];
+try {
+  existingStations = JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'stations.json'), 'utf-8'));
+} catch { /* 首次生成，无既有文件 */ }
+const existingMap = new Map(existingStations.map(s => [s.name, s]));
+
+const stations = Object.values(stationsDict).map(s => {
+  const exist = existingMap.get(s.name);
+  if (exist && (exist.lat !== s.lat || exist.lng !== s.lng)) {
+    console.log('  📌 ' + s.name + ' 保留线上坐标 ' + exist.lat + ',' + exist.lng + '（txt 首现为 ' + s.lat + ',' + s.lng + '）');
+    return { ...s, lat: exist.lat, lng: exist.lng };
+  }
+  return s;
+});
 fs.writeFileSync(
   path.join(DATA_DIR, 'stations.json'),
   JSON.stringify(stations, null, 2),

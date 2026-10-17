@@ -1,5 +1,20 @@
 # 数据变更记录
 
+## 2026-10-17 — 项目结构规范化整理（无数据变更）
+
+**变更类型**：仓库整理（不影响运行时数据与功能）
+
+**变更明细**：
+- 根目录零散文件归档：7 张原始时刻表/路线图照片 → `data/images/`；Excel 工作簿 → `data/excel/`；3 个站点经纬度 txt → `data/geo/`；3 张开发截图 → `data/screenshots/`；`data_backups/` → `data/backups/`
+- 制作日志、路段预估方法文档 → `documentation/`
+- 一次性历史脚本（extract_data.py、fix_*.js、add_missing_stations.js）→ `scripts/archive/`
+- 代码清理：`src/utils/map_project.ts` 删除无引用的 `gcj02ToPixel`/`gcj02ToWgs84`；`scripts/regenerate_from_txt.js` 移除过时的 GCJ-02 转换（与线上 WGS-84 数据口径对齐）；`satellite-bounds.json` 字段 `gcj02Bounds` → `wgs84Bounds`
+- 各文件夹新增 `README.md` 说明职责
+
+**影响范围**：无运行时行为变化；`public/data/*.json` 数据未改动。
+
+---
+
 ## 2026-07-22 — 环线1路两趟车次合并至就餐专线
 
 **变更类型**：路线变更
@@ -44,7 +59,7 @@
 - `public/data/departures.json`：移除 17 条 HX2 周末/节假日发车记录（191→174）
 - `public/data/arrival_predictions.json`：重新生成，预测记录 2282→2112 条
 
-**移除的记录清单**（共 17 条，备份于 `data_backups/hx2_weekend_departures_removed_2026-07-07.json`）：
+**移除的记录清单**（共 17 条，备份于 `data/backups/hx2_weekend_departures_removed_2026-07-07.json`）：
 
 | recordId | 班次 | 发车时间 | 驾驶员 | 车号 |
 |----------|------|----------|--------|------|
@@ -66,4 +81,4 @@
 | S0172 | 第二班 | 21:25 | 孙五星 | 2号车 |
 | S0173 | 第二班 | 21:50 | 孙五星 | 2号车 |
 
-**恢复方法**：将 `data_backups/hx2_weekend_departures_removed_2026-07-07.json` 中的记录合并回 `departures.json`，然后运行 `node scripts/regenerate_predictions.js` 重新生成预测。
+**恢复方法**：将 `data/backups/hx2_weekend_departures_removed_2026-07-07.json` 中的记录合并回 `departures.json`，然后运行 `node scripts/regenerate_predictions.js` 重新生成预测。

@@ -1,62 +1,21 @@
 /**
- * GCJ-02 坐标 → 卫星底图像素坐标
+ * WGS-84 坐标 → 卫星底图像素坐标
  * 用于静态地图的 SVG 叠加层定位
+ *
+ * 坐标口径：站点、路线、GPS（浏览器原生返回）均为 WGS-84，
+ * 卫星底图（ESRI World Imagery）同样为 WGS-84，全程无需 GCJ-02 转换。
  */
 
-// 卫星底图参数（从 download_satellite.mjs 生成，固定不变）
+// 卫星底图参数（与 public/data/satellite-bounds.json 一致，由 download_satellite.mjs 生成）
 const TOP_LEFT_TILE_X = 106688
 const TOP_LEFT_TILE_Y = 54795
 const ZOOM = 17
 const TILE_SIZE = 256
 const N = 2 ** ZOOM
 
-// ─── GCJ-02 → WGS-84 反转 ───
-export function gcj02ToWgs84(lng: number, lat: number): { lat: number; lng: number } {
-  const a = 6378245.0
-  const ee = 0.006693421622965943
-
-  function transformLat(x: number, y: number): number {
-    let r = -100 + 2 * x + 3 * y + 0.2 * y * y + 0.1 * x * y + 0.2 * Math.sqrt(Math.abs(x))
-    r += (20 * Math.sin(6 * x * Math.PI) + 20 * Math.sin(2 * x * Math.PI)) * 2 / 3
-    r += (20 * Math.sin(y * Math.PI) + 40 * Math.sin(y / 3 * Math.PI)) * 2 / 3
-    r += (160 * Math.sin(y / 12 * Math.PI) + 320 * Math.sin(y * Math.PI / 30)) * 2 / 3
-    return r
-  }
-
-  function transformLng(x: number, y: number): number {
-    let r = 300 + x + 2 * y + 0.1 * x * x + 0.1 * x * y + 0.1 * Math.sqrt(Math.abs(x))
-    r += (20 * Math.sin(6 * x * Math.PI) + 20 * Math.sin(2 * x * Math.PI)) * 2 / 3
-    r += (20 * Math.sin(x * Math.PI) + 40 * Math.sin(x / 3 * Math.PI)) * 2 / 3
-    r += (150 * Math.sin(x / 12 * Math.PI) + 300 * Math.sin(x / 30 * Math.PI)) * 2 / 3
-    return r
-  }
-
-  const dlat = transformLat(lng - 105, lat - 35)
-  const dlng = transformLng(lng - 105, lat - 35)
-  const radlat = lat / 180 * Math.PI
-  const magic = Math.sin(radlat)
-  const m2 = 1 - ee * magic * magic
-  const sq = Math.sqrt(m2)
-
-  return {
-    lat: lat - (dlat * 180) / ((a * (1 - ee)) / (m2 * sq) * Math.PI),
-    lng: lng - (dlng * 180) / (a / sq * Math.cos(radlat) * Math.PI),
-  }
-}
-
-// ─── GCJ-02 → 底图像素坐标（仅用于用户 GPS 定位，GPS 已转为 GCJ-02）───
-export function gcj02ToPixel(lng: number, lat: number): { x: number; y: number } {
-  const wgs = gcj02ToWgs84(lng, lat)
-  return wgs84ToPixelRaw(wgs.lng, wgs.lat)
-}
-
-// ─── WGS-84 → 底图像素坐标（用于站点/路线数据，数据源为 Google Maps WGS-84）───
+/** WGS-84 经纬度 → 底图像素坐标 */
 export function wgs84ToPixel(lng: number, lat: number): { x: number; y: number } {
-  return wgs84ToPixelRaw(lng, lat)
-}
-
-// 底层：WGS-84 经纬度 → Web Mercator tile → 像素坐标
-function wgs84ToPixelRaw(lng: number, lat: number): { x: number; y: number } {
+  // WGS-84 → Web Mercator 瓦片坐标（zoom 17）→ 减去左上角瓦片偏移
   const tileX = ((lng + 180) / 360) * N
   const tileY = ((1 - Math.log(Math.tan(lat * Math.PI / 180) + 1 / Math.cos(lat * Math.PI / 180)) / Math.PI) / 2) * N
   return {
