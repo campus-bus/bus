@@ -4,7 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 项目概述
 
-校园环线坐车 PWA —— 为校园师生提供校园环线公交车（环线1路、就餐专线、接驳1路、接驳2路）的发车时刻查询、到站时间预测、地图可视化、行程规划和乘车记录服务。
+校园环线坐车 —— 为校园师生提供校园环线公交车（环线1路、就餐专线、接驳1路、接驳2路）的发车时刻查询、到站时间预测、地图可视化、行程规划和乘车记录服务。
+
+**双端形态（2026-10-18 起）**：
+- **H5 PWA 版**（`src/`）：https://campus-bus.github.io/bus/ ，主仓 `campus-bus/bus`，GitHub Pages 部署
+- **微信小程序版**（`apps/miniprogram/`）：uni-app Vue3 重构，腾讯 map 组件 + 微信云开发，**开发中（待发布）**
 
 > **2026-10-18 线路调整**：原环线2路与环线3路合并为一条接驳环线，双向运行——**接驳2路（逆时针）**与**接驳1路（顺时针，同一物理环反向）**；军体活动中心拆分为东侧/南侧两站；门诊部、1号宿舍楼、图书馆不再经停。环线1路与就餐专线不变。工作日时刻表已同步更新（132 条：环1 62 + 就餐 10 + 接驳1路 35 + 接驳2路 25）；**周末/节假日时刻表待补充，目前周末无任何车次**。旧环2/环3共 104 条班次已移除，备份于 `data/backups/hx2_hx3_departures_removed_2026-10-18.json`。
 
@@ -517,6 +521,75 @@ git push          # 直接推 master，GitHub Pages 自动部署
 - 环线起终点同站需要特殊处理（过滤 isDepartureStop 和 isReturnStop）
 - 部署使用 GitHub Pages（docs/ 目录）
 - 地图改用静态卫星底图，彻底移除高德 API 依赖
+
+## 微信小程序版（apps/miniprogram/）
+
+> 2026-10-18 启动移植。目标：主流量入口迁移至微信小程序；H5 版继续维护不撤。
+
+### 关键决策（为什么这样选型）
+
+| 决策 | 理由 |
+|---|---|
+| **uni-app Vue3 + TS + Vite** | 最大化复用 H5 逻辑（utils/stores 思路同源），未来可一码多端 |
+| **腾讯 `<map>` 组件** | 免费不限调用量（H5 时代因高德按量收费才改静态卫星图）；markers/polyline/rotate/show-location 原生支持，卫星图方案在小程序端彻底废弃 |
+| **微信云开发（云数据库+云函数）** | Supabase 域名无法过小程序 ICP 白名单；云开发免域名备案、原生集成、有免费体验期 |
+| **数据 import 加载** | `src/data/*.json` 打进包内（同步脚本压缩，总包 1.5MB < 2MB 限制），启动即读无网络请求；开启 `lazyCodeLoading` |
+| **WGS-84 定位 + GCJ-02 转换** | `uni.getLocation(type:'wgs84')` 与数据同系；仅腾讯地图显示层用 `utils/geo.ts` 的 `wgs84ToGcj02` 转换 |
+| **UI 原生组件重写** | Vant 不能在小程序用；第一版全部原生 view/text/picker/map 组件 + rpx，未引入 uv-ui（后续可按需） |
+
+### 云开发配置（已生效）
+
+- **AppID**：`wx9793b294a259ec3a`（个人主体，类目审核中）
+- **云环境 ID**：`campus-bus-d5q9cli14141d5144`（在 `src/App.vue` onLaunch 的 `wx.cloud.init` 中引用）
+- **云函数**（`cloudfunctions/`，需在开发者工具右键「上传并部署：云端安装依赖」）：
+  - `weather`：Open-Meteo 天气代理，云数据库 `weather_cache` 缓存 30 分钟
+  - `holidays`：holiday-cn 节假日，云数据库 `holiday_cache` 按年缓存，内置 2026 兜底
+- **云数据库集合**（首次写入自动创建，无需手动建）：`measurements`（乘车记录）、`visits`（访客统计）、`weather_cache`、`holiday_cache`
+- **数据库权限**：`measurements`/`visits` 需在云开发控制台改为「所有用户可读，仅创建者可写」（默认"仅创建者可读写"会导致他人记录不可见）
+- 注意：云函数出网无白名单限制（天气/节假日/GitHub 均可直连）
+
+### 目录与数据流
+
+```
+apps/miniprogram/
+├── src/
+│   ├── pages/{index,schedule,map,record,about}/   # 5 页，与 H5 一一对应
+│   ├── stores/      # schedule(import JSON)/location/upload/global-time
+│   ├── utils/       # 与 H5 同源（station_group/countdown/geo/bus_position/datetime/holidays/time）
+│   ├── composables/ # useGeolocation（WGS-84）
+│   ├── data/        # sync_miniprogram_data.js 生成（勿手改）
+│   └── static/icons/# 公交图标（暂沿用 H5 素材）
+├── cloudfunctions/  # weather / holidays
+└── project.config.json  # miniprogramRoot=dist/dev/mp-weixin, cloudfunctionRoot=cloudfunctions/
+```
+
+**数据同步流程**：改 `public/data/` → `node scripts/regenerate_predictions.js`（如涉及预测） → `node scripts/sync_miniprogram_data.js`（压缩同步到 `apps/miniprogram/src/data/`） → 两端各自构建发布。
+
+**逻辑双向同步约定**：`apps/miniprogram/src/utils/` 与 `src/utils/` 同名文件为复制关系（station_group/countdown/geo/bus_position/time 完全一致，datetime/holidays 为小程序适配版）。修改任一侧逻辑时，必须同步另一侧并跑 `node scripts/test_scenarios.cjs` 回归。
+
+### 踩坑记录（后续勿重蹈）
+
+1. **project.config.json 源码目录字段是 `miniprogramRoot`**，不是 `srcMiniprogramRoot`（后者是 uni-app 内部字段）。写错会导致微信开发者工具"模拟器启动失败"（已在 5a51338 修复）。
+2. **npm 直连安装超时**：本机直连 npmjs.org 会卡死，必须 `--registry=https://registry.npmmirror.com`。
+3. **pinia 版本冲突**：uni-app 自带 vue 版本与 pinia 3 不兼容，固定 `pinia@2.1.7 --legacy-peer-deps`。
+4. **云数据库权限默认"仅创建者可读写"**：访客统计/记录共享场景必须手动改权限。
+5. **tabBar 图标**：可纯文字不配 iconPath（本项目暂无图标素材，后续可补）。
+6. **AppID 与云环境 ID 是两个东西**：AppID（小程序后台→开发设置，wx 开头 16 位）≠ 云环境 ID（云开发控制台）。
+
+### 待办（按优先级）
+
+1. 微信开发者工具编译预览，逐页验收（首页/行程/地图/记录/关于）
+2. 云函数 weather/holidays 右键上传部署（云端安装依赖）
+3. 云数据库 `measurements`/`visits` 权限调整
+4. 小程序类目审核通过后：`npm run build:mp-weixin` → 开发者工具上传 → 后台提审发布
+5. Supabase `measurements`/`visits` 历史数据迁移到云数据库（JSON 导出→控制台导入，58+ 条）
+6. 访客统计埋点（useVisitorTracking 小程序版）+ 管理面板小程序版（AdminView）
+7. 可选增强：时间覆写调试面板（H5 已有）、tabBar 图标、BusStopTimeline 公交动画、订阅消息提醒（小程序独占能力）
+
+### H5 版继续维护
+
+- H5（campus-bus.github.io/bus）不撤，数据同源；正式发布小程序后在 H5 首页挂"小程序版上线"引导
+- 旧地址迁移页（`migration/`）继续服役于 liusizheng.github.io/loop-ride-assistant
 
 ## 关键注意事项
 
