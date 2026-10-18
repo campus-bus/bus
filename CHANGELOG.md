@@ -1,5 +1,12 @@
 # 数据变更记录
 
+## 2026-10-18 小程序端联调修复
+
+- **云环境 ID 修正**：`campus-bus-d5q9cli...` → `campus-bus-d5g9cli...`（单个字符错误导致云函数全部报 `[100003] Env Not Exists`）
+- **天气功能补齐**：新增 `src/composables/useWeather.ts` 与首页头部天气展示；云函数改用 `https` 模块（Node16 无全局 fetch）
+- **定位接口修复**：`dist/dev` 产物缺失 `requiredPrivateInfos`（两个 watcher 互相覆盖），清理后重启单个 watcher 解决
+- **云函数超时适配**：`weather`/`holidays` 均加入网络时间预算与容器内存缓存，保证 3 秒内返回；数据库集合缺失时静默降级
+
 ## 2026-10-18 — 微信小程序版工程建立（uni-app 移植）
 
 **变更类型**：项目结构（新增小程序端，无运行时数据变更）
@@ -12,7 +19,7 @@
 - 五个核心页面：首页/行程/地图/记录/关于（逻辑与 H5 同源）
 - 数据同步：`scripts/sync_miniprogram_data.js`（`public/data` 压缩同步到 `apps/miniprogram/src/data/`，922KB）
 - 云函数：`weather`、`holidays`（待上传部署）
-- 云开发配置：AppID `wx9793b294a259ec3a`、云环境 `campus-bus-d5q9cli14141d5144`
+- 云开发配置：AppID `wx9793b294a259ec3a`、云环境 `campus-bus-d5g9cli14141d5144`
 - 修复：`project.config.json` 字段名 `srcMiniprogramRoot`→`miniprogramRoot`（模拟器启动失败）
 
 **待办**：云函数上传部署、数据库权限调整（measurements/visits）、类目审核、Supabase 历史数据迁移、提审发布。详见 `CLAUDE.md` 微信小程序版章节。

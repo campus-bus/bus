@@ -540,7 +540,7 @@ git push          # 直接推 master，GitHub Pages 自动部署
 ### 云开发配置（已生效）
 
 - **AppID**：`wx9793b294a259ec3a`（个人主体，类目审核中）
-- **云环境 ID**：`campus-bus-d5q9cli14141d5144`（在 `src/App.vue` onLaunch 的 `wx.cloud.init` 中引用）
+- **云环境 ID**：`campus-bus-d5g9cli14141d5144`（在 `src/App.vue` onLaunch 的 `wx.cloud.init` 中引用）
 - **云函数**（`cloudfunctions/`，需在开发者工具右键「上传并部署：云端安装依赖」）：
   - `weather`：Open-Meteo 天气代理，云数据库 `weather_cache` 缓存 30 分钟
   - `holidays`：holiday-cn 节假日，云数据库 `holiday_cache` 按年缓存，内置 2026 兜底
@@ -579,6 +579,12 @@ apps/miniprogram/
 7. **云函数默认运行时是 Node 16，没有全局 `fetch`**：云函数里请求外部接口必须用 `https` 模块（`cloudfunctions/weather` 已按此实现）。若用 fetch 会直接抛错，前端只能静默降级（天气不显示、节假日退回内置兜底）。
 8. **云函数不部署 = 前端拿不到数据**：`wx.cloud.callFunction` 会 reject，前端必须 try/catch 静默降级，否则整页报错。排查"天气不显示"先看云函数是否已右键"上传并部署：云端安装依赖"。
 9. **automator 的 `callWxMethod('setStorageSync', ...)` 要传位置参数**：`(key, data)`，不能传 `{key, data}`（那是异步 `setStorage` 的写法），否则静默失败、回读为空。
+10. **云函数默认超时只有 3 秒**（运行时 `Nodejs16.13`），且函数目录下 `config.json` 里的 `timeout` **不生效**（实测仍是 3 秒），只能去云开发控制台改。因此 `weather`/`holidays` 都在代码里设了网络时间预算（2 秒），超时就降级返回，避免整个调用失败。
+11. **云数据库集合不会自动创建**：对不存在的集合 `add` 会报 `-502005 collection not exists`。集合读写必须包 try/catch 当"可选缓存"，否则云函数整体失败。需在控制台手动建 `weather_cache`、`holiday_cache` 才有缓存效果。
+12. **`requiredPrivateInfos` 在 dev 产物中丢失**：`dist/dev/mp-weixin/app.json` 缺该字段时，所有定位接口报 `the api need to be declared in the requiredPrivateInfos field`。根因是**同时跑了两个 `npm run dev:mp-weixin` watcher** 互相覆盖产物。排查：`Get-CimInstance Win32_Process` 查重 → 杀掉 → 删 `dist/dev` → 只启一个。
+13. **云环境 ID 少一个字符就 `[100003] Env Not Exists`**：本项目是 `campus-bus-d5g9cli14141d5144`（d5g9，不是 d5q9）。改 `App.vue` 后必须重新编译并重启小程序，`onLaunch` 才会重新 `cloud.init`。
+14. **`mp.evaluate` 返回响应式对象会卡死**：不要直接返回 pinia store 的值（proxy 无法序列化），改用 `String(...)` 拼原始值，或先写 storage 再 `callWxMethod('getStorageSync')` 读回。
+15. **文档类中文文件不要用 PowerShell `Set-Content` 改写**：PowerShell 5.1 默认输出 ANSI(GBK)，会把 UTF-8 中文写成乱码且不可逆。改文档一律用编辑器/工具或 Node 显式 `utf8` 读写。
 
 ### 待办（按优先级）
 

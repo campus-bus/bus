@@ -64,9 +64,18 @@ export function useGeolocation(options: { autoStart?: boolean } = {}) {
       },
       fail: (err) => {
         loading.value = false
-        if (err.errMsg?.includes('auth') || err.errMsg?.includes('deny')) {
+        const msg = err.errMsg || ''
+        // 保留原始错误，便于定位"首次点击就失败"这类配置问题
+        console.warn('[location] getLocation 失败:', msg)
+
+        if (msg.includes('auth') || msg.includes('deny')) {
           store.setPermissionDenied(true)
           error.value = '定位权限被拒绝'
+        } else if (msg.includes('requiredPrivateInfos')) {
+          // app.json 未声明定位接口（通常是构建产物缺字段或小程序未发布对应配置）
+          error.value = '当前版本未获得定位接口权限，请稍后再试'
+        } else if (msg.includes('system permission') || msg.includes('systemPermission')) {
+          error.value = '请在手机系统设置中允许微信使用定位'
         } else {
           error.value = '定位不可用，请稍后重试'
         }

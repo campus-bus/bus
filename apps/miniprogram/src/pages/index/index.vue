@@ -357,7 +357,7 @@ const showNotice = ref(false)
       </view>
 
       <view v-if="hasLocation && nearbySections.length === 0" class="hint-card">
-        <text>附近 200 米内暂无站点，可从上方列表手动选择</text>
+        <text>当前时段附近暂无到站车次，可从上方列表手动选择站点</text>
       </view>
     </template>
 

@@ -79,8 +79,8 @@ function readCache(): { info: WeatherInfo; fresh: boolean } | null {
   }
 }
 
-/** 调云函数拉取天气 */
-async function fetchFromCloud(): Promise<WeatherInfo | null> {
+/** 调云函数拉取天气（失败重试一次：云函数冷启动超时后容器已热，重试通常能成功） */
+async function fetchFromCloud(retry = 1): Promise<WeatherInfo | null> {
   try {
     const res = await wx.cloud.callFunction({ name: 'weather' })
     const r = res.result as { code: number; tempNow: number; tempMax: number; tempMin: number } | null
@@ -92,8 +92,12 @@ async function fetchFromCloud(): Promise<WeatherInfo | null> {
       tempMin: Math.round(r.tempMin),
     }
   } catch (e) {
-    // 云函数未部署（右键上传并部署）或网络异常：静默降级
-    console.warn('weather 云函数调用失败', e)
+    // 云函数未部署 / 未创建集合 / 冷启动超时都会走到这里
+    console.warn('[weather] 云函数调用失败', e)
+    if (retry > 0) {
+      await new Promise((r) => setTimeout(r, 1500))
+      return fetchFromCloud(retry - 1)
+    }
     return null
   }
 }

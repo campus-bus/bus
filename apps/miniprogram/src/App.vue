@@ -3,7 +3,8 @@ import { onLaunch } from '@dcloudio/uni-app'
 import { initHolidays } from '@/utils/holidays'
 
 // 云开发环境 ID（微信云开发控制台获取）
-const CLOUD_ENV = 'campus-bus-d5q9cli14141d5144'
+// 注意：是 d5g9，不是 d5q9——只差一个字符就会报 `[100003] Env Not Exists`
+const CLOUD_ENV = 'campus-bus-d5g9cli14141d5144'
 
 onLaunch(() => {
   // 初始化云开发
