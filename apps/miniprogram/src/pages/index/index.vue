@@ -39,7 +39,7 @@ const locationStore = useLocationStore()
 
 // ─── 定位（用户主动点击后才获取，不在加载时自动调用） ───
 const {
-  loading: locLoading, error: locError,
+  ready: locReady, loading: locLoading, error: locError,
   init: initLocation, requestLocation, openSetting, openPrivacyContract,
 } = useGeolocation()
 
@@ -292,7 +292,7 @@ const showNotice = ref(false)
     </view>
 
     <!-- 定位引导：用户点击「允许定位」后才获取位置，隐私协议由微信官方弹窗兜底 -->
-    <view v-if="!hasLocation" class="locate-card">
+    <view v-if="locReady && !hasLocation" class="locate-card">
       <view class="locate-head">
         <text class="locate-icon">📍</text>
         <view class="locate-texts">

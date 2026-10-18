@@ -16,6 +16,8 @@ export function useGeolocation(options: { autoStart?: boolean } = {}) {
   const store = useLocationStore()
   const error = ref<string | null>(null)
   const loading = ref(false)
+  /** 授权状态是否已检查完毕（避免已授权用户看到引导卡片闪现） */
+  const ready = ref(false)
   let watching = false
 
   function handleLocation(res: { latitude: number; longitude: number; accuracy?: number }) {
@@ -90,6 +92,7 @@ export function useGeolocation(options: { autoStart?: boolean } = {}) {
   function init(autoRequest = false) {
     wx.getSetting({
       success: (res) => {
+        ready.value = true
         const auth = res.authSetting['scope.userLocation']
         if (auth === true) {
           startWatch()
@@ -101,6 +104,10 @@ export function useGeolocation(options: { autoStart?: boolean } = {}) {
         }
         // undefined：从未询问过，首页等待用户点击引导卡片；地图页可直接请求
         if (autoRequest) requestLocation()
+      },
+      fail: () => {
+        // 读取授权状态失败时按"未授权"处理，用户仍可手动点击
+        ready.value = true
       },
     })
   }
@@ -143,5 +150,5 @@ export function useGeolocation(options: { autoStart?: boolean } = {}) {
     onUnmounted(stopWatch)
   }
 
-  return { error, loading, init, requestLocation, startWatch, stopWatch, openSetting, openPrivacyContract }
+  return { ready, error, loading, init, requestLocation, startWatch, stopWatch, openSetting, openPrivacyContract }
 }
