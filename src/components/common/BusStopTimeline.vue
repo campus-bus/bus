@@ -11,8 +11,14 @@ const props = withDefaults(defineProps<{
   showMapBtn?: boolean
   highlightStop?: string
   highlightOrigin?: string
+  /** 目的地精确高亮位置（stopSeq，1 起）：同名站一圈多次出现时指定实际下车点 */
+  highlightDestSeq?: number
+  /** 起点精确高亮位置（stopSeq，1 起）：同名站一圈多次出现时指定实际上车点 */
+  highlightOriginSeq?: number
 }>(), {
   showMapBtn: true,
+  highlightDestSeq: undefined,
+  highlightOriginSeq: undefined,
 })
 
 const emit = defineEmits<{
@@ -99,8 +105,12 @@ function handleViewOnMap() {
   emit('view-on-map', props.departureId, props.routeKey)
 }
 
-// 判断是否应高亮：终点只高亮最后一次出现；起点高亮第一次出现
+// 判断是否应高亮：优先按精确 stopSeq（同名站多次出现时指定实际位置）；
+// 未指定时回退到 终点最后一次出现 / 起点第一次出现
 function isDestHighlighted(stopName: string, idx: number): boolean {
+  if (props.highlightDestSeq !== undefined) {
+    return idx === props.highlightDestSeq - 1 // stops 0-based，stopSeq 1-based
+  }
   if (!props.highlightStop || stopName !== props.highlightStop) return false
   const s = stops.value
   let lastIdx = idx
@@ -110,6 +120,9 @@ function isDestHighlighted(stopName: string, idx: number): boolean {
   return idx === lastIdx
 }
 function isOriginHighlighted(stopName: string, idx: number): boolean {
+  if (props.highlightOriginSeq !== undefined) {
+    return idx === props.highlightOriginSeq - 1
+  }
   if (!props.highlightOrigin || stopName !== props.highlightOrigin) return false
   const s = stops.value
   let firstIdx = idx

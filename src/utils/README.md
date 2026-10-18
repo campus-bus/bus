@@ -10,6 +10,7 @@
 | `bus_position.ts` | 公交实时位置推算：按发车时间 + `cumulativeSeconds` 定位当前段，沿 `route_paths.json` 折线按时间比例插值；`findClosestPathIndex` 的 `maxSearch` 限制搜索范围，防环线首尾同站误匹配远端 |
 | `map_project.ts` | WGS-84 → Web Mercator（zoom 17）→ 卫星底图像素坐标（`wgs84ToPixel`）；底图参数与 `public/data/satellite-bounds.json` 一致 |
 | `supabase.ts` | Supabase 客户端单例（`VITE_SUPABASE_URL`/`VITE_SUPABASE_ANON_KEY` 环境变量） |
+| `station_group.ts` | 站点分组（军体活动中心={东,南}、二食堂={二食堂,二食堂北}）与 `findBestRide` 最优乘车组合：枚举 上车站×下车站 全部位置组合取乘坐时间最短，解决接驳环线同名站一圈两次经过时误选远端上车点的问题 |
 
 ## 坐标系约定
 

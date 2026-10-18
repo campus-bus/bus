@@ -4,6 +4,7 @@ import { useScheduleStore } from '@/stores/schedule'
 import { getDateType } from '@/utils/datetime'
 import { getDateLabel } from '@/utils/holidays'
 import { getNow } from '@/utils/time'
+import { toGroup, groupMembers, findBestRide } from '@/utils/station_group'
 import type { RouteName, DateType, Departure } from '@/types'
 import RouteBadge from '@/components/common/RouteBadge.vue'
 import BusStopTimeline from '@/components/common/BusStopTimeline.vue'
@@ -13,9 +14,11 @@ interface PlanResult {
   boardStop: string
   boardTime: string
   boardMinutes: number
+  boardSeq: number
   destStop: string
   destTime: string
   destMinutes: number
+  destSeq: number
   isBoardDeparture: boolean
 }
 
@@ -84,14 +87,21 @@ const planDateLabel = computed(() => {
 })
 
 const allStops = computed(() => {
+  // 站点按组聚合显示：军体活动中心东/南 → 军体活动中心，二食堂/二食堂北 → 二食堂
+  // 用户无需区分东/南，系统按目的地自动匹配最优具体站
   const names = new Set<string>()
   for (const rp of scheduleStore.routePatterns) {
-    for (const s of rp.stops) names.add(s.currentStop)
+    for (const s of rp.stops) names.add(toGroup(s.currentStop))
   }
-  // 按首页点击频次排序
+  // 按首页点击频次排序（组频次 = 成员频次之和）
   let freq: Record<string, number> = {}
   try { freq = JSON.parse(localStorage.getItem('stop_click_freq') || '{}') } catch {}
-  return [...names].sort((a, b) => (freq[b] || 0) - (freq[a] || 0))
+  const groupFreq: Record<string, number> = {}
+  for (const [stop, f] of Object.entries(freq)) {
+    const g = toGroup(stop)
+    groupFreq[g] = (groupFreq[g] || 0) + f
+  }
+  return [...names].sort((a, b) => (groupFreq[b] || 0) - (groupFreq[a] || 0))
 })
 
 // 重置，避免切换模式后不同日期类型混淆
@@ -104,28 +114,32 @@ function doSearch() {
   const dt = planDateType.value
   const results: PlanResult[] = []
 
+  // 起止站按组展开（如 军体活动中心 → [军体活动中心东, 军体活动中心南]）
+  const originMembers = groupMembers(planOrigin.value)
+  const destMembers = groupMembers(planDest.value)
+
   for (const r of routes) {
     const deps = scheduleStore.getDepartures(dt, r)
     for (const dep of deps) {
       const preds = scheduleStore.predictions
         .filter(p => p.departureId === dep.recordId)
         .sort((a, b) => a.stopSeq - b.stopSeq)
-      const originIdx = preds.findIndex(p => p.stopName === planOrigin.value)
-      if (originIdx < 0) continue
-      const destIdx = preds.findIndex((p, i) => i > originIdx && p.stopName === planDest.value)
-      if (destIdx < 0) continue
-      const destPred = preds[destIdx]
-      if (destPred.arrivalMinutes > deadlineMin) continue
-      const originPred = preds[originIdx]
+      // 枚举所有 上车站×下车站 位置组合，取乘坐时间最短的方案
+      // （接驳环线同名站一圈经过两次，避免误选远端上车点绕大圈）
+      const best = findBestRide(preds, originMembers, destMembers)
+      if (!best) continue
+      if (best.dest.arrivalMinutes > deadlineMin) continue
       results.push({
         departure: dep,
-        boardStop: originPred.stopName,
-        boardTime: originPred.arrivalTime,
-        boardMinutes: originPred.arrivalMinutes,
-        destStop: destPred.stopName,
-        destTime: destPred.arrivalTime,
-        destMinutes: destPred.arrivalMinutes,
-        isBoardDeparture: originPred.isDepartureStop,
+        boardStop: best.origin.stopName,
+        boardTime: best.origin.arrivalTime,
+        boardMinutes: best.origin.arrivalMinutes,
+        boardSeq: best.origin.stopSeq,
+        destStop: best.dest.stopName,
+        destTime: best.dest.arrivalTime,
+        destMinutes: best.dest.arrivalMinutes,
+        destSeq: best.dest.stopSeq,
+        isBoardDeparture: best.origin.isDepartureStop,
       })
     }
   }
@@ -201,8 +215,10 @@ function togglePlanExpand(recordId: string) {
             v-if="planExpandedId === r.departure.recordId"
             :departure-id="r.departure.recordId"
             :route-key="r.departure.routeKey"
-            :highlight-stop="planDest"
-            :highlight-origin="planOrigin"
+            :highlight-stop="r.destStop"
+            :highlight-origin="r.boardStop"
+            :highlight-dest-seq="r.destSeq"
+            :highlight-origin-seq="r.boardSeq"
             :show-map-btn="false"
           />
         </div>

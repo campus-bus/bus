@@ -11,6 +11,7 @@ import { getDateLabel } from '@/utils/holidays'
 import { findNearestStop, findNearestStops, formatWalkTime } from '@/utils/geo'
 import { getSecondsSinceMidnight } from '@/utils/datetime'
 import { arrivalCountdown, departureCountdown } from '@/utils/countdown'
+import { toGroup, groupMembers, findBestRide } from '@/utils/station_group'
 import RouteBadge from '@/components/common/RouteBadge.vue'
 import ETAIndicator from '@/components/common/ETAIndicator.vue'
 import BusStopTimeline from '@/components/common/BusStopTimeline.vue'
@@ -38,6 +39,10 @@ interface StopArrivalItem {
   boardStatus?: string
   boardTime?: string
   destArrivalTime?: string
+  /** 上车点在班次序列中的 stopSeq（同名站多次经过时精确定位） */
+  boardSeq?: number
+  /** 到达站在班次序列中的 stopSeq */
+  destSeq?: number
 }
 
 interface DepartingSoonItem {
@@ -73,11 +78,19 @@ const secondsNow = computed(() => { void nowTick.value; return getSecondsSinceMi
 const clickFreq = ref<Record<string, number>>({})
 // 排序用的冻结频次（仅在 onMounted / 数据加载时从 localStorage 读取，避免点击后立即跳位）
 const sortOrder = ref<Record<string, number>>({})
-// 站点按冻结频次排序
+// 组频次 = 成员频次之和（兼容旧的具体站频次数据，如「军体活动中心东」计入「军体活动中心」）
+const groupSortOrder = computed(() => {
+  const agg: Record<string, number> = {}
+  for (const [stop, f] of Object.entries(sortOrder.value)) {
+    const g = toGroup(stop)
+    agg[g] = (agg[g] || 0) + f
+  }
+  return agg
+})
+// 站点按组聚合显示（军体活动中心东/南 → 军体活动中心），按冻结频次排序
 const sortedStops = computed(() => {
-  const stops = [...scheduleStore.stations.map(s => s.name)]
-  stops.sort((a, b) => (sortOrder.value[b] || 0) - (sortOrder.value[a] || 0))
-  return stops
+  const groups = new Set(scheduleStore.stations.map(s => toGroup(s.name)))
+  return [...groups].sort((a, b) => (groupSortOrder.value[b] || 0) - (groupSortOrder.value[a] || 0))
 })
 // 是否由用户手动点选过站点（手动点选后不自动覆盖）
 const userManuallySelected = ref(false)
@@ -190,94 +203,93 @@ function routeBorderColor(routeKey?: string): string {
   return ROUTE_COLORS[routeKey || ''] || '#6B7280'
 }
 
-// 当前选中站点作为目的地的车次推荐
+// 班次预测索引（departureId → 预测列表），避免每秒重复全表扫描
+const predsByDeparture = computed(() => {
+  const map = new Map<string, ArrivalPrediction[]>()
+  for (const p of scheduleStore.predictions) {
+    const list = map.get(p.departureId)
+    if (list) list.push(p)
+    else map.set(p.departureId, [p])
+  }
+  return map
+})
+
+// 当前选中站点（组）作为目的地的车次推荐
 const stopArrivals = computed(() => {
   if (!selectedStop.value) return []
-  const destStop = selectedStop.value
-  const preds = scheduleStore.getPredictionsForStop(destStop, dateType.value)
+  // 目的地按组展开（军体活动中心 → [军体活动中心东, 军体活动中心南]），用户无需区分东/南
+  const destMembers = groupMembers(selectedStop.value)
   const results: StopArrivalItem[] = []
 
   const hasGps = mapStore.userLat !== null
   const WALK_SPEED = 1.3 // m/s
 
   if (hasGps) {
-    // 检查选中的站点是否在 200m 范围内 → 展示该站过站车次（非多起点）
-    const isNearby = findNearestStops(mapStore.userLat!, mapStore.userLng!, scheduleStore.stations, 3, 200)
-      .some(c => c.station.name === destStop)
+    const nearStops = findNearestStops(mapStore.userLat!, mapStore.userLng!, scheduleStore.stations, 3, 200)
 
-    if (isNearby) {
-      // 和默认视图一样：只展示这个站的到站车次
-      for (const p of preds) {
-        // 环线起终点同站：isDepartureStop 是发车不是到站，isReturnStop 是绕一圈回来
-        // 两者都不适合作为"到达此站"展示，保留中途经过的到站记录即可
-        if (p.isReturnStop || p.isDepartureStop) continue
-        const dep = scheduleStore.departures.find(d => d.recordId === p.departureId)
-        if (!dep) continue
-        const secondsUntil = Math.round(p.arrivalMinutes * 60 - secondsNow.value)
-        if (secondsUntil < -300 || secondsUntil > 3600) continue
-        const { label, status } = arrivalCountdown(secondsUntil)
-        results.push({
-          departure: dep,
-          destStop,
-          secondsUntil,
-          label,
-          status,
-          arrivalTime: p.arrivalTime,
-          departed: (dep.departureMinutes * 60) <= secondsNow.value,
-        })
+    // 目的地就在附近（组内任一成员站 200m 内）→ 展示组成员的到站车次
+    if (nearStops.some(c => destMembers.includes(c.station.name))) {
+      for (const dep of scheduleStore.departures) {
+        if (dep.dateType !== dateType.value) continue
+        const depPreds = predsByDeparture.value.get(dep.recordId) || []
+        for (const p of depPreds) {
+          if (!destMembers.includes(p.stopName)) continue
+          // isDepartureStop 是发车不是到站，isReturnStop 是绕一圈回来：都不作为"到达此站"展示
+          if (p.isReturnStop || p.isDepartureStop) continue
+          const secondsUntil = Math.round(p.arrivalMinutes * 60 - secondsNow.value)
+          if (secondsUntil < -300 || secondsUntil > 3600) continue
+          const { label, status } = arrivalCountdown(secondsUntil)
+          results.push({
+            departure: dep,
+            destStop: p.stopName,
+            secondsUntil,
+            label,
+            status,
+            arrivalTime: p.arrivalTime,
+            destSeq: p.stopSeq,
+            departed: (dep.departureMinutes * 60) <= secondsNow.value,
+          })
+        }
       }
-      results.sort((a: any, b: any) => a.secondsUntil - b.secondsUntil)
+      results.sort((a, b) => (a.secondsUntil ?? 0) - (b.secondsUntil ?? 0))
       return results
     }
 
     // 远距离目的地：多起点搜索
-    const candidates = findNearestStops(mapStore.userLat!, mapStore.userLng!, scheduleStore.stations, 3, 200)
+    let candidates = nearStops
     if (candidates.length === 0) {
-      // 500m 内没有站点，退回到单一最近站点
+      // 200m 内没有站点，退回到单一最近站点
       const fallback = findNearestStop(mapStore.userLat!, mapStore.userLng!, scheduleStore.stations)
-      if (fallback) candidates.push(fallback)
+      if (fallback) candidates = [fallback]
     }
 
-    // 去重：preds 中同一 departure 可能有 isDepartureStop + isReturnStop 两条
-    // （如 JB1/JB2 起终点同站 研究生宿舍楼），只需保留一条
+    // 同一车次只展示一次（首选最近的上车站点）
     const seenDepartureIds = new Set<string>()
 
     for (const c of candidates) {
       const candidateStop = c.station.name
-      if (candidateStop === destStop) continue // 已经在目的地，跳过
+      if (destMembers.includes(candidateStop)) continue // 已经在目的地，跳过
 
       const walkSeconds = c.distance / WALK_SPEED
 
-      for (const p of preds) {
-        // 同一车次只展示一次（首选最近的上车站点）
-        if (seenDepartureIds.has(p.departureId)) continue
-        const dep = scheduleStore.departures.find(d => d.recordId === p.departureId)
-        if (!dep) continue
+      for (const dep of scheduleStore.departures) {
+        if (dep.dateType !== dateType.value) continue
+        if (seenDepartureIds.has(dep.recordId)) continue
+        const depPreds = predsByDeparture.value.get(dep.recordId) || []
+        // 枚举 上车站×下车站 全部位置组合，取乘坐时间最短的方案
+        // （接驳环线同名站一圈经过两次，避免误选远端上车点绕大圈）
+        const best = findBestRide(depPreds, [candidateStop], destMembers)
+        if (!best) continue
 
-        // 该车次是否经过这个候选上车点（且在上车点之后才到目的地）
-        const candidatePred = scheduleStore.predictions.find(
-          pp => pp.departureId === p.departureId && pp.stopName === candidateStop
-        )
-        if (!candidatePred) continue
-
-        const destPred = scheduleStore.predictions.find(
-          pp => pp.departureId === p.departureId
-            && pp.stopName === destStop
-            && pp.stopSeq > candidatePred.stopSeq
-        )
-        if (!destPred) continue
-
-        const secondsUntilCandidate = Math.round(candidatePred.arrivalMinutes * 60 - secondsNow.value)
-        const secondsUntilDest = Math.round(destPred.arrivalMinutes * 60 - secondsNow.value)
+        const secondsUntilCandidate = Math.round(best.origin.arrivalMinutes * 60 - secondsNow.value)
+        const secondsUntilDest = Math.round(best.dest.arrivalMinutes * 60 - secondsNow.value)
 
         // 步行可能赶不上 → 标记警告但不隐藏（车次信息对用户仍有参考价值）
         const walkWarning = secondsUntilCandidate > 0 && walkSeconds > secondsUntilCandidate
-        // 目的地到站超过 1 小时 → 跳过
         if (secondsUntilDest > 3600) continue
-        // 已过站超过 1 分钟 → 跳过
         if (secondsUntilCandidate < -300) continue
 
-        const isOriginDeparture = candidatePred.isDepartureStop ?? false
+        const isOriginDeparture = best.origin.isDepartureStop ?? false
         const { label, status } = isOriginDeparture
           ? departureCountdown(secondsUntilCandidate)
           : arrivalCountdown(secondsUntilCandidate)
@@ -286,7 +298,7 @@ const stopArrivals = computed(() => {
         results.push({
           departure: dep,
           candidateStop,
-          destStop,
+          destStop: best.dest.stopName,
           walkSeconds,
           walkLabel: formatWalkTime(walkSeconds),
           walkWarning,
@@ -294,34 +306,40 @@ const stopArrivals = computed(() => {
           boardSec: secondsUntilCandidate,
           boardLabel: label,
           boardStatus: status,
-          boardTime: candidatePred.arrivalTime,
-          destArrivalTime: destPred.arrivalTime,
+          boardTime: best.origin.arrivalTime,
+          boardSeq: best.origin.stopSeq,
+          destArrivalTime: best.dest.arrivalTime,
+          destSeq: best.dest.stopSeq,
           departed,
         })
-        seenDepartureIds.add(p.departureId)
+        seenDepartureIds.add(dep.recordId)
       }
     }
   } else {
-    // 无 GPS：回退到现有逻辑，只显示经过目的地的车次（不含出发站信息）
-    for (const p of preds) {
-      const dep = scheduleStore.departures.find(d => d.recordId === p.departureId)
-      if (!dep) continue
-      if (p.isDepartureStop || p.isReturnStop) continue
+    // 无 GPS：显示经过目的地（组）的车次（不含出发站信息）
+    for (const dep of scheduleStore.departures) {
+      if (dep.dateType !== dateType.value) continue
+      const depPreds = predsByDeparture.value.get(dep.recordId) || []
+      for (const p of depPreds) {
+        if (!destMembers.includes(p.stopName)) continue
+        if (p.isDepartureStop || p.isReturnStop) continue
 
-      const secondsUntil = Math.round(p.arrivalMinutes * 60 - secondsNow.value)
-      if (secondsUntil < -300 || secondsUntil > 3600) continue
+        const secondsUntil = Math.round(p.arrivalMinutes * 60 - secondsNow.value)
+        if (secondsUntil < -300 || secondsUntil > 3600) continue
 
-      const { label, status } = arrivalCountdown(secondsUntil)
-      const departed = (dep.departureMinutes * 60) <= secondsNow.value
-      results.push({
-        departure: dep,
-        destStop,
-        secondsUntil,
-        label,
-        status,
-        arrivalTime: p.arrivalTime,
-        departed,
-      })
+        const { label, status } = arrivalCountdown(secondsUntil)
+        const departed = (dep.departureMinutes * 60) <= secondsNow.value
+        results.push({
+          departure: dep,
+          destStop: p.stopName,
+          secondsUntil,
+          label,
+          status,
+          arrivalTime: p.arrivalTime,
+          destSeq: p.stopSeq,
+          departed,
+        })
+      }
     }
   }
 
@@ -371,6 +389,7 @@ const nearbyStopArrivals = computed(() => {
         label,
         status,
         arrivalTime: p.arrivalTime,
+        destSeq: p.stopSeq,
         departed: (dep.departureMinutes * 60) <= secondsNow.value,
       })
     }
@@ -458,6 +477,7 @@ const nearbyStopArrivals = computed(() => {
               :departure-id="item.departure.recordId"
               :route-key="item.departure.routeKey"
               :highlight-origin="item.stopName"
+              :highlight-origin-seq="item.destSeq"
               @view-on-map="handleViewOnMap"
             />
           </div>
@@ -505,6 +525,8 @@ const nearbyStopArrivals = computed(() => {
           :route-key="item.departure?.routeKey"
           :highlight-stop="item.destStop || selectedStop"
           :highlight-origin="item.candidateStop"
+          :highlight-dest-seq="item.destSeq"
+          :highlight-origin-seq="item.boardSeq"
           @view-on-map="handleViewOnMap"
         />
       </div>
