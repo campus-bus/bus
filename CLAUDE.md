@@ -558,7 +558,8 @@ apps/miniprogram/
 │   ├── utils/       # 与 H5 同源（station_group/countdown/geo/bus_position/datetime/holidays/time）
 │   ├── composables/ # useGeolocation（WGS-84）
 │   ├── data/        # sync_miniprogram_data.js 生成（勿手改）
-│   └── static/icons/# 公交图标（暂沿用 H5 素材）
+│   ├── static/icons/# 公交图标（暂沿用 H5 素材）
+│   └── static/tabbar/# tabBar 图标（81×81 PNG，generate_tabbar_icons.py 生成）
 ├── cloudfunctions/  # weather / holidays
 └── project.config.json  # miniprogramRoot=dist/dev/mp-weixin, cloudfunctionRoot=cloudfunctions/
 ```
@@ -573,7 +574,7 @@ apps/miniprogram/
 2. **npm 直连安装超时**：本机直连 npmjs.org 会卡死，必须 `--registry=https://registry.npmmirror.com`。
 3. **pinia 版本冲突**：uni-app 自带 vue 版本与 pinia 3 不兼容，固定 `pinia@2.1.7 --legacy-peer-deps`。
 4. **云数据库权限默认"仅创建者可读写"**：访客统计/记录共享场景必须手动改权限。
-5. **tabBar 图标**：可纯文字不配 iconPath（本项目暂无图标素材，后续可补）。
+5. **tabBar 图标**：已补齐（`src/static/tabbar/`，81×81 PNG，灰/蓝两版），由 `scripts/generate_tabbar_icons.py` 从 SVG 生成；改图标只需改该脚本再重跑，勿手改 PNG。微信 tabBar 只认本地图片，不支持 SVG 直引。
 6. **AppID 与云环境 ID 是两个东西**：AppID（小程序后台→开发设置，wx 开头 16 位）≠ 云环境 ID（云开发控制台）。
 
 ### 待办（按优先级）
@@ -584,7 +585,7 @@ apps/miniprogram/
 4. 小程序类目审核通过后：`npm run build:mp-weixin` → 开发者工具上传 → 后台提审发布
 5. Supabase `measurements`/`visits` 历史数据迁移到云数据库（JSON 导出→控制台导入，58+ 条）
 6. 访客统计埋点（useVisitorTracking 小程序版）+ 管理面板小程序版（AdminView）
-7. 可选增强：时间覆写调试面板（H5 已有）、tabBar 图标、BusStopTimeline 公交动画、订阅消息提醒（小程序独占能力）
+7. 可选增强：时间覆写调试面板（H5 已有）、BusStopTimeline 公交动画、订阅消息提醒（小程序独占能力）
 
 ### H5 版继续维护
 

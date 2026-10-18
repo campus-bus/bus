@@ -45,10 +45,30 @@
     "backgroundColor": "#FFFFFF",
     "borderStyle": "black",
     "list": [
-      { "pagePath": "pages/index/index", "text": "首页" },
-      { "pagePath": "pages/schedule/schedule", "text": "行程" },
-      { "pagePath": "pages/map/map", "text": "地图" },
-      { "pagePath": "pages/record/record", "text": "记录" }
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页",
+        "iconPath": "static/tabbar/home.png",
+        "selectedIconPath": "static/tabbar/home-active.png"
+      },
+      {
+        "pagePath": "pages/schedule/schedule",
+        "text": "行程",
+        "iconPath": "static/tabbar/schedule.png",
+        "selectedIconPath": "static/tabbar/schedule-active.png"
+      },
+      {
+        "pagePath": "pages/map/map",
+        "text": "地图",
+        "iconPath": "static/tabbar/map.png",
+        "selectedIconPath": "static/tabbar/map-active.png"
+      },
+      {
+        "pagePath": "pages/record/record",
+        "text": "记录",
+        "iconPath": "static/tabbar/record.png",
+        "selectedIconPath": "static/tabbar/record-active.png"
+      }
     ]
   }
 }
