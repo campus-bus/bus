@@ -469,7 +469,8 @@ onUnmounted(() => {
       </div>
 
       <MapLegend />
-      <div class="map-controls">
+      <!-- 阻止冒泡：快速点击定位/回中按钮时避免触发双击缩放与拖拽 -->
+      <div class="map-controls" @dblclick.stop @pointerdown.stop @touchstart.stop>
         <div v-if="isMapLost" class="locate-btn recenter-btn" @click="recenterMap">
           <van-icon name="replay" size="20" />
         </div>

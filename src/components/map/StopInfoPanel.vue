@@ -65,7 +65,8 @@ onUnmounted(() => {
 
 <template>
   <transition name="slide-up">
-    <div v-if="mapStore.selectedStop" class="stop-panel">
+    <!-- 阻止冒泡：面板上快速点击时避免触发地图双击缩放与拖拽 -->
+    <div v-if="mapStore.selectedStop" class="stop-panel" @dblclick.stop @pointerdown.stop @touchstart.stop>
       <div class="panel-header">
         <span class="panel-title">{{ mapStore.selectedStop }}</span>
         <van-icon name="cross" @click="close" />

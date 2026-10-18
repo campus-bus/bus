@@ -20,7 +20,8 @@ function toggleVisibility(key: string) {
 </script>
 
 <template>
-  <div class="map-legend">
+  <!-- 阻止冒泡：快速点击图例时避免触发地图的双击缩放/拖拽 -->
+  <div class="map-legend" @dblclick.stop @pointerdown.stop @touchstart.stop>
     <!-- 路线切换 -->
     <div
       v-for="item in legendItems"
