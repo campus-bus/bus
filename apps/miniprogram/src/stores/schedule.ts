@@ -26,7 +26,8 @@ export const useScheduleStore = defineStore('schedule', () => {
   const routePatterns = ref<RoutePattern[]>(routeParamsJson as RoutePattern[])
   const stations = ref<Station[]>(stationsJson as Station[])
   const predictions = ref<ArrivalPrediction[]>(predictionsJson as ArrivalPrediction[])
-  const routePaths = ref<Record<string, RoutePath>>(routePathsJson as Record<string, RoutePath>)
+  // JSON 中的折线是 number[][]，TS 无法自动收窄成元组，这里显式转换
+  const routePaths = ref<Record<string, RoutePath>>(routePathsJson as unknown as Record<string, RoutePath>)
   const routeStops = ref<Record<string, Array<{ name: string; lng: number; lat: number }>>>(
     routeStopsJson as Record<string, Array<{ name: string; lng: number; lat: number }>>
   )

@@ -58,6 +58,9 @@
         },
         "usingComponents" : true,
         "lazyCodeLoading" : "requiredComponents",
+        /* 2022-07-14 后发布的小程序必须声明才会放行定位接口，
+           否则真机/体验版调用 getLocation、startLocationUpdate、onLocationChange 会直接失败 */
+        "requiredPrivateInfos" : [ "getLocation", "startLocationUpdate", "onLocationChange" ],
         "permission" : {
             "scope.userLocation" : {
                 "desc" : "用于推荐附近站点和显示你的位置"

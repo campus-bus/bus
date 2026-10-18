@@ -1,12 +1,3 @@
-<script setup lang="ts">
-function copyLink() {
-  uni.setClipboardData({
-    data: 'https://campus-bus.github.io/bus/',
-    success: () => uni.showToast({ title: 'H5 链接已复制', icon: 'none' }),
-  })
-}
-</script>
-
 <template>
   <view class="about-page">
     <view class="header">
@@ -35,29 +26,18 @@ function copyLink() {
     <view class="section">
       <view class="section-title">网页版</view>
       <view class="text">本应用另有 H5 网页版（可添加到手机主屏幕）：</view>
-      <view class="link" @tap="copyLink">campus-bus.github.io/bus/（点击复制）</view>
+      <text class="link" selectable user-select>https://campus-bus.github.io/bus/</text>
+      <view class="tip">长按链接可复制</view>
     </view>
 
     <view class="section feedback">
       <view class="section-title">反馈意见</view>
       <view class="text">如有建议或问题，欢迎填写问卷：</view>
-      <view class="survey-btn" @tap="copySurvey">复制问卷链接</view>
+      <text class="link" selectable user-select>https://v.wjx.cn/vm/thRw5hx.aspx</text>
+      <view class="tip">长按链接可复制</view>
     </view>
   </view>
 </template>
-
-<script lang="ts">
-export default {
-  methods: {
-    copySurvey() {
-      uni.setClipboardData({
-        data: 'https://v.wjx.cn/vm/thRw5hx.aspx',
-        success: () => uni.showToast({ title: '问卷链接已复制', icon: 'none' }),
-      })
-    },
-  },
-}
-</script>
 
 <style scoped>
 .about-page { padding: 32rpx 24rpx; }
@@ -67,8 +47,8 @@ export default {
 .section { background: #fff; border-radius: 16rpx; padding: 24rpx; margin-bottom: 16rpx; }
 .section-title { font-size: 28rpx; font-weight: 600; margin-bottom: 12rpx; }
 .text { font-size: 26rpx; color: #6B7280; line-height: 1.7; }
-.link { font-size: 26rpx; color: #1A56DB; margin-top: 10rpx; }
-.survey-btn { display: inline-block; margin-top: 14rpx; background: #1A56DB; color: #fff; padding: 12rpx 28rpx; border-radius: 10rpx; font-size: 26rpx; }
+.link { display: block; font-size: 26rpx; color: #1A56DB; margin-top: 10rpx; word-break: break-all; }
+.tip { font-size: 22rpx; color: #9CA3AF; margin-top: 8rpx; }
 .feedback { text-align: center; }
 .feedback .section-title { text-align: left; }
 .feedback .text { text-align: left; }

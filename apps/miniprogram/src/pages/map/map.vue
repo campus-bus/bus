@@ -13,7 +13,8 @@ import type { BusPosition, ArrivalPrediction } from '@/types'
 
 const scheduleStore = useScheduleStore()
 const locationStore = useLocationStore()
-useGeolocation()
+// 地图页本身就是位置功能页：进入时请求定位（内部会先过隐私协议授权）
+useGeolocation({ autoStart: true })
 
 // ─── 地图中心（研究生宿舍楼，GCJ-02） ───
 const [centerLng, centerLat] = wgs84ToGcj02(113.045661, 28.257994)
@@ -154,7 +155,13 @@ function updateBusPositions() {
 let timer: ReturnType<typeof setInterval> | null = null
 function startTimer() {
   updateBusPositions()
-  if (!timer) timer = setInterval(updateBusPositions, 1000)
+  if (!timer) {
+    timer = setInterval(() => {
+      // 驱动站点面板倒计时刷新（secondsNow 依赖 nowTick）
+      nowTick.value++
+      updateBusPositions()
+    }, 1000)
+  }
 }
 function stopTimer() { if (timer) { clearInterval(timer); timer = null } }
 onShow(startTimer)

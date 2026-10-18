@@ -36,7 +36,25 @@ interface ArrivalItem {
 
 const scheduleStore = useScheduleStore()
 const locationStore = useLocationStore()
-const { openSetting } = useGeolocation()
+
+// ─── 定位（用户主动点击后才获取，不在加载时自动调用） ───
+const {
+  loading: locLoading, error: locError,
+  init: initLocation, requestLocation, openSetting, openPrivacyContract,
+} = useGeolocation()
+
+/** 是否已经拿到有效位置 */
+const hasLocation = computed(() => locationStore.userLat !== null && locationStore.userLng !== null)
+/** 定位卡片说明文案 */
+const locateDesc = computed(() => {
+  if (locationStore.permissionDenied) return '点此前往设置页，把「位置信息」改为允许'
+  if (locError.value) return locError.value
+  return '仅在本机计算你与站点的距离，位置不会上传服务器'
+})
+function onLocateTap() {
+  if (locationStore.permissionDenied) openSetting()
+  else requestLocation()
+}
 
 const dateType = computed<DateType>(() => getDateType(getNow()))
 const dateTypeLabel = computed(() => getDateLabel(getNow()))
@@ -48,7 +66,7 @@ const secondsNow = computed(() => { void nowTick.value; return getSecondsSinceMi
 let timer: ReturnType<typeof setInterval> | null = null
 function startTimer() { if (!timer) timer = setInterval(() => { nowTick.value++ }, 1000) }
 function stopTimer() { if (timer) { clearInterval(timer); timer = null } }
-onShow(startTimer)
+onShow(() => { startTimer(); initLocation() })
 onHide(stopTimer)
 onUnmounted(stopTimer)
 
@@ -273,9 +291,21 @@ const showNotice = ref(false)
       <text class="notice-text">线路试运行，时刻与预测仅供参考。点我查看详情 ›</text>
     </view>
 
-    <!-- 定位拒绝提示 -->
-    <view v-if="locationStore.permissionDenied" class="gps-card" @tap="openSetting">
-      <text>开启定位后自动推荐最近上车站点 ›</text>
+    <!-- 定位引导：用户点击「允许定位」后才获取位置，隐私协议由微信官方弹窗兜底 -->
+    <view v-if="!hasLocation" class="locate-card">
+      <view class="locate-head">
+        <text class="locate-icon">📍</text>
+        <view class="locate-texts">
+          <text class="locate-title">{{ locationStore.permissionDenied ? '定位权限已关闭' : '开启定位，查看附近站点' }}</text>
+          <text class="locate-desc">{{ locateDesc }}</text>
+        </view>
+      </view>
+      <view class="locate-actions">
+        <view class="locate-btn" :class="{ busy: locLoading }" @tap="onLocateTap">
+          {{ locLoading ? '定位中…' : (locationStore.permissionDenied ? '去设置开启' : '允许定位') }}
+        </view>
+        <text class="locate-privacy" @tap="openPrivacyContract">隐私协议</text>
+      </view>
     </view>
 
     <!-- 站点搜索与选择 -->
@@ -316,8 +346,8 @@ const showNotice = ref(false)
         </view>
       </view>
 
-      <view v-if="locationStore.userLat === null && !locationStore.permissionDenied" class="hint-card">
-        <text>定位中…开启定位后自动推荐附近站点</text>
+      <view v-if="hasLocation && nearbySections.length === 0" class="hint-card">
+        <text>附近 200 米内暂无站点，可从上方列表手动选择</text>
       </view>
     </template>
 
@@ -382,8 +412,8 @@ const showNotice = ref(false)
       <view class="dialog" @tap.stop>
         <view class="dialog-title">公告</view>
         <view class="dialog-body">
-          线路试运行，随时会调整，时间表和预测时间仅供参考。{'\n\n'}
-          如何帮忙校准：点击底部「记录」→ 输入昵称 → 选择线路 → 点击「上车」，到站停车即点击「计时」，下车提交。
+          <view>线路试运行，随时会调整，时间表和预测时间仅供参考。</view>
+          <view class="dialog-body-para">如何帮忙校准：点击底部「记录」→ 输入昵称 → 选择线路 → 点击「上车」，到站停车即点击「计时」，下车提交。</view>
         </view>
         <view class="dialog-btn" @tap="showNotice = false">我知道了</view>
       </view>
@@ -402,8 +432,25 @@ const showNotice = ref(false)
 .notice-bar { background: #FFF7ED; border-radius: 12rpx; padding: 16rpx 20rpx; margin-bottom: 16rpx; }
 .notice-text { font-size: 24rpx; color: #9A3412; }
 
-.gps-card { background: #EFF6FF; border-radius: 12rpx; padding: 20rpx; margin-bottom: 16rpx; font-size: 26rpx; color: #1A56DB; }
-.hint-card { background: #EFF6FF; border-radius: 12rpx; padding: 20rpx; margin: 16rpx 0; font-size: 26rpx; color: #1A56DB; }
+/* 定位引导卡片 */
+.locate-card {
+  background: #fff; border-radius: 14rpx; padding: 22rpx 24rpx; margin-bottom: 16rpx;
+  border: 1rpx solid #DBEAFE;
+}
+.locate-head { display: flex; align-items: flex-start; gap: 12rpx; }
+.locate-icon { font-size: 32rpx; line-height: 1.2; }
+.locate-texts { flex: 1; display: flex; flex-direction: column; gap: 6rpx; }
+.locate-title { font-size: 28rpx; font-weight: 600; color: #1F2937; }
+.locate-desc { font-size: 22rpx; color: #6B7280; line-height: 1.5; }
+.locate-actions { display: flex; align-items: center; justify-content: space-between; margin-top: 18rpx; }
+.locate-btn {
+  background: #1A56DB; color: #fff; font-size: 26rpx; font-weight: 600;
+  padding: 14rpx 40rpx; border-radius: 999rpx;
+}
+.locate-btn.busy { background: #93B4F5; }
+.locate-privacy { font-size: 22rpx; color: #1A56DB; }
+
+.hint-card { background: #F3F4F6; border-radius: 12rpx; padding: 24rpx; margin: 16rpx 0; font-size: 24rpx; color: #6B7280; text-align: center; }
 
 .search-box { margin-bottom: 16rpx; }
 .search-input { background: #fff; border-radius: 999rpx; padding: 14rpx 24rpx; font-size: 26rpx; }
@@ -445,6 +492,7 @@ const showNotice = ref(false)
 .dialog-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 100; }
 .dialog { background: #fff; border-radius: 20rpx; width: 560rpx; padding: 32rpx; }
 .dialog-title { font-size: 32rpx; font-weight: 600; margin-bottom: 16rpx; }
-.dialog-body { font-size: 26rpx; color: #374151; line-height: 1.8; white-space: pre-line; margin-bottom: 24rpx; }
+.dialog-body { font-size: 26rpx; color: #374151; line-height: 1.8; margin-bottom: 24rpx; }
+.dialog-body-para { margin-top: 16rpx; }
 .dialog-btn { background: #1A56DB; color: #fff; text-align: center; padding: 16rpx; border-radius: 12rpx; font-size: 28rpx; }
 </style>
