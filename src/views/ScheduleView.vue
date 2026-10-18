@@ -239,7 +239,7 @@ function togglePlanExpand(recordId: string) {
         <!-- 按班次排列 -->
         <template v-if="!sortByTime">
           <div v-for="[shift, deps] in groupedDepartures" :key="shift" class="shift-group">
-            <div class="shift-title">{{ shift }}</div>
+            <div v-if="shift" class="shift-title">{{ shift }}</div>
             <div v-for="dep in deps" :key="dep.recordId" class="dep-row" :class="{ expanded: expandedId === dep.recordId }">
               <div class="dep-main" @click="toggleExpand(dep.recordId)">
                 <div class="dep-left">
