@@ -6,6 +6,7 @@
 - **天气功能补齐**：新增 `src/composables/useWeather.ts` 与首页头部天气展示；云函数改用 `https` 模块（Node16 无全局 fetch）
 - **定位接口修复**：`dist/dev` 产物缺失 `requiredPrivateInfos`（两个 watcher 互相覆盖），清理后重启单个 watcher 解决
 - **云函数超时适配**：`weather`/`holidays` 均加入网络时间预算与容器内存缓存，保证 3 秒内返回；数据库集合缺失时静默降级
+- **回归修复**：`weather` 云函数加内存缓存时误删 `const CACHE_MS`，导致线上 `CACHE_MS is not defined`；已补回并重新部署验证（`cached:true` 分支实测通过）
 
 ## 2026-10-18 — 微信小程序版工程建立（uni-app 移植）
 

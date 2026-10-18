@@ -13,6 +13,9 @@ const https = require('https')
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 const db = cloud.database()
 
+// 缓存有效期：30 分钟
+const CACHE_MS = 30 * 60 * 1000
+
 // 容器内存缓存：同一容器内热调用直接返回，避免重复出网
 let memoryCache = null // { payload, updatedAt }
 

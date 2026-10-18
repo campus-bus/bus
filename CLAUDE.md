@@ -586,6 +586,52 @@ apps/miniprogram/
 14. **`mp.evaluate` 返回响应式对象会卡死**：不要直接返回 pinia store 的值（proxy 无法序列化），改用 `String(...)` 拼原始值，或先写 storage 再 `callWxMethod('getStorageSync')` 读回。
 15. **文档类中文文件不要用 PowerShell `Set-Content` 改写**：PowerShell 5.1 默认输出 ANSI(GBK)，会把 UTF-8 中文写成乱码且不可逆。改文档一律用编辑器/工具或 Node 显式 `utf8` 读写。
 
+### 调试工作流纪律（强制，违反必返工）
+
+**第一步永远是拿到逐字错误，不是猜现象。** 拿不到就说明探针写错了，先修探针，禁止动业务代码。
+
+| 现象 | 取证命令 |
+|---|---|
+| 定位失效 / 权限异常 | `node scripts/mp_probe.cjs location` |
+| 天气不显示 | `node scripts/mp_probe.cjs weather` |
+| 节假日 / 车次异常 | `node scripts/mp_probe.cjs holidays` |
+| 授权与隐私协议 | `node scripts/mp_probe.cjs setting` |
+| 编译异常 | `apps/miniprogram/dev-build.log` 原文 |
+
+**探针只用 `scripts/mp_probe.cjs`。** 它内置了唯一正确的写法（evaluate 只做同步启动 → 异步结果写 storage → Node 轮询读回 → 硬超时 → finally 断开）。
+禁止自己另写 `mp.evaluate`，以下三类写法会让 automator **永久挂起**，只能杀进程：
+
+1. `return new Promise(...)` —— `evaluate` 不会 await thenable；
+2. 返回 pinia store / 响应式 proxy —— 无法序列化；
+3. 依赖 `uni` 全局或额外入参 —— 注入环境只有 `wx`，且 `evaluate` 不传 args，storage key 必须写成字面量。
+
+**定位三要素齐全才动手**：哪个文件、哪一行、根因是什么。一次只验证一个假设，改一处 → 用同一探针复测 → 通过再进行下一步。禁止"顺手多改几处"。
+
+**改完必须三层验证，缺一不可：**
+
+1. 功能：`node scripts/mp_probe.cjs <相关探针>`
+2. 类型：`cd apps/miniprogram && npx vue-tsc --noEmit`
+3. 数据回归：`node scripts/test_scenarios.cjs`（应为 24/24 通过）
+
+**云函数改动必须重新部署并复测。** 注意容器可能仍在跑旧代码：以返回字段（如 `cached`）判断是不是新版本，**不能凭"刚才通过"就认定新代码生效**。
+本项目就吃过亏：给 `weather` 加内存缓存时误删 `const CACHE_MS`，提交后靠探针才发现线上报 `CACHE_MS is not defined`。
+
+**易误判清单（先查这里再动手）**
+
+- 两个 `npm run dev:mp-weixin` 会互相覆盖 `dist/dev`，表现为"配置莫名缺失" → 先查重进程；
+- `dist/dev` 异常优先删目录重建，不要改 `manifest.json` 去"绕"；
+- CLI `--env` 只适用于 `deploy` / `info` / `list`；
+- `cloudfunctions/*/config.json` 里的 `timeout` 不生效，别再试。
+
+**本地文件操作铁律**
+
+- 改含中文的文件：用 StrReplace / 编辑器 / Node `fs.writeFileSync(p, s, 'utf8')`；
+- **禁止** PowerShell `Set-Content` / `Out-File` 改写文档（默认 GBK / UTF-16 BOM，会毁掉中文且不可逆）；
+- 读 git 内容用 `execSync('git show ...').toString('utf8')`，**禁止** `git show > file`（PS 重定向产出 UTF-16 BOM）；
+- 每次写完立即校验：`new TextDecoder('utf-8', { fatal: true }).decode(fs.readFileSync(p))`；
+- 截图前先枚举窗口 `GetWindowRect` 拿真实 rect，**禁止猜坐标**（猜错会白读多张图，污染上下文）。
+
+
 ### 待办（按优先级）
 
 1. 微信开发者工具编译预览，逐页验收（首页/行程/地图/记录/关于）
