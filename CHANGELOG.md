@@ -1,5 +1,24 @@
 # 数据变更记录
 
+## 2026-10-18 — 微信小程序版工程建立（uni-app 移植）
+
+**变更类型**：项目结构（新增小程序端，无运行时数据变更）
+
+**背景**：主流量入口迁移至微信小程序；H5 PWA 版继续维护。因 Supabase 域名无法过小程序 ICP 白名单、高德按量收费，小程序端全面采用微信生态。
+
+**架构决策**：uni-app Vue3 + TS；腾讯 `<map>` 组件（免费）替代卫星底图；微信云开发（云数据库+云函数）替代 Supabase；数据 import 打包加载（总包 1.5MB）。
+
+**完成内容**（提交 `f63c159`、`c8a95c6`、`5a51338`）：
+- 五个核心页面：首页/行程/地图/记录/关于（逻辑与 H5 同源）
+- 数据同步：`scripts/sync_miniprogram_data.js`（`public/data` 压缩同步到 `apps/miniprogram/src/data/`，922KB）
+- 云函数：`weather`、`holidays`（待上传部署）
+- 云开发配置：AppID `wx9793b294a259ec3a`、云环境 `campus-bus-d5q9cli14141d5144`
+- 修复：`project.config.json` 字段名 `srcMiniprogramRoot`→`miniprogramRoot`（模拟器启动失败）
+
+**待办**：云函数上传部署、数据库权限调整（measurements/visits）、类目审核、Supabase 历史数据迁移、提审发布。详见 `CLAUDE.md` 微信小程序版章节。
+
+---
+
 ## 2026-10-18 — measurements 历史记录站名映射与段拆分（待执行 SQL）
 
 **变更类型**：数据库历史记录迁移（为接驳环线实测校准做准备）
