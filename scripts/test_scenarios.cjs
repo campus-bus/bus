@@ -1,5 +1,7 @@
-// 临时脚本：全功能场景化数据层断言（用后删除）
-// 复刻前端核心逻辑，用真实 public/data 验证 20 个场景断言
+// 回归测试：全功能场景化数据层断言
+// 用法：node scripts/test_scenarios.cjs（全部断言通过 exit 0，否则 exit 1）
+// 复刻前端核心逻辑（station_group.findBestRide 等），用真实 public/data 验证关键场景。
+// 每次数据变更（时刻表/路线/站间秒数）后应运行本脚本做回归验证。
 const fs = require('fs')
 const deps = JSON.parse(fs.readFileSync('public/data/departures.json'))
 const pred = JSON.parse(fs.readFileSync('public/data/arrival_predictions.json'))

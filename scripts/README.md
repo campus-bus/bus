@@ -10,6 +10,7 @@ Node.js / Python 离线工具，操作 `public/data/*.json`。**运行前先备�
 | `recalc_segments.py` | 从 Supabase 拉全部实测记录，按《路段运行时间预估方法》重新计算各段秒数（只打印结果，不写文件；旧环2/环3记录自动归入 JB2 统计池） | `python scripts/recalc_segments.py` |
 | `regenerate_from_txt.js` | 从 `data/geo/站点经纬度信息路径细化.txt` 重新生成 `route_stops.json`/`route_paths.json`/`stations.json`（JB1 由 JB2 反转自动派生） | `node scripts/regenerate_from_txt.js` |
 | `download_satellite.mjs` | 从 ESRI 下载卫星瓦片拼接底图，生成 `public/data/campus-satellite.jpg` + `satellite-bounds.json`（内部把锚点 GCJ-02 转 WGS-84 下瓦片，属正常用途） | `node scripts/download_satellite.mjs` |
+| `test_scenarios.cjs` | **回归测试**：复刻 findBestRide 等核心逻辑，对真实数据断言 24 个关键场景（同名站多次经过、站点分组、行程规划、时间逻辑等）。每次数据变更后必跑 | `node scripts/test_scenarios.cjs` |
 
 ## 坐标口径（重要）
 
