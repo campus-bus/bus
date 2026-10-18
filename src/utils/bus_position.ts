@@ -145,19 +145,22 @@ export function computeActiveBusPositions(
     if (elapsedSeconds < 0) continue // 尚未发车
     if (elapsedSeconds > pattern.totalSeconds + 300) continue // 已到终点
 
-    // 构建该路线的站点坐标 Map（优先使用 routeStops 中的路线专属坐标）
-    const routeStopMap = new Map<string, { lng: number; lat: number }>()
+    // 该路线的站点坐标序列（routeStops 与 pattern.stops 同序同构）
+    // 注意：同名站在去/回程可能有不同坐标（如接驳环线 激光所/网球场/军体活动中心东），
+    // 必须按序列索引取坐标——若按站名建 Map，后出现的坐标会覆盖先出现的，
+    // 导致去程站点误匹配到路径远端的回程位置（车辆瞬移/缓慢/消失）
     const rs = routeStops?.[dep.routeKey]
-    if (rs) {
-      for (const s of rs) routeStopMap.set(s.name, { lng: s.lng, lat: s.lat })
-    }
 
     // 为每个站点找到路径中的对应索引（从上一个站点的索引之后搜索，保证单调）
     const stopPathIndices: number[] = []
     let searchFrom = 0
-    for (const s of pattern.stops) {
-      // 优先用路线专属坐标，fallback 到 stations.json
-      let coord = routeStopMap.get(s.currentStop)
+    for (let i = 0; i < pattern.stops.length; i++) {
+      const s = pattern.stops[i]
+      // 优先按序列索引取路线专属坐标，fallback 到 stations.json 统一坐标
+      let coord: { lng: number; lat: number } | undefined
+      if (rs && rs[i] && rs[i].name === s.currentStop) {
+        coord = rs[i]
+      }
       if (!coord) coord = stationMap.get(s.currentStop)
       if (coord) {
         const start = searchFrom < path.length ? searchFrom : 0
