@@ -4,6 +4,7 @@ import { onShow, onHide } from '@dcloudio/uni-app'
 import { useScheduleStore } from '@/stores/schedule'
 import { useLocationStore } from '@/stores/location'
 import { useGeolocation } from '@/composables/useGeolocation'
+import { useWeather } from '@/composables/useWeather'
 import { getDateType, getSecondsSinceMidnight, formatDate, getDateLabel } from '@/utils/datetime'
 import { getNow } from '@/utils/time'
 import { findNearestStop, findNearestStops, formatWalkTime } from '@/utils/geo'
@@ -43,6 +44,9 @@ const {
   init: initLocation, requestLocation, openSetting, openPrivacyContract,
 } = useGeolocation()
 
+// ─── 天气（云函数代理 Open-Meteo，失败时静默不展示） ───
+const { weather, initWeather } = useWeather()
+
 /** 是否已经拿到有效位置 */
 const hasLocation = computed(() => locationStore.userLat !== null && locationStore.userLng !== null)
 /** 定位卡片说明文案 */
@@ -66,7 +70,7 @@ const secondsNow = computed(() => { void nowTick.value; return getSecondsSinceMi
 let timer: ReturnType<typeof setInterval> | null = null
 function startTimer() { if (!timer) timer = setInterval(() => { nowTick.value++ }, 1000) }
 function stopTimer() { if (timer) { clearInterval(timer); timer = null } }
-onShow(() => { startTimer(); initLocation() })
+onShow(() => { startTimer(); initLocation(); initWeather() })
 onHide(stopTimer)
 onUnmounted(stopTimer)
 
@@ -280,9 +284,15 @@ const showNotice = ref(false)
 
 <template>
   <view class="home-page">
-    <!-- 头部：日期 + 日期类型 -->
+    <!-- 头部：日期 + 天气 + 日期类型 -->
     <view class="today-header">
-      <view class="date-text">{{ todayDate }}</view>
+      <view class="header-left">
+        <view class="date-text">{{ todayDate }}</view>
+        <view v-if="weather" class="weather-row">
+          <text class="weather-icon">{{ weather.icon }}</text>
+          <text class="weather-text">{{ weather.tempNow }}°（{{ weather.tempMin }}°~{{ weather.tempMax }}°）{{ weather.desc }}</text>
+        </view>
+      </view>
       <view class="date-tag" :class="dateType === 'weekday' ? 'wd' : 'we'">{{ dateTypeLabel }}</view>
     </view>
 
@@ -423,8 +433,12 @@ const showNotice = ref(false)
 
 <style scoped>
 .home-page { padding: 24rpx; }
-.today-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20rpx; }
+.today-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 20rpx; }
+.header-left { display: flex; flex-direction: column; gap: 6rpx; }
 .date-text { font-size: 32rpx; font-weight: 600; }
+.weather-row { display: flex; align-items: center; gap: 8rpx; }
+.weather-icon { font-size: 26rpx; }
+.weather-text { font-size: 24rpx; color: #6B7280; }
 .date-tag { font-size: 24rpx; padding: 6rpx 18rpx; border-radius: 999rpx; }
 .date-tag.wd { background: #EFF6FF; color: #1A56DB; }
 .date-tag.we { background: #FEF3C7; color: #92400E; }

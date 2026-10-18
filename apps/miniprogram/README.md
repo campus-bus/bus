@@ -15,6 +15,7 @@
 - **地图**：腾讯 `<map>` 组件（免费不限量），WGS-84→GCJ-02 由 `utils/geo.ts` 的 `wgs84ToGcj02` 转换；站点/路线/公交用 markers+polyline，用户位置用原生 `show-location`
 - **数据库**：云开发云数据库 `measurements`（乘车记录）/ `visits`（访客统计）/ `weather_cache` / `holiday_cache`（集合首次写入自动创建）
 - **云函数**（`cloudfunctions/`）：`weather`（Open-Meteo 代理 + 30 分钟缓存）、`holidays`（holiday-cn + 按年缓存 + 2026 兜底）
+- **天气**：首页头部展示当前温度/今日高低温/天气描述；小程序不能直连第三方域名，故由 `composables/useWeather.ts` 调云函数 `weather`，本地再缓存 10 分钟；云函数未部署时静默不展示（不影响其他功能）
 - **数据加载**：`stores/schedule.ts` 直接 import 打包 JSON（无网络请求，启动即读；lazyCodeLoading 按需注入）
 
 ## 本地开发
@@ -38,7 +39,8 @@ npm run build:mp-weixin  # 生产构建（压缩）
 ## 云开发一次性配置（已完成/待办）
 
 - [x] 云函数代码（weather / holidays）
-- [ ] 微信开发者工具中右键 `cloudfunctions/weather` → 上传并部署（云端安装依赖）
+- [x] 前端天气展示（`composables/useWeather.ts` + 首页头部）
+- [ ] 微信开发者工具中右键 `cloudfunctions/weather` → 上传并部署（云端安装依赖）—— **未部署时首页不会显示天气**
 - [ ] 同上部署 `holidays`
 - [ ] 云数据库权限：`measurements`/`visits` 集合改为「所有用户可读，仅创建者可写」（默认仅创建者可读写会导致他人记录不可见）
 

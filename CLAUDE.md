@@ -556,7 +556,7 @@ apps/miniprogram/
 │   ├── pages/{index,schedule,map,record,about}/   # 5 页，与 H5 一一对应
 │   ├── stores/      # schedule(import JSON)/location/upload/global-time
 │   ├── utils/       # 与 H5 同源（station_group/countdown/geo/bus_position/datetime/holidays/time）
-│   ├── composables/ # useGeolocation（WGS-84）
+│   ├── composables/ # useGeolocation（WGS-84）、useWeather（云函数 weather 代理）
 │   ├── data/        # sync_miniprogram_data.js 生成（勿手改）
 │   ├── static/icons/# 公交图标（暂沿用 H5 素材）
 │   └── static/tabbar/# tabBar 图标（81×81 PNG，generate_tabbar_icons.py 生成）
@@ -576,6 +576,9 @@ apps/miniprogram/
 4. **云数据库权限默认"仅创建者可读写"**：访客统计/记录共享场景必须手动改权限。
 5. **tabBar 图标**：已补齐（`src/static/tabbar/`，81×81 PNG，灰/蓝两版），由 `scripts/generate_tabbar_icons.py` 从 SVG 生成；改图标只需改该脚本再重跑，勿手改 PNG。微信 tabBar 只认本地图片，不支持 SVG 直引。
 6. **AppID 与云环境 ID 是两个东西**：AppID（小程序后台→开发设置，wx 开头 16 位）≠ 云环境 ID（云开发控制台）。
+7. **云函数默认运行时是 Node 16，没有全局 `fetch`**：云函数里请求外部接口必须用 `https` 模块（`cloudfunctions/weather` 已按此实现）。若用 fetch 会直接抛错，前端只能静默降级（天气不显示、节假日退回内置兜底）。
+8. **云函数不部署 = 前端拿不到数据**：`wx.cloud.callFunction` 会 reject，前端必须 try/catch 静默降级，否则整页报错。排查"天气不显示"先看云函数是否已右键"上传并部署：云端安装依赖"。
+9. **automator 的 `callWxMethod('setStorageSync', ...)` 要传位置参数**：`(key, data)`，不能传 `{key, data}`（那是异步 `setStorage` 的写法），否则静默失败、回读为空。
 
 ### 待办（按优先级）
 
