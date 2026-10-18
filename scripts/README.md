@@ -11,6 +11,7 @@ Node.js / Python 离线工具，操作 `public/data/*.json`。**运行前先备�
 | `regenerate_from_txt.js` | 从 `data/geo/站点经纬度信息路径细化.txt` 重新生成 `route_stops.json`/`route_paths.json`/`stations.json`（JB1 由 JB2 反转自动派生） | `node scripts/regenerate_from_txt.js` |
 | `download_satellite.mjs` | 从 ESRI 下载卫星瓦片拼接底图，生成 `public/data/campus-satellite.jpg` + `satellite-bounds.json`（内部把锚点 GCJ-02 转 WGS-84 下瓦片，属正常用途） | `node scripts/download_satellite.mjs` |
 | `test_scenarios.cjs` | **回归测试**：复刻 findBestRide 等核心逻辑，对真实数据断言 24 个关键场景（同名站多次经过、站点分组、行程规划、时间逻辑等）。每次数据变更后必跑 | `node scripts/test_scenarios.cjs` |
+| `sync_miniprogram_data.js` | 将 `public/data/*.json` 压缩同步到 `apps/miniprogram/src/data/`（小程序端 import 加载）。数据变更后运行 | `node scripts/sync_miniprogram_data.js` |
 
 ## 坐标口径（重要）
 

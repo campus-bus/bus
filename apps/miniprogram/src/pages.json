@@ -1,0 +1,54 @@
+{
+  "pages": [
+    {
+      "path": "pages/index/index",
+      "style": {
+        "navigationBarTitleText": "环线坐车",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/schedule/schedule",
+      "style": {
+        "navigationBarTitleText": "行程"
+      }
+    },
+    {
+      "path": "pages/map/map",
+      "style": {
+        "navigationBarTitleText": "地图",
+        "disableScroll": true
+      }
+    },
+    {
+      "path": "pages/record/record",
+      "style": {
+        "navigationBarTitleText": "记录"
+      }
+    },
+    {
+      "path": "pages/about/about",
+      "style": {
+        "navigationBarTitleText": "关于"
+      }
+    }
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "环线坐车",
+    "navigationBarBackgroundColor": "#F3F4F6",
+    "backgroundColor": "#F3F4F6"
+  },
+  "tabBar": {
+    "color": "#6B7280",
+    "selectedColor": "#1A56DB",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "black",
+    "list": [
+      { "pagePath": "pages/index/index", "text": "首页" },
+      { "pagePath": "pages/schedule/schedule", "text": "行程" },
+      { "pagePath": "pages/map/map", "text": "地图" },
+      { "pagePath": "pages/record/record", "text": "记录" }
+    ]
+  }
+}

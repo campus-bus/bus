@@ -1,0 +1,9 @@
+{
+  "name": "holidays",
+  "version": "1.0.0",
+  "description": "节假日数据（holiday-cn + 按年缓存，含2026兜底）",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}
