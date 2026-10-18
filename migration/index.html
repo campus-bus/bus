@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#1A56DB" />
+  <meta http-equiv="refresh" content="15;url=https://campus-bus.github.io/bus/" />
+  <title>环线坐车已搬迁</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #F3F4F6;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      padding: 24px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 32px 24px;
+      max-width: 420px;
+      width: 100%;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      text-align: center;
+    }
+    .icon { font-size: 48px; margin-bottom: 12px; }
+    h1 { font-size: 20px; color: #1F2937; margin-bottom: 12px; }
+    .desc { font-size: 14px; color: #6B7280; line-height: 1.8; margin-bottom: 20px; }
+    .new-url {
+      display: block;
+      background: #EFF6FF;
+      color: #1A56DB;
+      font-size: 15px;
+      font-weight: 700;
+      padding: 14px 12px;
+      border-radius: 10px;
+      text-decoration: none;
+      word-break: break-all;
+      margin-bottom: 16px;
+      border: 1px solid #BFDBFE;
+    }
+    .new-url:active { background: #DBEAFE; }
+    .btn {
+      display: inline-block;
+      background: #1A56DB;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 28px;
+      font-size: 15px;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .btn:active { opacity: 0.85; }
+    .countdown { font-size: 13px; color: #9CA3AF; margin-top: 16px; }
+    .tip {
+      margin-top: 20px;
+      padding: 12px;
+      background: #FEF3C7;
+      border-radius: 8px;
+      font-size: 12px;
+      color: #92400E;
+      line-height: 1.7;
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon">🚌</div>
+    <h1>环线坐车已搬迁至新地址</h1>
+    <p class="desc">
+      旧地址已停止使用，请收藏并使用新地址访问。<br />
+      已添加到主屏幕的用户，请删除旧图标后<br />用新地址重新添加。
+    </p>
+    <a class="new-url" href="https://campus-bus.github.io/bus/">campus-bus.github.io/bus/</a>
+    <a class="btn" href="https://campus-bus.github.io/bus/">立即前往新地址 →</a>
+    <p class="countdown"><span id="sec">15</span> 秒后自动跳转…</p>
+    <div class="tip">
+      💡 如果你看到的仍是旧版本页面：请彻底关闭浏览器标签页后重新打开本页，系统已自动清除旧缓存。
+    </div>
+  </div>
+
+  <script>
+    // 双保险 1：页面加载即注销所有 Service Worker 并清空缓存
+    // （旧版 PWA 的 SW 缓存会让用户一直看到旧版，必须清理）
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function (rs) {
+        rs.forEach(function (r) { r.unregister() })
+      })
+    }
+    if ('caches' in window) {
+      caches.keys().then(function (keys) {
+        keys.forEach(function (k) { caches.delete(k) })
+      })
+    }
+
+    // 倒计时自动跳转
+    var sec = 15
+    var el = document.getElementById('sec')
+    var timer = setInterval(function () {
+      sec--
+      el.textContent = sec
+      if (sec <= 0) {
+        clearInterval(timer)
+        location.replace('https://campus-bus.github.io/bus/')
+      }
+    }, 1000)
+  </script>
+</body>
+</html>
