@@ -3,7 +3,7 @@
   "appid": "wx9793b294a259ec3a",
   "compileType": "miniprogram",
   "libVersion": "latest",
-  "srcMiniprogramRoot": "dist/dev/mp-weixin/",
+  "miniprogramRoot": "dist/dev/mp-weixin/",
   "cloudfunctionRoot": "cloudfunctions/",
   "setting": {
     "urlCheck": false,
