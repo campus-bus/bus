@@ -10,6 +10,7 @@
 | `fix_route_params.js` | 修正 route_params.json 站名与序列（高超楼→系统楼等） |
 | `add_missing_stations.js` | 向 stations.json 补充系统楼、网球场两个站点 |
 | `apply_new_params.py` | v2.0 路段重估的一次性写回脚本；其硬编码的 HX2/HX3 段键已不适用于 2026-10-18 接驳环线（JB1/JB2）新结构 |
+| `gen_remap_sql.js` | 2026-10-18 历史记录迁移：由映射结果 JSON 生成 Supabase 更新 SQL（已生成 `data/backups/measurements_remap_2026-10-18.sql`，勿重复运行） |
 
 ## 如需重新执行类似操作
 
