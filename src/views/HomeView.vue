@@ -184,7 +184,7 @@ function handleViewOnMap(departureId: string, routeKey: string) {
 // 路线颜色
 const ROUTE_COLORS: Record<string, string> = {
   HX1_NORMAL: '#2563EB', HX1_DINING: '#F59E0B',
-  HX2_NORMAL: '#10B981', HX3_NORMAL: '#8B5CF6', HX3_GAOCHAO: '#7C3AED',
+  JB1_NORMAL: '#10B981', JB2_NORMAL: '#8B5CF6',
 }
 function routeBorderColor(routeKey?: string): string {
   return ROUTE_COLORS[routeKey || ''] || '#6B7280'
@@ -239,7 +239,7 @@ const stopArrivals = computed(() => {
     }
 
     // 去重：preds 中同一 departure 可能有 isDepartureStop + isReturnStop 两条
-    // （如 HX3_GAOCHAO 起终点同站 高超楼），只需保留一条
+    // （如 JB1/JB2 起终点同站 研究生宿舍楼），只需保留一条
     const seenDepartureIds = new Set<string>()
 
     for (const c of candidates) {

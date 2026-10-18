@@ -15,7 +15,7 @@
 | 文件 | 职责 |
 |------|------|
 | `StopInfoPanel.vue` | 点站弹出的底部到站面板：实时读秒（1s tick），仅过滤 isDepartureStop（保留 isReturnStop 回程到站），显示发车状态（已发车绿/未发车红） |
-| `MapLegend.vue` | 路线图例：4 条路线显示开关（HX3_NORMAL/GAOCHAO 联动切换）+ 站名标签开关 |
+| `MapLegend.vue` | 路线图例：4 条路线显示开关（环1/就餐/接驳1/接驳2）+ 站名标签开关 |
 
 ## layout/ 布局组件
 

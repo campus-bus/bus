@@ -4,15 +4,19 @@
 export type DateType = 'weekday' | 'weekend_holiday'
 
 /** 线路名称 */
-export type RouteName = '环线1路' | '环线2路' | '环线3路'
+export type RouteName = '环线1路' | '接驳1路' | '接驳2路'
 
-/** 路线键（5组路线模式） */
+/** 路线键（4组路线模式）
+ * HX1_NORMAL  环线1路（公交，仅工作日）
+ * HX1_DINING  就餐专线（公交，仅工作日就餐时段）
+ * JB1_NORMAL  接驳1路（顺时针环线）
+ * JB2_NORMAL  接驳2路（逆时针环线，与 JB1 同物理环反向）
+ */
 export type RouteKey =
   | 'HX1_NORMAL'
   | 'HX1_DINING'
-  | 'HX2_NORMAL'
-  | 'HX3_NORMAL'
-  | 'HX3_GAOCHAO'
+  | 'JB1_NORMAL'
+  | 'JB2_NORMAL'
 
 /** 数据可信度 */
 export type Confidence = 'confirmed' | 'speculative'

@@ -6,32 +6,15 @@ const mapStore = useMapStore()
 const legendItems = [
   { key: 'HX1_NORMAL', label: '环线1路', color: '#2563EB' },
   { key: 'HX1_DINING', label: '就餐专线', color: '#F59E0B' },
-  { key: 'HX2_NORMAL', label: '环线2路', color: '#10B981' },
-  { key: 'HX3_NORMAL', label: '环线3路', color: '#8B5CF6' },
+  { key: 'JB1_NORMAL', label: '接驳1路', color: '#10B981' },
+  { key: 'JB2_NORMAL', label: '接驳2路', color: '#8B5CF6' },
 ]
 
 function isVisible(key: string): boolean {
-  if (key === 'HX3_NORMAL') {
-    return mapStore.visibleRouteList.includes('HX3_NORMAL') || mapStore.visibleRouteList.includes('HX3_GAOCHAO')
-  }
   return mapStore.visibleRouteList.includes(key)
 }
 
 function toggleVisibility(key: string) {
-  if (key === 'HX3_NORMAL') {
-    // Toggle both 环线3路 variants together
-    const next = new Set(mapStore.visibleRoutes)
-    const visible = next.has('HX3_NORMAL') || next.has('HX3_GAOCHAO')
-    if (visible) {
-      next.delete('HX3_NORMAL')
-      next.delete('HX3_GAOCHAO')
-    } else {
-      next.add('HX3_NORMAL')
-      next.add('HX3_GAOCHAO')
-    }
-    mapStore.visibleRoutes = next
-    return
-  }
   mapStore.toggleRoute(key)
 }
 </script>

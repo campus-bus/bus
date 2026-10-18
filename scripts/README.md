@@ -7,9 +7,8 @@ Node.js / Python 离线工具，操作 `public/data/*.json`。**运行前先备�
 | 脚本 | 用途 | 用法 |
 |------|------|------|
 | `regenerate_predictions.js` | 按 `route_params.json`（站间秒数）+ `departures.json`（发车时刻）重新生成 `arrival_predictions.json` | `node scripts/regenerate_predictions.js` |
-| `recalc_segments.py` | 从 Supabase 拉全部实测记录，按《路段运行时间预估方法》重新计算各段秒数（只打印结果，不写文件） | `python scripts/recalc_segments.py` |
-| `apply_new_params.py` | 将重估后的段秒数写回 `route_params.json`（随后须运行 regenerate_predictions.js） | `python scripts/apply_new_params.py` |
-| `regenerate_from_txt.js` | 从 `data/geo/站点经纬度信息路径细化.txt` 重新生成 `route_stops.json`/`route_paths.json`/`stations.json` | `node scripts/regenerate_from_txt.js` |
+| `recalc_segments.py` | 从 Supabase 拉全部实测记录，按《路段运行时间预估方法》重新计算各段秒数（只打印结果，不写文件；旧环2/环3记录自动归入 JB2 统计池） | `python scripts/recalc_segments.py` |
+| `regenerate_from_txt.js` | 从 `data/geo/站点经纬度信息路径细化.txt` 重新生成 `route_stops.json`/`route_paths.json`/`stations.json`（JB1 由 JB2 反转自动派生） | `node scripts/regenerate_from_txt.js` |
 | `download_satellite.mjs` | 从 ESRI 下载卫星瓦片拼接底图，生成 `public/data/campus-satellite.jpg` + `satellite-bounds.json`（内部把锚点 GCJ-02 转 WGS-84 下瓦片，属正常用途） | `node scripts/download_satellite.mjs` |
 
 ## 坐标口径（重要）
@@ -17,11 +16,18 @@ Node.js / Python 离线工具，操作 `public/data/*.json`。**运行前先备�
 - txt 源文件与 `public/data/*.json` 全部 **WGS-84**，`regenerate_from_txt.js` 直接存储不转换
 - 2026-10-17 前该脚本曾错误地执行 WGS-84→GCJ-02 转换，已修复；若发现坐标整体偏移约数百米，检查是否误用了旧版脚本
 
-## regenerate_from_txt.js 的安全保证（2026-10-17 验证）
+## regenerate_from_txt.js 的安全保证
 
-- **幂等**：在当前数据上重复运行，三个输出文件与线上数据 100% 一致
-- **HX3_GAOCHAO 派生内置**：txt 无 GAOCHAO 独立坐标，脚本自动按 GAOCHAO 站序从 HX3_NORMAL 同名站取坐标派生（已验证与线上一致）
+- **幂等**：在当前数据上重复运行，输出文件与线上数据保持一致（2026-10-17 验证 100% 一致）
+- **JB1 反转派生内置**：txt 只需提供接驳2路（逆时针）坐标，接驳1路（顺时针）由脚本自动反转派生
 - **stations.json 坐标保留**：同名站在不同路线坐标略有差异，线上 stations.json 为人工校准值；脚本检测到已有 stations.json 时保留其坐标，仅更新 serviceRoutes 与新增站点（日志会打印保留明细）
+
+## 站间秒数校准流程（2026-10-18 起）
+
+1. `python scripts/recalc_segments.py` 查看实测重估结果
+2. 手动编辑 `public/data/route_params.json` 对应段的 `finalSegmentSeconds` 与 `cumulativeSeconds`、`totalSeconds`
+3. `node scripts/regenerate_predictions.js`
+4. 记 `CHANGELOG.md` 后 deploy
 
 ## 数据变更标准流程
 

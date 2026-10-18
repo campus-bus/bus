@@ -1,3 +1,7 @@
+# ⚠️ 已归档（2026-10-18）：本脚本为 v2.0 路段重估时的一次性写回脚本，
+# 内部硬编码的 HX2/HX3 段键已不适用于接驳环线（JB1/JB2）新结构，请勿直接运行。
+# 后续站间秒数校准：编辑 public/data/route_params.json 对应段的 finalSegmentSeconds，
+# 然后运行 node scripts/regenerate_predictions.js。
 #!/usr/bin/env python3
 """更新 route_params.json 中的 finalSegmentSeconds / cumulativeSeconds / totalSeconds"""
 

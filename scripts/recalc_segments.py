@@ -59,16 +59,20 @@ def correct_station(route, seg_from, seg_to):
 # route name → routeKey mapping
 name_to_key = {
     "环线1路": "HX1_NORMAL",
-    "环线2路": "HX2_NORMAL",
-    "环线3路": "HX3_NORMAL",
-    "环线3路(系统楼发车)": "HX3_GAOCHAO",   # 旧称（2026-10-17 前记录）
-    "环线3路(高超楼发车)": "HX3_GAOCHAO",   # 现行称
     "就餐专线": "HX1_DINING",
+    # 2026-10-18 起：环线2路/环线3路合并为接驳环线（JB1 顺时针 / JB2 逆时针）
+    # 旧环2/环3记录的段与新线逆时针（JB2）主体走向一致，统一归入 JB2 统计池
+    "环线2路": "JB2_NORMAL",              # 历史记录（2026-10-18 前）
+    "环线3路": "JB2_NORMAL",              # 历史记录
+    "环线3路(系统楼发车)": "JB2_NORMAL",  # 历史记录
+    "环线3路(高超楼发车)": "JB2_NORMAL",  # 历史记录
+    "接驳1路": "JB1_NORMAL",
+    "接驳2路": "JB2_NORMAL",
 }
 
-# routeKey → vehicle type
+# routeKey → vehicle type（公交/接驳车分开统计）
 bus_routes = {"HX1_NORMAL", "HX1_DINING"}
-shuttle_routes = {"HX2_NORMAL", "HX3_NORMAL", "HX3_GAOCHAO"}
+shuttle_routes = {"JB1_NORMAL", "JB2_NORMAL"}
 
 def vehicle_type(rk):
     return "bus" if rk in bus_routes else "shuttle"

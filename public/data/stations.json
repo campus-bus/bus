@@ -3,7 +3,7 @@
     "name": "研究生宿舍楼",
     "lat": 28.257994,
     "lng": 113.045661,
-    "serviceRoutes": "HX1_NORMAL,HX2_NORMAL,HX3_NORMAL,HX3_GAOCHAO"
+    "serviceRoutes": "HX1_NORMAL,JB2_NORMAL,JB1_NORMAL"
   },
   {
     "name": "东门",
@@ -15,19 +15,19 @@
     "name": "2号宿舍楼",
     "lat": 28.26234,
     "lng": 113.044242,
-    "serviceRoutes": "HX1_NORMAL,HX3_NORMAL,HX3_GAOCHAO"
+    "serviceRoutes": "HX1_NORMAL,JB2_NORMAL,JB1_NORMAL"
   },
   {
-    "name": "军体活动中心",
+    "name": "军体活动中心东",
     "lat": 28.264276,
     "lng": 113.042703,
-    "serviceRoutes": "HX1_NORMAL,HX2_NORMAL,HX3_NORMAL,HX3_GAOCHAO"
+    "serviceRoutes": "HX1_NORMAL,JB2_NORMAL,JB1_NORMAL"
   },
   {
     "name": "激光所",
     "lat": 28.268547,
     "lng": 113.041763,
-    "serviceRoutes": "HX1_NORMAL,HX3_NORMAL,HX3_GAOCHAO"
+    "serviceRoutes": "HX1_NORMAL,JB2_NORMAL,JB1_NORMAL"
   },
   {
     "name": "超算中心",
@@ -45,78 +45,66 @@
     "name": "高超楼",
     "lat": 28.270657,
     "lng": 113.036702,
-    "serviceRoutes": "HX1_NORMAL,HX3_NORMAL,HX1_DINING,HX3_GAOCHAO"
+    "serviceRoutes": "HX1_NORMAL,HX1_DINING,JB2_NORMAL,JB1_NORMAL"
   },
   {
     "name": "理学院",
     "lat": 28.268969,
     "lng": 113.036722,
-    "serviceRoutes": "HX1_NORMAL,HX3_NORMAL,HX1_DINING,HX3_GAOCHAO"
+    "serviceRoutes": "HX1_NORMAL,HX1_DINING,JB2_NORMAL,JB1_NORMAL"
   },
   {
     "name": "二食堂",
     "lat": 28.260412,
     "lng": 113.037879,
-    "serviceRoutes": "HX1_NORMAL,HX2_NORMAL,HX3_NORMAL,HX1_DINING,HX3_GAOCHAO"
+    "serviceRoutes": "HX1_NORMAL,HX1_DINING,JB2_NORMAL,JB1_NORMAL"
   },
   {
     "name": "5号宿舍楼",
     "lat": 28.258411,
     "lng": 113.039876,
-    "serviceRoutes": "HX1_NORMAL,HX2_NORMAL,HX1_DINING"
+    "serviceRoutes": "HX1_NORMAL,HX1_DINING,JB2_NORMAL,JB1_NORMAL"
   },
   {
     "name": "305教学楼",
     "lat": 28.257986,
     "lng": 113.043124,
-    "serviceRoutes": "HX1_NORMAL,HX2_NORMAL,HX3_NORMAL,HX1_DINING,HX3_GAOCHAO"
+    "serviceRoutes": "HX1_NORMAL,HX1_DINING,JB2_NORMAL,JB1_NORMAL"
   },
   {
     "name": "一食堂",
     "lat": 28.259904,
     "lng": 113.044899,
-    "serviceRoutes": "HX2_NORMAL,HX3_NORMAL,HX1_DINING,HX3_GAOCHAO"
-  },
-  {
-    "name": "门诊部",
-    "lat": 28.260459,
-    "lng": 113.04726,
-    "serviceRoutes": "HX2_NORMAL"
-  },
-  {
-    "name": "1号宿舍楼",
-    "lat": 28.263323,
-    "lng": 113.044867,
-    "serviceRoutes": "HX2_NORMAL"
-  },
-  {
-    "name": "水上训练中心",
-    "lat": 28.262648,
-    "lng": 113.039453,
-    "serviceRoutes": "HX2_NORMAL"
-  },
-  {
-    "name": "网球场",
-    "lat": 28.265592,
-    "lng": 113.04268,
-    "serviceRoutes": "HX3_NORMAL,HX3_GAOCHAO"
-  },
-  {
-    "name": "空天楼",
-    "lat": 28.27085,
-    "lng": 113.037833,
-    "serviceRoutes": "HX3_NORMAL,HX3_GAOCHAO"
-  },
-  {
-    "name": "图书馆",
-    "lat": 28.260047,
-    "lng": 113.044942,
-    "serviceRoutes": "HX3_NORMAL,HX3_GAOCHAO"
+    "serviceRoutes": "HX1_DINING,JB2_NORMAL,JB1_NORMAL"
   },
   {
     "name": "二食堂北",
     "lat": 28.260462,
     "lng": 113.037881,
     "serviceRoutes": "HX1_DINING"
+  },
+  {
+    "name": "网球场",
+    "lat": 28.265592,
+    "lng": 113.04268,
+    "serviceRoutes": "JB2_NORMAL,JB1_NORMAL"
+  },
+  {
+    "name": "空天楼",
+    "lat": 28.27085,
+    "lng": 113.037833,
+    "serviceRoutes": "JB2_NORMAL,JB1_NORMAL"
+  },
+  {
+    "name": "军体活动中心南",
+    "lat": 28.263272,
+    "lng": 113.042008,
+    "serviceRoutes": "JB2_NORMAL,JB1_NORMAL"
+  },
+  {
+    "name": "水上训练中心",
+    "lat": 28.262648,
+    "lng": 113.039453,
+    "serviceRoutes": "JB2_NORMAL,JB1_NORMAL"
   }
 ]

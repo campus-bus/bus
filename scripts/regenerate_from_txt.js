@@ -3,6 +3,12 @@
 //
 // 坐标口径：txt 源文件与 public/data/*.json 全部为 WGS-84（与卫星底图同口径），
 // 直接存储，不做任何坐标转换。GCJ-02 转换已于静态卫星地图改造后废弃。
+//
+// 路线结构（2026-10-18 起）：
+//   HX1_NORMAL  环线1路（公交）
+//   HX1_DINING  就餐专线（公交）
+//   JB2_NORMAL  接驳2路 = 逆时针环线（txt 中给出完整坐标）
+//   JB1_NORMAL  接驳1路 = 顺时针环线（由 JB2 反转自动派生，txt 无需重复提供）
 
 import fs from 'fs';
 import path from 'path';
@@ -14,21 +20,23 @@ const __dirname = path.dirname(__filename);
 const DATA_DIR = path.join(__dirname, '..', 'public', 'data');
 const TXT_FILE = path.join(__dirname, '..', 'data', 'geo', '站点经纬度信息路径细化.txt');
 
-// 路线键映射
+// 路线键映射（整行精确匹配 txt 中的路线标题）
 const ROUTE_KEY_MAP = {
   '环线1路途径站点': 'HX1_NORMAL',
-  '环线2路途径站点': 'HX2_NORMAL',
-  '环线3路途径站点': 'HX3_NORMAL',
   '就餐专线途径站点': 'HX1_DINING',
+  '接驳2路途径站点（逆时针；接驳1路为其反向，脚本自动派生）': 'JB2_NORMAL',
 };
 
 // 路线站点序列（从 txt 文件中的站名顺序）
+// 注意：JB2_NORMAL 中 激光所/网球场/军体活动中心东 各出现两次（去程+回程），属正常
 const ROUTE_STOP_SEQUENCES = {
-  'HX1_NORMAL': ['研究生宿舍楼', '东门', '2号宿舍楼', '军体活动中心', '激光所', '超算中心', '北门', '高超楼', '理学院', '二食堂', '5号宿舍楼', '305教学楼', '研究生宿舍楼'],
-  'HX2_NORMAL': ['研究生宿舍楼', '一食堂', '门诊部', '1号宿舍楼', '军体活动中心', '水上训练中心', '二食堂', '5号宿舍楼', '305教学楼', '研究生宿舍楼'],
-  'HX3_NORMAL': ['研究生宿舍楼', '一食堂', '2号宿舍楼', '军体活动中心', '网球场', '激光所', '空天楼', '高超楼', '理学院', '二食堂', '图书馆', '305教学楼', '研究生宿舍楼'],
+  'HX1_NORMAL': ['研究生宿舍楼', '东门', '2号宿舍楼', '军体活动中心东', '激光所', '超算中心', '北门', '高超楼', '理学院', '二食堂', '5号宿舍楼', '305教学楼', '研究生宿舍楼'],
   'HX1_DINING': ['高超楼', '理学院', '二食堂', '一食堂', '305教学楼', '5号宿舍楼', '二食堂北', '理学院', '高超楼'],
+  'JB2_NORMAL': ['研究生宿舍楼', '一食堂', '2号宿舍楼', '军体活动中心东', '网球场', '激光所', '空天楼', '高超楼', '理学院', '激光所', '网球场', '军体活动中心东', '军体活动中心南', '水上训练中心', '二食堂', '5号宿舍楼', '305教学楼', '研究生宿舍楼'],
 };
+
+// JB1_NORMAL（顺时针）= JB2_NORMAL 站点序列反转
+const JB1_SEQUENCE = [...ROUTE_STOP_SEQUENCES['JB2_NORMAL']].reverse();
 
 console.log('📖 读取 txt 文件...\n');
 const txtContent = fs.readFileSync(TXT_FILE, 'utf-8');
@@ -70,12 +78,12 @@ for (const line of lines) {
 
     // 检查是否是站点行（不以 > 开头）
     if (!trimmed.startsWith('>')) {
-      // 所有可能的站名列表（按长度排序，优先匹配长名称）
+      // 所有可能的站名列表（按长度排序，长名优先匹配，防止短名截胡）
       const allStationNames = [
-        '研究生宿舍楼', '水上训练中心', '军体活动中心', '305教学楼', '5号宿舍楼',
-        '2号宿舍楼', '1号宿舍楼', '二食堂北', '二食堂', '一食堂', '空天楼',
-        '高超楼', '理学院', '激光所', '超算中心', '门诊部', '网球场', '图书馆',
-        '东门', '北门', '教勤连'
+        '军体活动中心东', '军体活动中心南', '研究生宿舍楼', '水上训练中心',
+        '305教学楼', '5号宿舍楼', '2号宿舍楼', '1号宿舍楼', '二食堂北',
+        '超算中心', '空天楼', '高超楼', '理学院', '激光所', '网球场',
+        '二食堂', '一食堂', '门诊部', '图书馆', '东门', '北门', '教勤连'
       ];
 
       for (const stationName of allStationNames) {
@@ -104,33 +112,16 @@ for (const line of lines) {
   }
 }
 
-// ─── 派生 HX3_GAOCHAO 的 route_stops ───
-// GAOCHAO 与 HX3_NORMAL 走同一物理环（坐标复用），仅起点为高超楼。
-// txt 中无其独立坐标，按 GAOCHAO 站序从 NORMAL 同名站取坐标派生。
-// 已验证：线上 GAOCHAO 全部坐标与 NORMAL 同名站一致（2026-10-17 对比）。
-const HX3_GAOCHAO_SEQ = ['高超楼', '理学院', '二食堂', '图书馆', '305教学楼', '研究生宿舍楼', '一食堂', '2号宿舍楼', '军体活动中心', '网球场', '激光所', '空天楼', '高超楼'];
-
-if (routeStops['HX3_NORMAL'] && routeStops['HX3_NORMAL'].length > 0) {
-  const normalByName = new Map(routeStops['HX3_NORMAL'].map(s => [s.name, s]));
-  const gaochaoStops = [];
-  let allFound = true;
-  for (const name of HX3_GAOCHAO_SEQ) {
-    const src = normalByName.get(name);
-    if (!src) {
-      console.log('  ⚠️  派生 HX3_GAOCHAO 失败：HX3_NORMAL 中不存在站点 ' + name);
-      allFound = false;
-      break;
-    }
-    gaochaoStops.push({ name: src.name, lat: src.lat, lng: src.lng });
-  }
-  if (allFound) {
-    routeStops['HX3_GAOCHAO'] = gaochaoStops;
-    console.log('✅ 已派生 HX3_GAOCHAO 站点（' + gaochaoStops.length + ' 站，坐标复用 HX3_NORMAL）');
-  }
+// ─── 派生 JB1_NORMAL（顺时针）───
+// 站点序列与路径均为 JB2 的完全反转（同物理环线反向运行）
+if (routeStops['JB2_NORMAL'] && routeStops['JB2_NORMAL'].length > 0) {
+  routeStops['JB1_NORMAL'] = [...routeStops['JB2_NORMAL']].reverse();
+  routePaths['JB1_NORMAL'] = [...routePaths['JB2_NORMAL']].reverse();
+  console.log('✅ 已派生 JB1_NORMAL（顺时针，' + routeStops['JB1_NORMAL'].length + ' 站，由 JB2 反转）');
 }
 
-// 验证结果（含派生的 HX3_GAOCHAO）
-const ALL_EXPECTED = { ...ROUTE_STOP_SEQUENCES, 'HX3_GAOCHAO': HX3_GAOCHAO_SEQ };
+// 验证结果（含派生的 JB1_NORMAL）
+const ALL_EXPECTED = { ...ROUTE_STOP_SEQUENCES, 'JB1_NORMAL': JB1_SEQUENCE };
 console.log('\n📊 验证结果：\n');
 for (const [routeKey, stops] of Object.entries(routeStops)) {
   const expected = ALL_EXPECTED[routeKey];
@@ -166,7 +157,7 @@ fs.writeFileSync(
 console.log('✅ 已保存 route_paths.json');
 
 // 更新 stations.json（汇总所有站点，取第一个出现的坐标）
-// serviceRoutes：按 routeStops 键顺序（HX1,HX2,HX3,DINING,GAOCHAO）去重拼接，逗号无空格（与线上格式一致）
+// serviceRoutes：按 routeStops 键顺序去重拼接，逗号无空格（与线上格式一致）
 const stationsDict = {};
 for (const [routeKey, stops] of Object.entries(routeStops)) {
   for (const stop of stops) {

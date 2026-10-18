@@ -29,7 +29,7 @@ const selectedRoute = ref<RouteName>('环线1路')
 const selectedDateType = ref<DateType>(getDateType())
 const expandedId = ref<string | null>(null)
 const sortByTime = ref(true)  // true=按发车时间排列, false=按班次排列
-const routes: RouteName[] = ['环线1路', '环线2路', '环线3路']
+const routes: RouteName[] = ['环线1路', '接驳1路', '接驳2路']
 
 const departures = computed(() => scheduleStore.getDepartures(selectedDateType.value, selectedRoute.value))
 

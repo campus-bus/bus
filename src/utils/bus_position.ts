@@ -135,11 +135,7 @@ export function computeActiveBusPositions(
     const pattern = patterns.get(dep.routeKey)
     if (!pattern || pattern.stops.length < 2) continue
 
-    let path = routePaths[dep.routeKey]
-    // HX3_GAOCHAO 与 HX3_NORMAL 走同一物理环路，fallback 复用路径坐标
-    if ((!path || path.length < 2) && dep.routeKey === 'HX3_GAOCHAO') {
-      path = routePaths['HX3_NORMAL']
-    }
+    const path = routePaths[dep.routeKey]
     if (!path || path.length < 2) continue
 
     let elapsedSeconds = secondsSinceMidnight - dep.departureMinutes * 60

@@ -7,7 +7,7 @@
 | 类型 | 对应数据 | 关键字段 |
 |------|----------|----------|
 | `DateType` | — | `'weekday' \| 'weekend_holiday'` |
-| `RouteKey` | — | 5 种路线模式：`HX1_NORMAL`/`HX1_DINING`/`HX2_NORMAL`/`HX3_NORMAL`/`HX3_GAOCHAO` |
+| `RouteKey` | — | 4 种路线模式：`HX1_NORMAL`/`HX1_DINING`/`JB1_NORMAL`（接驳1路·顺时针）/`JB2_NORMAL`（接驳2路·逆时针） |
 | `Departure` | departures.json | recordId, departureTime, departureMinutes, routeKey, isGaochaoDeparture, confidence |
 | `RouteStop` / `RoutePattern` | route_params.json | finalSegmentSeconds, cumulativeSeconds, isDepartureStop, isReturnStop |
 | `Station` | stations.json | name, lat, lng（WGS-84） |

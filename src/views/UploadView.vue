@@ -25,9 +25,9 @@ function formatLocalTime(isoStr?: string): string {
 
 // routeKey 映射
 const routeToKey: Record<string, string> = {
-  '环线1路': 'HX1_NORMAL', '环线2路': 'HX2_NORMAL', '环线3路': 'HX3_NORMAL', '环线3路(高超楼发车)': 'HX3_GAOCHAO', '就餐专线': 'HX1_DINING'
+  '环线1路': 'HX1_NORMAL', '接驳1路': 'JB1_NORMAL', '接驳2路': 'JB2_NORMAL', '就餐专线': 'HX1_DINING'
 }
-const routeOptions = ['环线1路', '环线2路', '环线3路', '环线3路(高超楼发车)', '就餐专线']
+const routeOptions = ['环线1路', '接驳1路', '接驳2路', '就餐专线']
 
 // 当前路线的完整站点序列（含终点站）
 const routeStops = computed(() => {
@@ -176,7 +176,7 @@ watch(selectedRoute, () => {
           <div class="field-row">
             <span class="label">线路</span>
             <van-radio-group v-model="selectedRoute" direction="horizontal">
-              <van-radio v-for="r in routeOptions" :key="r" :name="r">{{ r.replace('环线1路','环1').replace('环线2路','环2').replace('环线3路(高超楼发车)','环3高超发').replace('环线3路','环3').replace('就餐专线','就餐') }}</van-radio>
+              <van-radio v-for="r in routeOptions" :key="r" :name="r">{{ r.replace('环线1路','环1').replace('接驳1路','接1').replace('接驳2路','接2').replace('就餐专线','就餐') }}</van-radio>
             </van-radio-group>
           </div>
 

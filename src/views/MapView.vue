@@ -28,7 +28,7 @@ const IMG_H = 2816
 // ---- 路线颜色 ----
 const ROUTE_COLORS: Record<string, string> = {
   HX1_NORMAL: '#2563EB', HX1_DINING: '#F59E0B',
-  HX2_NORMAL: '#10B981', HX3_NORMAL: '#8B5CF6', HX3_GAOCHAO: '#7C3AED',
+  JB1_NORMAL: '#10B981', JB2_NORMAL: '#8B5CF6',
 }
 function getRouteColor(key: string) { return ROUTE_COLORS[key] || '#6B7280' }
 
@@ -41,9 +41,10 @@ function extractShiftNum(name: string): number | null {
 
 // ---- 公交车图标 ----
 const BASE_URL = import.meta.env.BASE_URL
+// TODO: 接驳1/2路暂沿用原环线2/3路图标，待新图标素材后替换
 const BUS_ICON: Record<string, string> = {
   HX1_NORMAL: 'icons/环线1路.png', HX1_DINING: 'icons/就餐专线.png',
-  HX2_NORMAL: 'icons/环线2路.png', HX3_NORMAL: 'icons/环线3路.png', HX3_GAOCHAO: 'icons/环线3路.png',
+  JB1_NORMAL: 'icons/环线2路.png', JB2_NORMAL: 'icons/环线3路.png',
 }
 function busIconHtml(rk: string, shift: string, heading: number): string {
   const file = BUS_ICON[rk] || BUS_ICON['HX1_NORMAL']

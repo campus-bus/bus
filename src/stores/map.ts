@@ -10,7 +10,7 @@ export const useMapStore = defineStore('map', () => {
   const selectedStop = ref<string | null>(null)
   const mapCenter = ref<[number, number]>([112.99, 28.221])
   const mapZoom = ref(15)
-  const visibleRoutes = ref<Set<string>>(new Set(['HX1_NORMAL', 'HX1_DINING', 'HX2_NORMAL', 'HX3_NORMAL', 'HX3_GAOCHAO']))
+  const visibleRoutes = ref<Set<string>>(new Set(['HX1_NORMAL', 'HX1_DINING', 'JB1_NORMAL', 'JB2_NORMAL']))
   const visibleRouteList = computed(() => [...visibleRoutes.value])
   const showLabels = ref(true)
 
@@ -46,7 +46,7 @@ export const useMapStore = defineStore('map', () => {
   }
 
   function setAllRoutesVisible() {
-    visibleRoutes.value = new Set(['HX1_NORMAL', 'HX1_DINING', 'HX2_NORMAL', 'HX3_NORMAL', 'HX3_GAOCHAO'])
+    visibleRoutes.value = new Set(['HX1_NORMAL', 'HX1_DINING', 'JB1_NORMAL', 'JB2_NORMAL'])
   }
 
   function clearAllRoutes() {

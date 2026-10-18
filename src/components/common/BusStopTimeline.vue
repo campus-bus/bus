@@ -28,7 +28,7 @@ onUnmounted(() => { if (timer) clearInterval(timer) })
 
 const ROUTE_COLORS: Record<string, string> = {
   HX1_NORMAL: '#2563EB', HX1_DINING: '#F59E0B',
-  HX2_NORMAL: '#10B981', HX3_NORMAL: '#8B5CF6', HX3_GAOCHAO: '#7C3AED',
+  JB1_NORMAL: '#10B981', JB2_NORMAL: '#8B5CF6',
 }
 const routeColor = computed(() => ROUTE_COLORS[props.routeKey] || '#6B7280')
 
@@ -88,8 +88,8 @@ const railStyle = computed(() => {
 
 const iconFile = computed(() => {
   if (props.routeKey === 'HX1_DINING') return 'icons/就餐专线.png'
-  if (props.routeKey.includes('HX2')) return 'icons/环线2路.png'
-  if (props.routeKey.includes('HX3')) return 'icons/环线3路.png'
+  if (props.routeKey.includes('JB1')) return 'icons/环线2路.png'
+  if (props.routeKey.includes('JB2')) return 'icons/环线3路.png'
   return 'icons/环线1路.png'
 })
 

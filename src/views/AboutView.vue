@@ -14,7 +14,7 @@ const scheduleStore = useScheduleStore()
     <div class="section">
       <h3>关于</h3>
       <p>
-        校园环线公交车时刻表查询与到站预测应用。支持环线1路、环线2路、环线3路的发车时刻查询、站点到站预测和地图可视化。
+        校园环线公交车时刻表查询与到站预测应用。支持环线1路、就餐专线、接驳1路（顺时针）、接驳2路（逆时针）的发车时刻查询、站点到站预测和地图可视化。
       </p>
     </div>
 
@@ -25,8 +25,7 @@ const scheduleStore = useScheduleStore()
       </p>
       <br />
       <p>
-        <strong>推测数据：</strong>工作日环线2路 17:10 和 21:30 为根据发车间隔推测，以
-        <span class="spec-label">待确认</span> 标记。
+        接驳1路（顺时针）、接驳2路（逆时针）为同一环线的两个运行方向，线路站点相同、方向相反。
       </p>
     </div>
 
@@ -44,7 +43,7 @@ const scheduleStore = useScheduleStore()
       <ul>
         <li>环线1路仅在<strong>工作日</strong>运行</li>
         <li>标有"就餐"的车次走就餐专线，站点与普通环线1路不同</li>
-        <li>高超楼是系统工程学院所在地，就餐专线和环线3路部分车次在此发车</li>
+        <li>高超楼是系统工程学院所在地，就餐专线在此发车，接驳1路/2路均经过</li>
       </ul>
     </div>
     <div class="section feedback">
