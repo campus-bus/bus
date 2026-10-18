@@ -1,5 +1,6 @@
+// ⚠️ 已归档（2026-10-18）：一次性脚本，SQL 已生成完毕（data/backups/measurements_remap_2026-10-18.sql），勿重复运行
 // 一次性脚本：由映射结果 JSON 生成 Supabase 控制台执行用 SQL
-// 用法：node scripts/gen_remap_sql.js
+// 用法：node scripts/archive/gen_remap_sql.js
 import fs from 'fs'
 
 const updates = JSON.parse(fs.readFileSync('data/backups/measurements_remapped_2026-10-18.json', 'utf-8'))
@@ -27,7 +28,7 @@ DELETE FROM measurements WHERE id IN (39, 44, 83);
 
 -- 验证 1：旧站名/废弃站点应全部消失（预期 0）
 SELECT count(*) AS old_name_left FROM measurements
-WHERE segments::text ~ '系统楼|教勤连|门诊部|1号宿舍楼|图书馆|军体活动中心」';
+WHERE segments::text ~ '系统楼|教勤连|门诊部|1号宿舍楼|图书馆|"军体活动中心"';
 
 -- 验证 2：route 分布预览
 SELECT route, count(*) FROM measurements GROUP BY route ORDER BY route;
