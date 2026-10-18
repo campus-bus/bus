@@ -1,6 +1,6 @@
 {
   "description": "环线坐车小程序（uni-app Vue3）",
-  "appid": "__APPID__",
+  "appid": "wx9793b294a259ec3a",
   "compileType": "miniprogram",
   "libVersion": "latest",
   "srcMiniprogramRoot": "dist/dev/mp-weixin/",
@@ -17,13 +17,30 @@
       "ignore": [],
       "disablePlugins": [],
       "outputPath": ""
-    }
+    },
+    "compileWorklet": false,
+    "uglifyFileName": false,
+    "uploadWithSourceMap": true,
+    "packNpmManually": false,
+    "packNpmRelationList": [],
+    "minifyWXSS": true,
+    "minifyWXML": true,
+    "localPlugins": false,
+    "disableUseStrict": false,
+    "useCompilerPlugins": false,
+    "condition": false
   },
   "packOptions": {
     "ignore": [
-      { "type": "folder", "value": "node_modules" }
-    ]
+      {
+        "value": "node_modules",
+        "type": "folder"
+      }
+    ],
+    "include": []
   },
   "projectname": "campus-bus-miniprogram",
-  "condition": {}
+  "condition": {},
+  "simulatorPluginLibVersion": {},
+  "editorSetting": {}
 }
