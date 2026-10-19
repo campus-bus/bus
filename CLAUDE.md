@@ -632,6 +632,14 @@ apps/miniprogram/
 - 截图前先枚举窗口 `GetWindowRect` 拿真实 rect，**禁止猜坐标**（猜错会白读多张图，污染上下文）。
 
 
+16. **tabBar 图标显示为灰色占位框 = 开发者工具文件索引与重建后的 `dist/dev` 不同步**：`iconPath` 指向的文件存在、MD5 正确、PNG 可解码、日志无任何报错，但模拟器里四个 tab 都显示**同一个灰色方框**。
+    判别方法（可量化，别靠肉眼）：把屏幕 tabBar 图标带裁出来统计深/中灰像素，**四个 tab 数值几乎相同 → 就是占位符**；正常时四个图标的像素分布各不相同，且与各自源图标做滑动窗口相关性搜索能匹配到自己。
+    根因：整体 `Remove-Item -Recurse dist\dev` 后重建，工具的文件监听索引没跟着更新。解法：`cli.bat cache --clean file` → `cache --clean compile` → `close` → `open`。
+    预防：**不要整体删 `dist/dev`**；若必须删，删完一定要重开项目（并重新开 `cli auto`）。
+17. **automator 依赖不要装在 `%TEMP%`**：临时目录会被系统清理，导致探针突然报 `Cannot find module`。应装为项目 devDependency：
+    `npm i -D miniprogram-automator --registry=https://registry.npmmirror.com --legacy-peer-deps`（不加 `--legacy-peer-deps` 会因 `@vitejs/plugin-basic-ssl` 的 peer 冲突失败）。
+    另注意：`cli.bat close` + `open` 重置项目后，自动化端口 9420 会失效，需重新执行 `cli.bat auto --project <项目> --auto-port 9420`。
+
 ### 待办（按优先级）
 
 1. 微信开发者工具编译预览，逐页验收（首页/行程/地图/记录/关于）

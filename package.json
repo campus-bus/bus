@@ -20,6 +20,7 @@
     "@vant/auto-import-resolver": "^1.2.0",
     "@vitejs/plugin-basic-ssl": "^2.3.0",
     "@vitejs/plugin-vue": "^5.0.0",
+    "miniprogram-automator": "^0.13.0",
     "sharp": "^0.35.2",
     "typescript": "~5.4.0",
     "unplugin-auto-import": "^0.17.0",
