@@ -10,6 +10,7 @@ import { getNow } from '@/utils/time'
 import { findNearestStop, findNearestStops, formatWalkTime } from '@/utils/geo'
 import { arrivalCountdown, departureCountdown } from '@/utils/countdown'
 import { toGroup, groupMembers, findBestRide } from '@/utils/station_group'
+import BusStopTimeline from '@/components/BusStopTimeline.vue'
 import type { Departure, ArrivalPrediction, DateType } from '@/types'
 
 interface ArrivalItem {
@@ -283,6 +284,26 @@ function toggleSection(stopName: string) {
   expandedSections.value = next
 }
 
+// ─── 车次卡片展开（显示站点时间线与车辆进度） ───
+// 用 Set 保存已展开卡片的 key，同一页可同时展开多趟车次互不干扰
+const expandedCards = ref<Set<string>>(new Set())
+function toggleCard(key: string) {
+  const next = new Set(expandedCards.value)
+  if (next.has(key)) next.delete(key)
+  else next.add(key)
+  expandedCards.value = next
+}
+/** 附近站卡片的 key 需带站名与 stopSeq：同一班车在多个附近站点、或环线同一站两次经过都会出现 */
+function nearbyCardKey(stopName: string, recordId: string, stopSeq: number) {
+  return `nb-${stopName}-${recordId}-${stopSeq}`
+}
+function destCardKey(recordId: string) {
+  return `dest-${recordId}`
+}
+function departingCardKey(recordId: string) {
+  return `dep-${recordId}`
+}
+
 // ─── 展示辅助 ───
 const ROUTE_COLORS: Record<string, string> = {
   HX1_NORMAL: '#2563EB', HX1_DINING: '#F59E0B',
@@ -359,16 +380,27 @@ const showNotice = ref(false)
         <view
           v-for="(item, idx) in section.arrivals" :key="item.departure.recordId + '-' + item.destSeq"
           v-show="idx < 5 || expandedSections.has(section.stopName)"
-          class="bus-card" :style="{ borderLeftColor: routeColor(item.departure.routeKey) }"
+          class="bus-card" :class="{ expanded: expandedCards.has(nearbyCardKey(section.stopName, item.departure.recordId, item.destSeq || 0)) }"
+          :style="{ borderLeftColor: routeColor(item.departure.routeKey) }"
         >
-          <view class="card-left">
-            <view class="route-badge" :style="{ background: routeColor(item.departure.routeKey) }">{{ routeName(item.departure) }}</view>
-            <text v-if="item.departure.isGaochaoDeparture" class="tag-dining">高超楼发车</text>
+          <view class="bus-card-main" @tap="toggleCard(nearbyCardKey(section.stopName, item.departure.recordId, item.destSeq || 0))">
+            <view class="card-left">
+              <view class="route-badge" :style="{ background: routeColor(item.departure.routeKey) }">{{ routeName(item.departure) }}</view>
+              <text v-if="item.departure.isGaochaoDeparture" class="tag-dining">高超楼发车</text>
+            </view>
+            <view class="card-right">
+              <text class="arrival-time">{{ item.arrivalTime?.slice(0, 5) }}</text>
+              <text :class="etaClass(item.status)">{{ item.label }}</text>
+            </view>
+            <text class="card-arrow" :class="{ rotated: expandedCards.has(nearbyCardKey(section.stopName, item.departure.recordId, item.destSeq || 0)) }">▾</text>
           </view>
-          <view class="card-right">
-            <text class="arrival-time">{{ item.arrivalTime?.slice(0, 5) }}</text>
-            <text :class="etaClass(item.status)">{{ item.label }}</text>
-          </view>
+          <BusStopTimeline
+            v-if="expandedCards.has(nearbyCardKey(section.stopName, item.departure.recordId, item.destSeq || 0))"
+            :departure-id="item.departure.recordId"
+            :route-key="item.departure.routeKey"
+            :highlight-origin="item.stopName"
+            :highlight-origin-seq="item.destSeq"
+          />
         </view>
         <view v-if="section.arrivals.length > 5" class="show-more" @tap="toggleSection(section.stopName)">
           {{ expandedSections.has(section.stopName) ? '收起 ▲' : `展开更多 ${section.arrivals.length - 5} 趟车次 ▼` }}
@@ -387,27 +419,40 @@ const showNotice = ref(false)
       <view
         v-for="(item, idx) in (showAllArrivals ? destArrivals : destArrivals.slice(0, 5))"
         :key="item.departure.recordId"
-        class="bus-card" :style="{ borderLeftColor: routeColor(item.departure.routeKey) }"
+        class="bus-card" :class="{ expanded: expandedCards.has(destCardKey(item.departure.recordId)) }"
+        :style="{ borderLeftColor: routeColor(item.departure.routeKey) }"
       >
-        <view class="card-left">
-          <view class="route-badge" :style="{ background: routeColor(item.departure.routeKey) }">{{ routeName(item.departure) }}</view>
-          <text v-if="item.departure.isGaochaoDeparture" class="tag-dining">高超楼发车</text>
+        <view class="bus-card-main" @tap="toggleCard(destCardKey(item.departure.recordId))">
+          <view class="card-left">
+            <view class="route-badge" :style="{ background: routeColor(item.departure.routeKey) }">{{ routeName(item.departure) }}</view>
+            <text v-if="item.departure.isGaochaoDeparture" class="tag-dining">高超楼发车</text>
+          </view>
+          <view class="card-right">
+            <template v-if="item.candidateStop">
+              <view class="boarding">
+                <text class="boarding-text">{{ item.walkLabel }}到「{{ item.candidateStop }}」</text>
+                <text v-if="item.walkWarning" class="walk-warn">⚠</text>
+              </view>
+              <text class="board-time">于{{ item.boardTime?.slice(0, 5) }}{{ item.isOriginDeparture ? '发车' : '到站' }}</text>
+              <text :class="etaClass(item.boardStatus)">{{ item.boardLabel }}</text>
+              <text class="dest-info">预计 {{ item.destArrivalTime?.slice(0, 5) }} 到「{{ item.destStop }}」</text>
+            </template>
+            <template v-else>
+              <text class="arrival-time">{{ item.arrivalTime?.slice(0, 5) }}</text>
+              <text :class="etaClass(item.status)">{{ item.label }}</text>
+            </template>
+          </view>
+          <text class="card-arrow" :class="{ rotated: expandedCards.has(destCardKey(item.departure.recordId)) }">▾</text>
         </view>
-        <view class="card-right">
-          <template v-if="item.candidateStop">
-            <view class="boarding">
-              <text class="boarding-text">{{ item.walkLabel }}到「{{ item.candidateStop }}」</text>
-              <text v-if="item.walkWarning" class="walk-warn">⚠</text>
-            </view>
-            <text class="board-time">于{{ item.boardTime?.slice(0, 5) }}{{ item.isOriginDeparture ? '发车' : '到站' }}</text>
-            <text :class="etaClass(item.boardStatus)">{{ item.boardLabel }}</text>
-            <text class="dest-info">预计 {{ item.destArrivalTime?.slice(0, 5) }} 到「{{ item.destStop }}」</text>
-          </template>
-          <template v-else>
-            <text class="arrival-time">{{ item.arrivalTime?.slice(0, 5) }}</text>
-            <text :class="etaClass(item.status)">{{ item.label }}</text>
-          </template>
-        </view>
+        <BusStopTimeline
+          v-if="expandedCards.has(destCardKey(item.departure.recordId))"
+          :departure-id="item.departure.recordId"
+          :route-key="item.departure.routeKey"
+          :highlight-stop="item.destStop || selectedStop || ''"
+          :highlight-origin="item.candidateStop || ''"
+          :highlight-dest-seq="item.destSeq"
+          :highlight-origin-seq="item.boardSeq"
+        />
       </view>
       <view v-if="destArrivals.length > 5" class="show-more" @tap="showAllArrivals = !showAllArrivals">
         {{ showAllArrivals ? '收起 ▲' : `展开更多 ${destArrivals.length - 5} 趟车次 ▼` }}
@@ -420,16 +465,25 @@ const showNotice = ref(false)
       <view
         v-for="(item, idx) in (showAllDeparting ? departingSoon : departingSoon.slice(0, 5))"
         :key="item.departure.recordId"
-        class="bus-card" :style="{ borderLeftColor: routeColor(item.departure.routeKey) }"
+        class="bus-card" :class="{ expanded: expandedCards.has(departingCardKey(item.departure.recordId)) }"
+        :style="{ borderLeftColor: routeColor(item.departure.routeKey) }"
       >
-        <view class="card-left">
-          <view class="route-badge" :style="{ background: routeColor(item.departure.routeKey) }">{{ routeName(item.departure) }}</view>
-          <text v-if="item.departure.isGaochaoDeparture" class="tag-dining">高超楼发车</text>
+        <view class="bus-card-main" @tap="toggleCard(departingCardKey(item.departure.recordId))">
+          <view class="card-left">
+            <view class="route-badge" :style="{ background: routeColor(item.departure.routeKey) }">{{ routeName(item.departure) }}</view>
+            <text v-if="item.departure.isGaochaoDeparture" class="tag-dining">高超楼发车</text>
+          </view>
+          <view class="card-right">
+            <text class="arrival-time">{{ item.departure.departureTime }}</text>
+            <text :class="etaClass(item.isUrgent ? 'urgent' : undefined)">{{ item.label }}</text>
+          </view>
+          <text class="card-arrow" :class="{ rotated: expandedCards.has(departingCardKey(item.departure.recordId)) }">▾</text>
         </view>
-        <view class="card-right">
-          <text class="arrival-time">{{ item.departure.departureTime }}</text>
-          <text :class="etaClass(item.isUrgent ? 'urgent' : undefined)">{{ item.label }}</text>
-        </view>
+        <BusStopTimeline
+          v-if="expandedCards.has(departingCardKey(item.departure.recordId))"
+          :departure-id="item.departure.recordId"
+          :route-key="item.departure.routeKey"
+        />
       </view>
       <view v-if="departingSoon.length > 5" class="show-more" @tap="showAllDeparting = !showAllDeparting">
         {{ showAllDeparting ? '收起 ▲' : `展开更多 ${departingSoon.length - 5} 趟车次 ▼` }}
@@ -458,7 +512,8 @@ const showNotice = ref(false)
 .today-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 20rpx; }
 .header-left { display: flex; flex-direction: column; gap: 6rpx; }
 .date-text { font-size: 32rpx; font-weight: 600; }
-.weather-row { display: flex; align-items: center; gap: 8rpx; }.weather-icon { font-size: 26rpx; }
+.weather-row { display: flex; align-items: center; gap: 8rpx; }
+.weather-icon { font-size: 26rpx; }
 .weather-text { font-size: 24rpx; color: #6B7280; }
 .date-tag { font-size: 24rpx; padding: 6rpx 18rpx; border-radius: 999rpx; }
 .date-tag.wd { background: #EFF6FF; color: #1A56DB; }
@@ -501,14 +556,25 @@ const showNotice = ref(false)
 .section-title { font-size: 30rpx; font-weight: 600; margin-bottom: 14rpx; }
 
 .bus-card {
-  background: #fff; border-radius: 14rpx; padding: 20rpx 24rpx; margin-bottom: 12rpx;
-  display: flex; justify-content: space-between; align-items: center;
+  background: #fff; border-radius: 14rpx; margin-bottom: 12rpx; overflow: hidden;
   border-left: 6rpx solid transparent;
+  transition: box-shadow 0.15s;
 }
-.card-left { display: flex; align-items: center; gap: 12rpx; }
-.route-badge { color: #fff; font-size: 22rpx; font-weight: 600; padding: 4rpx 14rpx; border-radius: 8rpx; }
+.bus-card.expanded { box-shadow: 0 4rpx 18rpx rgba(0, 0, 0, 0.08); }
+.bus-card-main {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 20rpx 24rpx;
+}
+.bus-card-main:active { background: #F9FAFB; }
+.card-left { display: flex; align-items: center; gap: 12rpx; flex: 1; min-width: 0; }
+.route-badge { color: #fff; font-size: 22rpx; font-weight: 600; padding: 4rpx 14rpx; border-radius: 8rpx; flex-shrink: 0; }
 .tag-dining { font-size: 20rpx; color: #F59E0B; }
-.card-right { display: flex; flex-direction: column; align-items: flex-end; gap: 2rpx; }
+.card-right { display: flex; flex-direction: column; align-items: flex-end; gap: 2rpx; flex-shrink: 0; }
+.card-arrow {
+  font-size: 22rpx; color: #9CA3AF; margin-left: 14rpx; flex-shrink: 0;
+  transition: transform 0.2s;
+}
+.card-arrow.rotated { transform: rotate(180deg); }
 .arrival-time { font-size: 36rpx; font-weight: 700; color: #1A56DB; font-variant-numeric: tabular-nums; }
 .boarding { display: flex; align-items: center; gap: 6rpx; }
 .boarding-text { font-size: 22rpx; color: #10B981; }

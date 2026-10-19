@@ -5,6 +5,7 @@ import { getDateType } from '@/utils/datetime'
 import { getDateLabel } from '@/utils/holidays'
 import { getNow } from '@/utils/time'
 import { toGroup, groupMembers, findBestRide } from '@/utils/station_group'
+import BusStopTimeline from '@/components/BusStopTimeline.vue'
 import type { Departure, RouteName, DateType } from '@/types'
 
 const scheduleStore = useScheduleStore()
@@ -112,6 +113,11 @@ const selectedRoute = ref<RouteName>('环线1路')
 const selectedDateType = ref<DateType>(getDateType(getNow()))
 const sortByTime = ref(true)
 const expandedId = ref<string | null>(null)
+/** 行程规划结果卡片：展开显示完整站点时间线 */
+const planExpandedId = ref<string | null>(null)
+function togglePlanExpand(id: string) { planExpandedId.value = planExpandedId.value === id ? null : id }
+/** 查询日期是今天才显示车辆运行进度（历史/未来日期用当前时间判断会误导） */
+const isPlanToday = computed(() => planDate.value === todayStr())
 
 const departures = computed(() => scheduleStore.getDepartures(selectedDateType.value, selectedRoute.value))
 const timeSorted = computed(() => [...departures.value].sort((a, b) => a.departureMinutes - b.departureMinutes))
@@ -131,9 +137,6 @@ const grouped = computed(() => {
 })
 
 function toggleExpand(id: string) { expandedId.value = expandedId.value === id ? null : id }
-function getTimeline(recordId: string) {
-  return (predsByDeparture.value.get(recordId) || []).slice().sort((a, b) => a.stopSeq - b.stopSeq)
-}
 
 const ROUTE_COLORS: Record<string, string> = {
   HX1_NORMAL: '#2563EB', HX1_DINING: '#F59E0B',
@@ -186,11 +189,12 @@ function switchRoute(r: RouteName) {
 
       <view v-if="planResults.length > 0" class="results">
         <view class="result-title">找到 {{ planResults.length }} 趟车次（按到达时间从晚到早排列）</view>
-        <view v-for="(r, i) in (planShowAll ? planResults : planResults.slice(0, 10))" :key="i" class="plan-card">
-          <view class="plan-head">
+        <view v-for="(r, i) in (planShowAll ? planResults : planResults.slice(0, 10))" :key="i" class="plan-card" :class="{ expanded: planExpandedId === r.departure.recordId }">
+          <view class="plan-head" @tap="togglePlanExpand(r.departure.recordId)">
             <view class="route-badge" :style="{ background: routeColor(r.departure.routeKey) }">{{ routeNameOf(r.departure) }}</view>
             <text class="plan-shift">{{ r.departure.shiftName }}</text>
             <text v-if="r.departure.isGaochaoDeparture" class="tag-dining">高超楼发车</text>
+            <text class="card-arrow" :class="{ rotated: planExpandedId === r.departure.recordId }">▾</text>
           </view>
           <view class="plan-body">
             <view class="step"><view class="dot start"></view>
@@ -201,6 +205,16 @@ function switchRoute(r: RouteName) {
               <text><text class="time-strong">{{ r.destTime.slice(0, 5) }}</text> 到达 「{{ r.destStop }}」</text>
             </view>
           </view>
+          <BusStopTimeline
+            v-if="planExpandedId === r.departure.recordId"
+            :departure-id="r.departure.recordId"
+            :route-key="r.departure.routeKey"
+            :highlight-stop="r.destStop"
+            :highlight-origin="r.boardStop"
+            :highlight-dest-seq="r.destSeq"
+            :highlight-origin-seq="r.boardSeq"
+            :show-progress="isPlanToday"
+          />
         </view>
         <view v-if="planResults.length > 10 && !planShowAll" class="show-more" @tap="planShowAll = true">
           展开查看更早到达的 {{ planResults.length - 10 }} 趟车次 ▼
@@ -242,13 +256,7 @@ function switchRoute(r: RouteName) {
               </view>
               <text class="arrow" :class="{ rotated: expandedId === dep.recordId }">▾</text>
             </view>
-            <view v-if="expandedId === dep.recordId" class="timeline">
-              <view v-for="stop in getTimeline(dep.recordId)" :key="stop.stopSeq" class="tl-row">
-                <view class="tl-dot" :class="{ start: stop.isDepartureStop, end: stop.isReturnStop }"></view>
-                <text class="tl-name">{{ stop.stopName }}</text>
-                <text class="tl-time">{{ stop.arrivalTime }}</text>
-              </view>
-            </view>
+            <BusStopTimeline v-if="expandedId === dep.recordId" :departure-id="dep.recordId" :route-key="dep.routeKey" :show-progress="false" />
           </view>
         </template>
         <!-- 按班次 -->
@@ -264,13 +272,7 @@ function switchRoute(r: RouteName) {
                 </view>
                 <text class="arrow" :class="{ rotated: expandedId === dep.recordId }">▾</text>
               </view>
-              <view v-if="expandedId === dep.recordId" class="timeline">
-                <view v-for="stop in getTimeline(dep.recordId)" :key="stop.stopSeq" class="tl-row">
-                  <view class="tl-dot" :class="{ start: stop.isDepartureStop, end: stop.isReturnStop }"></view>
-                  <text class="tl-name">{{ stop.stopName }}</text>
-                  <text class="tl-time">{{ stop.arrivalTime }}</text>
-                </view>
-              </view>
+              <BusStopTimeline v-if="expandedId === dep.recordId" :departure-id="dep.recordId" :route-key="dep.routeKey" :show-progress="false" />
             </view>
           </view>
         </template>
@@ -296,10 +298,14 @@ function switchRoute(r: RouteName) {
 .search-btn { background: #1A56DB; color: #fff; text-align: center; padding: 18rpx; border-radius: 999rpx; font-size: 30rpx; margin: 20rpx 0; }
 
 .result-title { font-size: 24rpx; color: #6B7280; margin-bottom: 12rpx; }
-.plan-card { background: #fff; border-radius: 14rpx; padding: 18rpx 22rpx; margin-bottom: 12rpx; }
-.plan-head { display: flex; align-items: center; gap: 12rpx; margin-bottom: 12rpx; }
+.plan-card { background: #fff; border-radius: 14rpx; margin-bottom: 12rpx; overflow: hidden; }
+.plan-card.expanded { box-shadow: 0 4rpx 18rpx rgba(0, 0, 0, 0.08); }
+/* 内边距下放到 head/body，展开时时间线可通栏铺满卡片底部 */
+.plan-head { display: flex; align-items: center; gap: 12rpx; padding: 18rpx 22rpx 0; margin-bottom: 12rpx; }
+.card-arrow { font-size: 22rpx; color: #9CA3AF; transition: transform 0.2s; }
+.card-arrow.rotated { transform: rotate(180deg); }
 .plan-shift { font-size: 24rpx; color: #6B7280; flex: 1; }
-.plan-body { padding-left: 8rpx; }
+.plan-body { padding: 0 22rpx 18rpx 30rpx; }
 .step { display: flex; align-items: center; gap: 12rpx; font-size: 26rpx; padding: 4rpx 0; }
 .dot { width: 14rpx; height: 14rpx; border-radius: 50%; flex-shrink: 0; }
 .dot.start { background: #10B981; }
@@ -329,12 +335,5 @@ function switchRoute(r: RouteName) {
 .route-badge { color: #fff; font-size: 22rpx; font-weight: 600; padding: 4rpx 14rpx; border-radius: 8rpx; }
 .arrow { color: #9CA3AF; transition: transform 0.2s; }
 .arrow.rotated { transform: rotate(180deg); }
-.timeline { border-top: 1rpx solid #F3F4F6; padding: 12rpx 22rpx; background: #FAFBFC; }
-.tl-row { display: flex; align-items: center; gap: 14rpx; padding: 6rpx 0; }
-.tl-dot { width: 12rpx; height: 12rpx; border-radius: 50%; background: #CBD5E1; flex-shrink: 0; }
-.tl-dot.start { background: #10B981; }
-.tl-dot.end { background: #1A56DB; }
-.tl-name { flex: 1; font-size: 26rpx; }
-.tl-time { font-size: 24rpx; color: #6B7280; font-variant-numeric: tabular-nums; }
 .empty { text-align: center; padding: 80rpx 24rpx; font-size: 26rpx; color: #6B7280; }
 </style>
