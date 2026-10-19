@@ -120,8 +120,8 @@ const busPositions = ref<BusPosition[]>([])
 const BUS_ICON: Record<string, string> = {
   HX1_NORMAL: '/static/icons/环线1路.png',
   HX1_DINING: '/static/icons/就餐专线.png',
-  JB1_NORMAL: '/static/icons/环线2路.png',
-  JB2_NORMAL: '/static/icons/环线3路.png',
+  JB1_NORMAL: '/static/icons/接驳1路.png',
+  JB2_NORMAL: '/static/icons/接驳2路.png',
 }
 const busMarkers = computed(() =>
   busPositions.value.map((b, i) => {

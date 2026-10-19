@@ -13,7 +13,7 @@
 ## 技术架构
 
 - **地图**：腾讯 `<map>` 组件（免费不限量），WGS-84→GCJ-02 由 `utils/geo.ts` 的 `wgs84ToGcj02` 转换；站点/路线/公交用 markers+polyline，用户位置用原生 `show-location`
-- **数据库**：云开发云数据库 `measurements`（乘车记录）/ `visits`（访客统计）/ `weather_cache` / `holiday_cache`（集合首次写入自动创建）
+- **数据库**：云开发云数据库 `measurements`（乘车记录）/ `weather_cache` / `holiday_cache`（缓存，**需在控制台手动创建集合，不会自动创建**）；`visits`（访客统计）尚未在小程序端实现
 - **云函数**（`cloudfunctions/`）：`weather`（Open-Meteo 代理 + 30 分钟缓存）、`holidays`（holiday-cn + 按年缓存 + 2026 兜底）
 - **天气**：首页头部展示当前温度/今日高低温/天气描述；小程序不能直连第三方域名，故由 `composables/useWeather.ts` 调云函数 `weather`，本地再缓存 10 分钟；云函数未部署时静默不展示（不影响其他功能）
 - **数据加载**：`stores/schedule.ts` 直接 import 打包 JSON（无网络请求，启动即读；lazyCodeLoading 按需注入）
@@ -42,7 +42,7 @@ npm run build:mp-weixin  # 生产构建（压缩）
 - [x] 前端天气展示（`composables/useWeather.ts` + 首页头部）
 - [ ] 微信开发者工具中右键 `cloudfunctions/weather` → 上传并部署（云端安装依赖）—— **未部署时首页不会显示天气**
 - [ ] 同上部署 `holidays`
-- [ ] 云数据库权限：`measurements`/`visits` 集合改为「所有用户可读，仅创建者可写」（默认仅创建者可读写会导致他人记录不可见）
+- [ ] 云数据库权限：`measurements` 集合改为「所有用户可读，仅创建者可写」（默认仅创建者可读写会导致他人记录不可见）
 
 ## 目录说明
 
@@ -51,10 +51,14 @@ src/
 ├── pages/           # index(首页) schedule(行程) map(地图) record(记录) about(关于)
 ├── stores/          # schedule(数据) location(定位) upload(记录) global-time(调试)
 ├── utils/           # 业务逻辑（与 H5 同源）
-├── composables/     # useGeolocation（WGS-84 定位）
-├── data/            # 同步生成的 JSON（勿手改）
-├── static/icons/    # 公交图标（暂沿用 H5 素材）
+├── composables/     # useGeolocation（WGS-84 定位）、useWeather（云函数天气）
+├── data/            # sync_miniprogram_data.js 生成，勿手改
+├── types/           # index(业务类型，与 H5 一致)、wx(微信原生 API 声明)
+├── static/icons/    # 公交图标
+├── static/tabbar/   # tabBar 图标（generate_tabbar_icons.py 生成）
 └── pages.json       # 页面与 tabBar 配置
 cloudfunctions/      # 云函数（weather/holidays）
-project.config.json  # 开发者工具工程配置（appid 待填）
+scripts/             # 小程序专用工具脚本（截图、tabBar 图标生成）
+docs/                # 接口申请材料与截图（非运行时代码）
+project.config.json  # 开发者工具工程配置（appid 已填）
 ```

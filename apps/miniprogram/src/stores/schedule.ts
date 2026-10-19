@@ -7,7 +7,6 @@ import type {
   ArrivalPrediction,
   RouteName,
   DateType,
-  RouteKey,
 } from '@/types'
 
 // 数据以 import 方式同步加载（由 scripts/sync_miniprogram_data.js 从 H5 public/data 同步生成）
@@ -51,22 +50,6 @@ export const useScheduleStore = defineStore('schedule', () => {
     return m
   })
 
-  const predictionsByDeparture = computed<Map<string, ArrivalPrediction[]>>(() => {
-    const m = new Map<string, ArrivalPrediction[]>()
-    for (const p of predictions.value) {
-      const l = m.get(p.departureId)
-      if (l) l.push(p)
-      else m.set(p.departureId, [p])
-    }
-    return m
-  })
-
-  const patternByKey = computed<Map<RouteKey, RoutePattern>>(() => {
-    const m = new Map<RouteKey, RoutePattern>()
-    for (const rp of routePatterns.value) m.set(rp.routeKey, rp)
-    return m
-  })
-
   function getDepartures(dateType: DateType, route?: RouteName): Departure[] {
     let result = departuresByDateType.value.get(dateType) || []
     if (route) result = result.filter((d) => d.route === route)
@@ -78,12 +61,6 @@ export const useScheduleStore = defineStore('schedule', () => {
     return all.filter((p) => p.dateType === dateType)
   }
 
-  function getPattern(routeKey: RouteKey): RoutePattern | undefined {
-    return patternByKey.value.get(routeKey)
-  }
-
-  const isDataLoaded = computed(() => departures.value.length > 0)
-
   return {
     departures,
     routePatterns,
@@ -91,9 +68,7 @@ export const useScheduleStore = defineStore('schedule', () => {
     predictions,
     routePaths,
     routeStops,
-    isDataLoaded,
     getDepartures,
     getPredictionsForStop,
-    getPattern,
   }
 })
