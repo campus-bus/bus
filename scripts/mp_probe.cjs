@@ -15,6 +15,7 @@
  *
  * 用法：
  *   node scripts/mp_probe.cjs location           # 定位（含真实 errMsg）
+ *   node scripts/mp_probe.cjs geo                # 对比 wgs84 / gcj02 两种取值的差异
  *   node scripts/mp_probe.cjs setting            # 授权状态 + 隐私协议状态
  *   node scripts/mp_probe.cjs weather            # 天气云函数
  *   node scripts/mp_probe.cjs holidays           # 节假日云函数
@@ -108,8 +109,51 @@ function probeLocation() {
   return 'started'
 }
 
-/** 授权状态 + 隐私协议状态 */
-function probeSetting() {
+/**
+ * 坐标系对比：分别用 wgs84 / gcj02 各取一次定位
+ *
+ * 用途：判断当前环境（开发者工具模拟定位 / 真机）是否真的尊重 type 参数。
+ * 若两次结果相同 → 环境不区分坐标系（例如模拟器直接把 GCJ-02 当结果返回），
+ * 此时页面侧必须自己决定要不要转换；若相差 300-800m → 两次都可信。
+ */
+function probeGeo() {
+  const KEY = '__mp_probe_result'
+  wx.setStorageSync(KEY, '{"status":"pending"}')
+  wx.getLocation({
+    type: 'wgs84',
+    success: (a) => {
+      wx.getLocation({
+        type: 'gcj02',
+        success: (b) => {
+          wx.setStorageSync(
+            KEY,
+            JSON.stringify({
+              status: 'ok',
+              wgs84: { latitude: a.latitude, longitude: a.longitude, accuracy: a.accuracy },
+              gcj02: { latitude: b.latitude, longitude: b.longitude, accuracy: b.accuracy },
+            })
+          )
+        },
+        fail: (e) => {
+          wx.setStorageSync(
+            KEY,
+            JSON.stringify({
+              status: 'ok',
+              wgs84: { latitude: a.latitude, longitude: a.longitude, accuracy: a.accuracy },
+              gcj02Error: e && e.errMsg,
+            })
+          )
+        },
+      })
+    },
+    fail: (e) => {
+      wx.setStorageSync(KEY, JSON.stringify({ status: 'fail', errMsg: e && e.errMsg }))
+    },
+  })
+  return 'started'
+}
+
+/** 授权状态 + 隐私协议状态 */function probeSetting() {
   const KEY = '__mp_probe_result'
   wx.setStorageSync(KEY, '{"status":"pending"}')
   wx.getSetting({
@@ -212,6 +256,7 @@ function probePage() {
 
 const PROBES = {
   location: probeLocation,
+  geo: probeGeo,
   setting: probeSetting,
   weather: probeWeather,
   holidays: probeHolidays,

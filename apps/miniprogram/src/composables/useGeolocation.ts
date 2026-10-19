@@ -1,5 +1,6 @@
 import { onMounted, ref } from 'vue'
 import { useLocationStore } from '@/stores/location'
+import { gcj02ToWgs84 } from '@/utils/geo'
 
 /**
  * 小程序定位（WGS-84）
@@ -34,10 +35,28 @@ let watching = false
 /** 是否正在启动（防止并发重复调用 getLocation） */
 let starting = false
 
+/**
+ * 单次定位回调（uni.getLocation type=wgs84）→ 已是 WGS-84，直接入库
+ */
 function handleLocation(res: LocationResult) {
   // 过滤极低精度定位（Wi-Fi 定位精度通常 20-200m）
   if (res.accuracy && res.accuracy > 500) return
   useLocationStore().setUserLocation(res.latitude, res.longitude)
+  error.value = null
+}
+
+/**
+ * 持续监听回调（wx.onLocationChange）→ 固定返回 GCJ-02，必须转回 WGS-84
+ *
+ * 官方文档：回调对象的 latitude/longitude 均「使用 gcj02 国测局坐标系」，
+ * 且不受 startLocationUpdate 的 type 参数影响。本项目站点/路线/距离
+ * 全部为 WGS-84，若直接入库，长沙地区会固定偏移约 600-700m，
+ * 表现就是「人明明在宿舍楼，却显示在网球场/东门附近」这类误判。
+ */
+function handleWatchedLocation(res: LocationResult) {
+  if (res.accuracy && res.accuracy > 500) return
+  const [lng, lat] = gcj02ToWgs84(res.longitude, res.latitude)
+  useLocationStore().setUserLocation(lat, lng)
   error.value = null
 }
 
@@ -77,7 +96,12 @@ function startWatch() {
         success: () => {
           if (watching) return
           watching = true
-          wx.onLocationChange(handleLocation)
+          wx.onLocationChange(handleWatchedLocation)
+        },
+        fail: (err) => {
+          // 常见原因：后台未开通「位置信息（持续监听）」接口权限（需类目审核）
+          // 此时不影响单次定位，只是走动时位置不刷新
+          console.warn('[location] startLocationUpdate 失败:', err?.errMsg || err)
         },
       })
     },
@@ -141,7 +165,7 @@ function init(autoRequest = false) {
 
 function stopWatch() {
   if (watching) {
-    wx.offLocationChange(handleLocation)
+    wx.offLocationChange(handleWatchedLocation)
     wx.stopLocationUpdate({})
     watching = false
   }

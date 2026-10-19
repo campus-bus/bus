@@ -36,6 +36,29 @@ export function wgs84ToGcj02(lng: number, lat: number): [number, number] {
 }
 
 /**
+ * GCJ-02 → WGS-84（火星坐标反解）
+ *
+ * GCJ-02 没有解析逆变换，用正变换迭代逼近：每轮把残差补回输入，
+ * 3 轮即可收敛到 1m 以内（校园尺度远优于 GPS 自身误差）。
+ *
+ * 使用场景：微信 `wx.onLocationChange` 的回调固定返回 GCJ-02
+ * （官方文档：latitude/longitude「使用 gcj02 国测局坐标系」），
+ * 而本项目站点、路线、距离计算全部使用 WGS-84，
+ * 若直接混用会产生约 600-700m 的恒定偏移（长沙地区实测）。
+ * 仅小程序端 wx.onLocationChange 需要；H5 端用的是原生 GPS，无需转换。
+ */
+export function gcj02ToWgs84(lng: number, lat: number): [number, number] {
+  let wgsLng = lng
+  let wgsLat = lat
+  for (let i = 0; i < 3; i++) {
+    const [gLng, gLat] = wgs84ToGcj02(wgsLng, wgsLat)
+    wgsLng += lng - gLng
+    wgsLat += lat - gLat
+  }
+  return [wgsLng, wgsLat]
+}
+
+/**
  * Haversine 公式计算两点间的距离（米）
  */
 export function haversineDistance(

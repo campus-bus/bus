@@ -639,6 +639,9 @@ apps/miniprogram/
 17. **automator 依赖不要装在 `%TEMP%`**：临时目录会被系统清理，导致探针突然报 `Cannot find module`。应装为项目 devDependency：
     `npm i -D miniprogram-automator --registry=https://registry.npmmirror.com --legacy-peer-deps`（不加 `--legacy-peer-deps` 会因 `@vitejs/plugin-basic-ssl` 的 peer 冲突失败）。
     另注意：`cli.bat close` + `open` 重置项目后，自动化端口 9420 会失效，需重新执行 `cli.bat auto --project <项目> --auto-port 9420`。
+18. **`wx.onLocationChange` 回调固定返回 GCJ-02，与 `getLocation({type:'wgs84'})` 不同源**：官方文档明确回调 `latitude`/`longitude`「使用 gcj02 国测局坐标系」，且不受 `startLocationUpdate` 的 `type` 参数影响。本项目站点/路线/距离全按 WGS-84 计算，若把监听回调直接入库，长沙地区会固定偏移 **约 670m**（实测 18 个站点里 14 个会误判到别的站，如「理学院」被判成「网球场」）。
+    正确做法：`utils/geo.ts` 的 `gcj02ToWgs84()`（正变换迭代 3 轮，往返误差 < 0.001m）转换后再写入 store；单次 `getLocation` 的 wgs84 结果**不要**再转，否则同样偏 670m。
+    排查工具：`node scripts/mp_probe.cjs geo` 对比两种 type 的返回值——两次相同说明当前环境（开发者工具模拟定位）不区分坐标系，此时看的是模拟点本身，不代表真机行为。开发者工具无真实 GPS，模拟定位点常驻上次设置的位置，是「人不在那却显示那附近」的最常见原因。
 
 ### 待办（按优先级）
 
