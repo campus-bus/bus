@@ -639,9 +639,14 @@ apps/miniprogram/
 17. **automator 依赖不要装在 `%TEMP%`**：临时目录会被系统清理，导致探针突然报 `Cannot find module`。应装为项目 devDependency：
     `npm i -D miniprogram-automator --registry=https://registry.npmmirror.com --legacy-peer-deps`（不加 `--legacy-peer-deps` 会因 `@vitejs/plugin-basic-ssl` 的 peer 冲突失败）。
     另注意：`cli.bat close` + `open` 重置项目后，自动化端口 9420 会失效，需重新执行 `cli.bat auto --project <项目> --auto-port 9420`。
-18. **`wx.onLocationChange` 回调固定返回 GCJ-02，与 `getLocation({type:'wgs84'})` 不同源**：官方文档明确回调 `latitude`/`longitude`「使用 gcj02 国测局坐标系」，且不受 `startLocationUpdate` 的 `type` 参数影响。本项目站点/路线/距离全按 WGS-84 计算，若把监听回调直接入库，长沙地区会固定偏移 **约 670m**（实测 18 个站点里 14 个会误判到别的站，如「理学院」被判成「网球场」）。
-    正确做法：`utils/geo.ts` 的 `gcj02ToWgs84()`（正变换迭代 3 轮，往返误差 < 0.001m）转换后再写入 store；单次 `getLocation` 的 wgs84 结果**不要**再转，否则同样偏 670m。
-    排查工具：`node scripts/mp_probe.cjs geo` 对比两种 type 的返回值——两次相同说明当前环境（开发者工具模拟定位）不区分坐标系，此时看的是模拟点本身，不代表真机行为。开发者工具无真实 GPS，模拟定位点常驻上次设置的位置，是「人不在那却显示那附近」的最常见原因。
+18. **微信侧位置一律按 GCJ-02 解读，项目内部一律 WGS-84**（坐标系唯一约定）：
+    - `wx.onLocationChange` 官方文档明确回调「使用 gcj02 国测局坐标系」，不受 `startLocationUpdate` 的 `type` 影响，**没有 WGS-84 可选**；
+    - `wx.getLocation` 虽支持 `type:'wgs84'`，但**开发者工具忽略 type**，两种取值原样返回同一个模拟点（`node scripts/mp_probe.cjs geo` 可复现：wgs84/gcj02 完全相同）；
+    - 因此代码里 `getLocation` 也显式要 `gcj02`，与监听共用 `handleWechatLocation()` 统一逆解成 WGS-84 后再入库。规则只有一条：**凡是微信交出来的位置都是 GCJ-02，只在这一处转**。
+    - 若把 GCJ-02 当 WGS-84 直接用，长沙地区固定偏移 **约 670m**（实测 18 个站点里 14 个会误判到别的站：把 GCJ 的「理学院」当成 WGS，最近站会变成「网球场」，仅 23m）。
+    - 反方向（给地图渲染）用 `utils/geo.ts` 的 `wgs84ToGcj02()`：`<map>` 的 markers/polyline/latitude/longitude、`wx.openLocation`、`wx.chooseLocation`、腾讯 LBS（天气）全部只认 GCJ-02。
+    - 距离计算对坐标系不敏感：153 个站对在 WGS-84 与 GCJ-02 下算出的距离最大只差 **2.8m**，远小于 GPS 精度（20-50m）与 200m 附近站阈值——**只要不混用就行**，混用才是 670m。
+    - 开发者工具没有真实 GPS，模拟定位点常驻上次设置的值（且面板用的是 GCJ-02）。想在工具里模拟「研究生宿舍楼」，应填 `28.254769, 113.051463`（该站 WGS-84 的 GCJ-02 值），不是 `28.257994, 113.045661`。
 
 ### 待办（按优先级）
 
