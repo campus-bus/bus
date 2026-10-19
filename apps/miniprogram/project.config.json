@@ -4,7 +4,6 @@
   "compileType": "miniprogram",
   "libVersion": "latest",
   "miniprogramRoot": "dist/dev/mp-weixin/",
-  "cloudfunctionRoot": "cloudfunctions/",
   "setting": {
     "urlCheck": false,
     "es6": true,

@@ -81,7 +81,7 @@ async function main() {
   await shoot(mp, '02-首页-附近站点完整车次.png')
 
   // 5. 地图：自身定位蓝点 + 班车实时位置（startLocationUpdate / onLocationChange 的核心场景）
-  //    注意：地图、记录页都是 tabBar 页，只能用 switchTab 跳转
+  //    注意：地图是 tabBar 页，只能用 switchTab 跳转
   await mp.switchTab('/pages/map/map')
   await sleep(4000)
   // 点「◎」把地图居中到用户位置，让蓝点处于画面中心
@@ -96,11 +96,6 @@ async function main() {
     /* 定位按钮不可用时保持默认视角 */
   }
   await shoot(mp, '03-地图-自身位置与班车位置.png')
-
-  // 6. 记录页：最近站点一键上车（位置数据复用场景）
-  await mp.switchTab('/pages/record/record')
-  await sleep(2500)
-  await shoot(mp, '04-记录-最近站点一键上车.png')
 
   // 收尾：还原 mock 与模拟时间，避免影响后续手动调试
   await mp.evaluate(() => {

@@ -1,16 +1,16 @@
 /**
  * 中国法定节假日数据（小程序版）
  *
- * 策略：
- * 1. 通过云函数 holidays 拉取（云函数端从 holiday-cn 拉取并按年缓存，含兜底）
- * 2. 结果缓存到小程序 storage，下次启动直接读取
- * 3. 全部失败时使用内置 2026 兜底数据
+ * 数据全部内置，不请求任何网络、不依赖云开发。
+ *
+ * 维护方式：每年 11 月国务院公布次年放假安排后，在下方补齐下一年数据，
+ * 重新发版即可（审核 1-3 天，无费用）。未补齐的年份会回退到
+ * "周末即周末、其余即工作日" 的简单判断，不会报错。
  */
-
 import { getNow } from './time'
 
-// ─── 内置兜底（2026 年） ───
-const FALLBACK_HOLIDAYS: Record<string, string> = {
+// ─── 法定节假日（2026 年） ───
+const HOLIDAYS: Record<string, string> = {
   '2026-01-01': '元旦', '2026-01-02': '元旦', '2026-01-03': '元旦',
   '2026-02-17': '春节', '2026-02-18': '春节', '2026-02-19': '春节',
   '2026-02-20': '春节', '2026-02-21': '春节', '2026-02-22': '春节', '2026-02-23': '春节',
@@ -22,14 +22,11 @@ const FALLBACK_HOLIDAYS: Record<string, string> = {
   '2026-10-01': '国庆', '2026-10-02': '国庆', '2026-10-03': '国庆',
   '2026-10-04': '国庆', '2026-10-05': '国庆', '2026-10-06': '国庆', '2026-10-07': '国庆',
 }
-const FALLBACK_WORKDAYS: Set<string> = new Set([
+
+// ─── 调休上班日（周末但需上班） ───
+const WORKDAYS_ON_WEEKEND: Set<string> = new Set([
   '2026-02-14', '2026-02-15', '2026-02-28', '2026-04-04', '2026-04-26', '2026-09-20', '2026-10-10',
 ])
-
-let holidays: Record<string, string> = { ...FALLBACK_HOLIDAYS }
-let workdaysOnWeekend: Set<string> = new Set(FALLBACK_WORKDAYS)
-
-const CACHE_KEY = 'holiday_data_v1'
 
 function dateKey(date: Date): string {
   const y = date.getFullYear()
@@ -38,57 +35,12 @@ function dateKey(date: Date): string {
   return `${y}-${m}-${d}`
 }
 
-function loadCache(): boolean {
-  try {
-    const raw = uni.getStorageSync(CACHE_KEY)
-    if (!raw) return false
-    const cache = JSON.parse(raw as string)
-    if (cache.year !== getNow().getFullYear()) return false // 跨年强制刷新
-    if (cache.holidays) holidays = { ...FALLBACK_HOLIDAYS, ...cache.holidays }
-    if (cache.workdays) workdaysOnWeekend = new Set(cache.workdays)
-    return true
-  } catch {
-    return false
-  }
-}
-
-// ─── 初始化：先读缓存，再异步调云函数刷新 ───
-let initPromise: Promise<void> | null = null
-
-export function initHolidays(): Promise<void> {
-  if (initPromise) return initPromise
-
-  initPromise = (async () => {
-    const hasCache = loadCache()
-    if (hasCache) return // 有当年缓存直接用，后台不刷新（节假日数据极少变动）
-
-    try {
-      const res = await wx.cloud.callFunction({ name: 'holidays' })
-      const result = (res.result as { holidays: Record<string, string>; workdays: string[] }) || null
-      if (result && result.holidays) {
-        holidays = { ...FALLBACK_HOLIDAYS, ...result.holidays }
-        workdaysOnWeekend = new Set(result.workdays || [])
-        uni.setStorageSync(CACHE_KEY, JSON.stringify({
-          year: getNow().getFullYear(),
-          holidays: result.holidays,
-          workdays: result.workdays,
-        }))
-      }
-    } catch (e) {
-      // 云函数未部署/网络失败：使用内置兜底，不阻塞
-      console.warn('holidays 云函数调用失败，使用内置兜底数据', e)
-    }
-  })()
-
-  return initPromise
-}
-
 /** 获取日期标签（节日名 > 调休工作日 > 周末/工作日） */
 export function getDateLabel(date?: Date): string {
   const d = date ?? getNow()
   const key = dateKey(d)
-  if (holidays[key]) return holidays[key]
-  if (workdaysOnWeekend.has(key)) return '工作日'
+  if (HOLIDAYS[key]) return HOLIDAYS[key]
+  if (WORKDAYS_ON_WEEKEND.has(key)) return '工作日'
   const day = d.getDay()
   if (day === 0 || day === 6) return '周末'
   return '工作日'

@@ -4,7 +4,15 @@ import { useUploadStore } from '@/stores/upload'
 import { useScheduleStore } from '@/stores/schedule'
 import { useLocationStore } from '@/stores/location'
 import { findNearestStop } from '@/utils/geo'
-import { onShow } from '@dcloudio/uni-app'
+import { isDevUnlocked } from '@/utils/dev'
+import { onShow, onLoad } from '@dcloudio/uni-app'
+
+// 开发者专属页面：未解锁时直接退回首页，避免普通用户误入
+onLoad(() => {
+  if (isDevUnlocked()) return
+  uni.showToast({ title: '该页面仅维护者可用', icon: 'none' })
+  setTimeout(() => uni.switchTab({ url: '/pages/index/index' }), 1200)
+})
 
 const uploadStore = useUploadStore()
 const scheduleStore = useScheduleStore()
@@ -185,12 +193,15 @@ function formatTime(ts: number) {
       <view v-if="!uploadStore.nickname" class="hint">请先在「手动记录」中输入昵称</view>
       <view v-else-if="uploadStore.loadingHistory" class="hint">加载中…</view>
       <view v-else-if="uploadStore.history.length === 0" class="hint">暂无记录</view>
-      <view v-for="rec in uploadStore.history" :key="rec._id" class="history-card">
+      <view v-for="rec in uploadStore.history" :key="rec.id" class="history-card">
         <view class="history-header">
           <text>{{ rec.date }} {{ formatTime(rec.created_at) }} {{ rec.route }}</text>
-          <text class="delete-btn" @tap="handleDelete(rec._id)">撤销</text>
+          <text class="delete-btn" @tap="handleDelete(rec.id)">撤销</text>
         </view>
         <view class="history-segs">{{ formatSegs(rec.segments) }}</view>
+      </view>
+      <view v-if="uploadStore.history.length > 0" class="copy-btn" @tap="uploadStore.copyCalibrationText()">
+        复制全部记录（用于校准时刻表）
       </view>
     </view>
   </view>
@@ -234,4 +245,5 @@ function formatTime(ts: number) {
 .history-header { display: flex; justify-content: space-between; align-items: center; font-size: 26rpx; font-weight: 600; margin-bottom: 8rpx; }
 .delete-btn { font-size: 22rpx; color: #DC2626; border: 1rpx solid #DC2626; border-radius: 8rpx; padding: 4rpx 14rpx; font-weight: 400; }
 .history-segs { font-size: 24rpx; color: #6B7280; line-height: 1.8; word-break: break-all; }
+.copy-btn { margin-top: 24rpx; text-align: center; font-size: 26rpx; color: #1A56DB; background: #EFF6FF; border-radius: 999rpx; padding: 18rpx; }
 </style>

@@ -23,7 +23,7 @@
     {
       "path": "pages/record/record",
       "style": {
-        "navigationBarTitleText": "记录"
+        "navigationBarTitleText": "记录（维护者）"
       }
     },
     {
@@ -62,12 +62,6 @@
         "text": "地图",
         "iconPath": "static/tabbar/map.png",
         "selectedIconPath": "static/tabbar/map-active.png"
-      },
-      {
-        "pagePath": "pages/record/record",
-        "text": "记录",
-        "iconPath": "static/tabbar/record.png",
-        "selectedIconPath": "static/tabbar/record-active.png"
       }
     ]
   }

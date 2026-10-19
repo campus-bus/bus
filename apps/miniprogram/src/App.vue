@@ -1,20 +1,11 @@
 <script setup lang="ts">
 import { onLaunch } from '@dcloudio/uni-app'
-import { initHolidays } from '@/utils/holidays'
 
-// 云开发环境 ID（微信云开发控制台获取）
-// 注意：是 d5g9，不是 d5q9——只差一个字符就会报 `[100003] Env Not Exists`
-const CLOUD_ENV = 'campus-bus-d5g9cli14141d5144'
-
+// 说明：本项目不从任何服务器拉取数据。
+// 时刻表/站点/预测数据在小程序包内（src/data），节假日内置（utils/holidays），
+// 天气走腾讯位置服务（可选，未配置 Key 时不展示），乘车记录仅存本机。
 onLaunch(() => {
-  // 初始化云开发
-  if (wx.cloud) {
-    wx.cloud.init({ env: CLOUD_ENV, traceUser: true })
-  } else {
-    console.error('当前微信版本过低，请升级微信（云开发不可用）')
-  }
-  // 初始化节假日数据（云函数 + 缓存 + 兜底）
-  initHolidays()
+  // 占位：后续如需启动期初始化，在此处补充
 })
 </script>
 

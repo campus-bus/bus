@@ -44,7 +44,7 @@ const {
   init: initLocation, requestLocation, openSetting, openPrivacyContract,
 } = useGeolocation()
 
-// ─── 天气（云函数代理 Open-Meteo，失败时静默不展示） ───
+// ─── 天气（腾讯位置服务，未配置 Key 时静默不展示） ───
 const { weather, initWeather } = useWeather()
 
 /** 是否已经拿到有效位置 */
@@ -73,6 +73,11 @@ function stopTimer() { if (timer) { clearInterval(timer); timer = null } }
 onShow(() => { startTimer(); initLocation(); initWeather() })
 onHide(stopTimer)
 onUnmounted(stopTimer)
+
+/** 打开关于页（维护者工具入口也在这里） */
+function goAbout() {
+  uni.navigateTo({ url: '/pages/about/about' })
+}
 
 // ─── 站点选择（组化 + 频次排序） ───
 const selectedStop = ref<string | null>(null)
@@ -304,7 +309,7 @@ const showNotice = ref(false)
         <view class="date-text">{{ todayDate }}</view>
         <view v-if="weather" class="weather-row">
           <text class="weather-icon">{{ weather.icon }}</text>
-          <text class="weather-text">{{ weather.tempNow }}°（{{ weather.tempMin }}°~{{ weather.tempMax }}°）{{ weather.desc }}</text>
+          <text class="weather-text">{{ weather.tempNow }}° {{ weather.desc }}</text>
         </view>
       </view>
       <view class="date-tag" :class="dateType === 'weekday' ? 'wd' : 'we'">{{ dateTypeLabel }}</view>
@@ -431,13 +436,16 @@ const showNotice = ref(false)
       </view>
     </view>
 
+    <!-- 页脚 -->
+    <view class="footer-link" @tap="goAbout">关于本应用</view>
+
     <!-- 公告弹窗 -->
     <view v-if="showNotice" class="dialog-mask" @tap="showNotice = false">
       <view class="dialog" @tap.stop>
         <view class="dialog-title">公告</view>
         <view class="dialog-body">
           <view>线路试运行，随时会调整，时间表和预测时间仅供参考。</view>
-          <view class="dialog-body-para">如何帮忙校准：点击底部「记录」→ 输入昵称 → 选择线路 → 点击「上车」，到站停车即点击「计时」，下车提交。</view>
+          <view class="dialog-body-para">如需反馈时刻偏差，欢迎通过「关于 → 反馈意见」联系我们。</view>
         </view>
         <view class="dialog-btn" @tap="showNotice = false">我知道了</view>
       </view>
@@ -450,8 +458,7 @@ const showNotice = ref(false)
 .today-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 20rpx; }
 .header-left { display: flex; flex-direction: column; gap: 6rpx; }
 .date-text { font-size: 32rpx; font-weight: 600; }
-.weather-row { display: flex; align-items: center; gap: 8rpx; }
-.weather-icon { font-size: 26rpx; }
+.weather-row { display: flex; align-items: center; gap: 8rpx; }.weather-icon { font-size: 26rpx; }
 .weather-text { font-size: 24rpx; color: #6B7280; }
 .date-tag { font-size: 24rpx; padding: 6rpx 18rpx; border-radius: 999rpx; }
 .date-tag.wd { background: #EFF6FF; color: #1A56DB; }
@@ -524,4 +531,6 @@ const showNotice = ref(false)
 .dialog-body { font-size: 26rpx; color: #374151; line-height: 1.8; margin-bottom: 24rpx; }
 .dialog-body-para { margin-top: 16rpx; }
 .dialog-btn { background: #1A56DB; color: #fff; text-align: center; padding: 16rpx; border-radius: 12rpx; font-size: 28rpx; }
+
+.footer-link { text-align: center; font-size: 24rpx; color: #9CA3AF; padding: 24rpx 0 8rpx; }
 </style>

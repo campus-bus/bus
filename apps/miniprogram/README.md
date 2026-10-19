@@ -1,6 +1,8 @@
 # apps/miniprogram — 环线坐车微信小程序
 
-基于 **uni-app（Vue 3 + TypeScript + Vite）** 的微信小程序版，与 H5 版（`src/`）共享数据与业务逻辑，全面使用微信生态：腾讯 `<map>` 组件、云开发（云数据库 + 云函数）。
+基于 **uni-app（Vue 3 + TypeScript + Vite）** 的微信小程序版，与 H5 版（`src/`）共享数据与业务逻辑。
+
+**2026-10-19 起不再使用微信云开发**：时刻表数据打包进小程序、节假日内置、天气直连腾讯位置服务（可选）、乘车记录只存本机。因此**无需购买云开发套餐**，也没有任何必须的服务器成本。
 
 ## 与 H5 版的关系
 
@@ -13,10 +15,11 @@
 ## 技术架构
 
 - **地图**：腾讯 `<map>` 组件（免费不限量），WGS-84→GCJ-02 由 `utils/geo.ts` 的 `wgs84ToGcj02` 转换；站点/路线/公交用 markers+polyline，用户位置用原生 `show-location`
-- **数据库**：云开发云数据库 `measurements`（乘车记录）/ `weather_cache` / `holiday_cache`（缓存，**需在控制台手动创建集合，不会自动创建**）；`visits`（访客统计）尚未在小程序端实现
-- **云函数**（`cloudfunctions/`）：`weather`（Open-Meteo 代理 + 30 分钟缓存）、`holidays`（holiday-cn + 按年缓存 + 2026 兜底）
-- **天气**：首页头部展示当前温度/今日高低温/天气描述；小程序不能直连第三方域名，故由 `composables/useWeather.ts` 调云函数 `weather`，本地再缓存 10 分钟；云函数未部署时静默不展示（不影响其他功能）
 - **数据加载**：`stores/schedule.ts` 直接 import 打包 JSON（无网络请求，启动即读；lazyCodeLoading 按需注入）
+- **节假日**：`utils/holidays.ts` 内置当年法定节假日与调休安排，**不请求网络**；每年 11 月补齐次年数据后发版
+- **天气**：`composables/useWeather.ts` 调腾讯位置服务 `apis.map.qq.com`（个人开发者 1 万次/天免费），本地缓存 60 分钟；**未配置 Key 时不展示天气**，其余功能不受影响
+- **乘车记录**：`stores/upload.ts` 仅写本机 storage（最多 200 条），入口在「关于 → 维护者工具」，普通用户不可见；支持复制校准文本
+- **访客统计**：使用微信官方「We 分析」内置报表（免费、零代码），无需自建上报
 
 ## 本地开发
 
@@ -36,29 +39,42 @@ npm run build:mp-weixin  # 生产构建（压缩）
 # 微信开发者工具 → 上传 → 小程序后台提交审核
 ```
 
-## 云开发一次性配置（已完成/待办）
+## 一次性配置（按需）
 
-- [x] 云函数代码（weather / holidays）
-- [x] 前端天气展示（`composables/useWeather.ts` + 首页头部）
-- [ ] 微信开发者工具中右键 `cloudfunctions/weather` → 上传并部署（云端安装依赖）—— **未部署时首页不会显示天气**
-- [ ] 同上部署 `holidays`
-- [ ] 云数据库权限：`measurements` 集合改为「所有用户可读，仅创建者可写」（默认仅创建者可读写会导致他人记录不可见）
+### 天气（可选）
+
+1. https://lbs.qq.com/dev/console/application/mine 注册个人开发者并实名
+2. 创建应用 → 添加 Key → **只勾选「WebServiceAPI」**
+3. 把 Key 填入 `src/config.ts` 的 `TENCENT_LBS_KEY`
+4. 小程序后台 → 开发管理 → 开发设置 → 服务器域名 → request 合法域名，添加 `https://apis.map.qq.com`
+5. 重新编译
+
+不配置也不会报错，首页只是不显示天气。
+
+### 定位
+
+`app.json` 的 `requiredPrivateInfos` 已包含 `getLocation` / `startLocationUpdate` / `onLocationChange`，需在小程序后台对应接口权限审核通过后方可使用。
+
+### 访客统计
+
+小程序后台 →「We 分析」→ 基础版（免费）即可查看访问人数、打开次数、留存、页面分析。
+如需自定义事件（如站点点击），在 We 分析「数据管理 → 上报管理」建好事件后，再用 `wx.reportEvent` 上报；本项目默认不埋点。
 
 ## 目录说明
 
 ```
 src/
-├── pages/           # index(首页) schedule(行程) map(地图) record(记录) about(关于)
-├── stores/          # schedule(数据) location(定位) upload(记录) global-time(调试)
-├── utils/           # 业务逻辑（与 H5 同源）
-├── composables/     # useGeolocation（WGS-84 定位）、useWeather（云函数天气）
+├── pages/           # index(首页) schedule(行程) map(地图) record(维护者记录) about(关于)
+├── stores/          # schedule(数据) location(定位) upload(记录，本地) global-time(调试)
+├── utils/           # 业务逻辑（与 H5 同源）+ dev(维护者开关)
+├── composables/     # useGeolocation（WGS-84 定位）、useWeather（腾讯位置服务）
 ├── data/            # sync_miniprogram_data.js 生成，勿手改
 ├── types/           # index(业务类型，与 H5 一致)、wx(微信原生 API 声明)
 ├── static/icons/    # 公交图标
 ├── static/tabbar/   # tabBar 图标（generate_tabbar_icons.py 生成）
+├── config.ts        # 运行时配置（腾讯位置服务 Key）
 └── pages.json       # 页面与 tabBar 配置
-cloudfunctions/      # 云函数（weather/holidays）
 scripts/             # 小程序专用工具脚本（截图、tabBar 图标生成）
-docs/                # 接口申请材料与截图（非运行时代码）
+docs/                # 接口申请材料与截图；docs/archive/ 存放已停用的云函数
 project.config.json  # 开发者工具工程配置（appid 已填）
 ```

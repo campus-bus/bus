@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { useScheduleStore } from '@/stores/schedule'
 import { getNow } from '@/utils/time'
 
 export interface TimeSegment {
@@ -10,8 +9,7 @@ export interface TimeSegment {
 }
 
 export interface Measurement {
-  _id: string
-  user_id: string
+  id: string
   route: string
   shift: string
   depart_time: string
@@ -20,15 +18,40 @@ export interface Measurement {
   created_at: number
 }
 
+const STORAGE_KEY = 'measurement_history_v1'
+/** 本地只保留最近 200 条，约 60KB，远低于单 key 1MB 上限 */
+const MAX_RECORDS = 200
+
 /** 本地时区的 YYYY-MM-DD（不能用 toISOString，UTC 会导致 00:00-08:00 日期串到前一天） */
 function localDateStr(): string {
   const d = getNow()
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
-/** 手动记录上传（云数据库 measurements 集合） */
+/** 读取本地记录；storage 损坏时返回空数组，避免页面白屏 */
+function readAll(): Measurement[] {
+  try {
+    const raw = uni.getStorageSync(STORAGE_KEY)
+    if (!raw) return []
+    const list = JSON.parse(raw as string)
+    return Array.isArray(list) ? list : []
+  } catch {
+    return []
+  }
+}
+
+function writeAll(list: Measurement[]) {
+  uni.setStorageSync(STORAGE_KEY, JSON.stringify(list.slice(0, MAX_RECORDS)))
+}
+
+/**
+ * 手动记录（仅开发者在本机使用，不经过任何服务器）
+ *
+ * 设计说明：乘车记录的唯一用途是校准站间秒数，实际只需要少量高质量样本。
+ * 因此不做云端汇总，全部存在本机，避免引入云开发或第三方后端。
+ */
 export const useUploadStore = defineStore('upload', () => {
-  const nickname = ref(uni.getStorageSync('bus_nickname') || '')
+  const nickname = ref(uni.getStorageSync('bus_nickname') || '管理员')
   const uploading = ref(false)
   const history = ref<Measurement[]>([])
   const loadingHistory = ref(false)
@@ -44,14 +67,6 @@ export const useUploadStore = defineStore('upload', () => {
   function saveNickname(name: string) {
     nickname.value = name
     uni.setStorageSync('bus_nickname', name)
-  }
-
-  const scheduleStore = useScheduleStore()
-
-  function getStopsForRoute(routeKey: string): string[] {
-    const rp = scheduleStore.routePatterns.find(p => p.routeKey === routeKey)
-    if (!rp) return []
-    return rp.stops.map(s => s.currentStop)
   }
 
   function startRecordingAt(stopName: string) {
@@ -89,62 +104,74 @@ export const useUploadStore = defineStore('upload', () => {
     timingActive.value = false
   }
 
-  function db() {
-    return wx.cloud.database()
-  }
-
-  /** 提交记录（字段结构与 H5/Supabase measurements 保持一致） */
-  async function submit(route: string, shift = '', departTime = ''): Promise<boolean> {
-    if (!nickname.value || recordedSegments.value.length === 0) return false
+  /** 保存到本机；返回是否成功 */
+  function submit(route: string, shift = '', departTime = ''): boolean {
+    if (recordedSegments.value.length === 0) return false
     uploading.value = true
     try {
-      await db().collection('measurements').add({
-        data: {
-          user_id: nickname.value,
-          route,
-          shift,
-          depart_time: departTime,
-          date: localDateStr(),
-          segments: recordedSegments.value,
-          created_at: Date.now(),
-        },
-      })
+      const record: Measurement = {
+        id: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+        route,
+        shift,
+        depart_time: departTime,
+        date: localDateStr(),
+        segments: [...recordedSegments.value],
+        created_at: Date.now(),
+      }
+      writeAll([record, ...readAll()])
       resetRecording()
-      await loadHistory()
+      loadHistory()
       return true
     } catch (e) {
-      console.error('上传失败', e)
+      console.error('保存记录失败', e)
       return false
     } finally {
       uploading.value = false
     }
   }
 
-  async function loadHistory() {
-    if (!nickname.value) return
+  function loadHistory() {
     loadingHistory.value = true
     try {
-      const res = await db().collection('measurements')
-        .where({ user_id: nickname.value })
-        .orderBy('created_at', 'desc')
-        .limit(50)
-        .get()
-      history.value = res.data as Measurement[]
-    } catch (e) {
-      console.error('加载历史失败', e)
+      history.value = readAll()
     } finally {
       loadingHistory.value = false
     }
   }
 
-  async function deleteRecord(id: string) {
+  function deleteRecord(id: string) {
     try {
-      await db().collection('measurements').doc(id).remove()
-      history.value = history.value.filter(r => r._id !== id)
+      writeAll(readAll().filter(r => r.id !== id))
+      history.value = history.value.filter(r => r.id !== id)
     } catch (e) {
-      console.error('删除失败', e)
+      console.error('删除记录失败', e)
       uni.showToast({ title: '删除失败', icon: 'none' })
     }
+  }
+
+  /**
+   * 生成可直接粘贴给管理员做校准的纯文本（每行一段：日期 线路 起点→终点 秒数）
+   * 用户量少时比任何云端汇总都实用，也便于人工核对异常值。
+   */
+  function buildCalibrationText(): string {
+    const rows: string[] = []
+    for (const rec of readAll()) {
+      const d = new Date(rec.created_at)
+      const hh = String(d.getHours()).padStart(2, '0')
+      const mm = String(d.getMinutes()).padStart(2, '0')
+      for (const seg of rec.segments) {
+        rows.push(`${rec.date} ${hh}:${mm} ${rec.route} ${seg.from}→${seg.to} ${seg.seconds}s`)
+      }
+    }
+    return rows.length ? rows.join('\n') : '暂无记录'
+  }
+
+  /** 复制校准文本到剪贴板（无服务器也能交给管理员汇总） */
+  function copyCalibrationText() {
+    uni.setClipboardData({
+      data: buildCalibrationText(),
+      success: () => uni.showToast({ title: '已复制，可粘贴发给我', icon: 'none' }),
+    })
   }
 
   return {
@@ -153,5 +180,6 @@ export const useUploadStore = defineStore('upload', () => {
     startTime, recordedSegments, currentFromStop, segmentSeconds, timingActive,
     startRecordingAt, recordSegment, undoLastSegment, resetRecording,
     submit, loadHistory, deleteRecord,
+    buildCalibrationText, copyCalibrationText,
   }
 })

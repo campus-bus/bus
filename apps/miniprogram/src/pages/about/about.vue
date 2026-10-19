@@ -1,3 +1,39 @@
+<script setup lang="ts">
+import { ref } from 'vue'
+import { isDevUnlocked, unlockDev, lockDev } from '@/utils/dev'
+
+const devUnlocked = ref(isDevUnlocked())
+
+/** 维护者入口：口令正确后进入记录页（普通用户看不到任何记录功能） */
+function openDevEntry() {
+  if (devUnlocked.value) {
+    uni.navigateTo({ url: '/pages/record/record' })
+    return
+  }
+  uni.showModal({
+    title: '维护者入口',
+    editable: true,
+    placeholderText: '请输入口令',
+    success: (res) => {
+      if (!res.confirm) return
+      const input = (res as { content?: string }).content || ''
+      if (unlockDev(input)) {
+        devUnlocked.value = true
+        uni.navigateTo({ url: '/pages/record/record' })
+      } else {
+        uni.showToast({ title: '口令不正确', icon: 'none' })
+      }
+    },
+  })
+}
+
+function exitDev() {
+  lockDev()
+  devUnlocked.value = false
+  uni.showToast({ title: '已退出维护者模式', icon: 'none' })
+}
+</script>
+
 <template>
   <view class="about-page">
     <view class="header">
@@ -36,6 +72,14 @@
       <text class="link" selectable user-select>https://v.wjx.cn/vm/thRw5hx.aspx</text>
       <view class="tip">长按链接可复制</view>
     </view>
+
+    <!-- 维护者工具：普通用户无需理会 -->
+    <view class="section dev">
+      <view class="section-title">维护者工具</view>
+      <view class="text">用于实测校准站间秒数，仅本机保存，不会上传。</view>
+      <view class="dev-btn" @tap="openDevEntry">{{ devUnlocked ? '进入记录页' : '维护者入口' }}</view>
+      <view v-if="devUnlocked" class="dev-exit" @tap="exitDev">退出维护者模式</view>
+    </view>
   </view>
 </template>
 
@@ -52,4 +96,7 @@
 .feedback { text-align: center; }
 .feedback .section-title { text-align: left; }
 .feedback .text { text-align: left; }
+.dev { background: #FAFAFA; border: 1rpx dashed #D1D5DB; }
+.dev-btn { margin-top: 16rpx; text-align: center; font-size: 26rpx; color: #6B7280; border: 1rpx solid #D1D5DB; border-radius: 999rpx; padding: 14rpx; }
+.dev-exit { margin-top: 12rpx; text-align: center; font-size: 24rpx; color: #9CA3AF; }
 </style>

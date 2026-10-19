@@ -2,16 +2,12 @@
  * 微信小程序原生全局对象声明
  *
  * @dcloudio/types 只提供 uni.* 的类型，不含 wx.*，
- * 而本项目在用到微信原生能力（云开发、隐私授权、前台持续定位）时需要直接调用 wx.*。
+ * 而本项目在用到微信原生能力（隐私授权、前台持续定位）时需要直接调用 wx.*。
  * 这里只声明实际用到的部分，避免整个项目报 "Cannot find name 'wx'"。
+ *
+ * 注：本项目已不再使用云开发，wx.cloud 相关声明已移除。
  */
 declare const wx: {
-  /** 云开发 */
-  cloud: {
-    init(opts: { env: string; traceUser?: boolean }): void
-    database(): any
-    callFunction(opts: { name: string; data?: Record<string, unknown> }): Promise<any>
-  }
   /** 获取用户已授权的 scope 列表 */
   getSetting(opts: {
     success?: (res: { authSetting: Record<string, boolean | undefined> }) => void

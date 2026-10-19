@@ -7,7 +7,7 @@
 用法（在 apps/miniprogram 目录下）：
     python scripts/generate_tabbar_icons.py
 
-输出：src/static/tabbar/{home,schedule,map,record}[-active].png
+    输出：src/static/tabbar/{home,schedule,map}[-active].png
 """
 
 import io
@@ -43,13 +43,6 @@ ICONS = {
     "map": """
         <path d="M12 21.2 C12 21.2 19.2 14.6 19.2 9.6 A7.2 7.2 0 1 0 4.8 9.6 C4.8 14.6 12 21.2 12 21.2 Z" />
         <circle cx="12" cy="9.5" r="2.7" />
-    """,
-    # 记录：记录板
-    "record": """
-        <path d="M8.8 4.6 H15.2 V7.4 H8.8 Z" />
-        <path d="M7.6 5.6 H5.8 A1.8 1.8 0 0 0 4 7.4 V19.2 A1.8 1.8 0 0 0 5.8 21 H18.2 A1.8 1.8 0 0 0 20 19.2 V7.4 A1.8 1.8 0 0 0 18.2 5.6 H16.4" />
-        <path d="M8.2 11.4 H15.8" />
-        <path d="M8.2 15.4 H13.4" />
     """,
 }
 
