@@ -13,9 +13,17 @@ export interface Measurement {
   _id: string
   user_id: string
   route: string
+  shift: string
+  depart_time: string
   date: string
   segments: TimeSegment[]
   created_at: number
+}
+
+/** 本地时区的 YYYY-MM-DD（不能用 toISOString，UTC 会导致 00:00-08:00 日期串到前一天） */
+function localDateStr(): string {
+  const d = getNow()
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
 /** 手动记录上传（云数据库 measurements 集合） */
@@ -85,7 +93,8 @@ export const useUploadStore = defineStore('upload', () => {
     return wx.cloud.database()
   }
 
-  async function submit(route: string): Promise<boolean> {
+  /** 提交记录（字段结构与 H5/Supabase measurements 保持一致） */
+  async function submit(route: string, shift = '', departTime = ''): Promise<boolean> {
     if (!nickname.value || recordedSegments.value.length === 0) return false
     uploading.value = true
     try {
@@ -93,7 +102,9 @@ export const useUploadStore = defineStore('upload', () => {
         data: {
           user_id: nickname.value,
           route,
-          date: getNow().toISOString().slice(0, 10),
+          shift,
+          depart_time: departTime,
+          date: localDateStr(),
           segments: recordedSegments.value,
           created_at: Date.now(),
         },

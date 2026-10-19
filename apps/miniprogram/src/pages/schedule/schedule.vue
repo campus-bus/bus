@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useScheduleStore } from '@/stores/schedule'
 import { getDateType } from '@/utils/datetime'
 import { getDateLabel } from '@/utils/holidays'
@@ -12,12 +12,21 @@ const scheduleStore = useScheduleStore()
 const activeTab = ref(0)
 
 // ─── 站点列表（组化） ───
+// 站点按组聚合显示：军体活动中心东/南 → 军体活动中心，二食堂/二食堂北 → 二食堂
 const allStops = computed(() => {
   const names = new Set<string>()
   for (const rp of scheduleStore.routePatterns) {
     for (const s of rp.stops) names.add(toGroup(s.currentStop))
   }
-  return [...names]
+  // 按首页点击频次排序（组频次 = 成员频次之和），常用站排在前面
+  let freq: Record<string, number> = {}
+  try { freq = JSON.parse(uni.getStorageSync('stop_click_freq') || '{}') } catch { freq = {} }
+  const groupFreq: Record<string, number> = {}
+  for (const [stop, f] of Object.entries(freq)) {
+    const g = toGroup(stop)
+    groupFreq[g] = (groupFreq[g] || 0) + f
+  }
+  return [...names].sort((a, b) => (groupFreq[b] || 0) - (groupFreq[a] || 0))
 })
 
 // ─── 行程规划 ───
@@ -45,6 +54,14 @@ interface PlanResult {
 const planResults = ref<PlanResult[]>([])
 const planShowAll = ref(false)
 const searched = ref(false)
+
+// 切换顶部 tab、日期或起止站后，旧查询结果已失效，清空避免误导
+function resetPlanResults() {
+  planResults.value = []
+  planShowAll.value = false
+  searched.value = false
+}
+watch([activeTab, planDate, planOrigin, planDest], resetPlanResults)
 
 const planDateType = computed<DateType>(() => getDateType(new Date(planDate.value + 'T00:00:00+08:00')))
 const planDateLabel = computed(() => getDateLabel(new Date(planDate.value + 'T00:00:00+08:00')))
@@ -99,7 +116,7 @@ const expandedId = ref<string | null>(null)
 const departures = computed(() => scheduleStore.getDepartures(selectedDateType.value, selectedRoute.value))
 const timeSorted = computed(() => [...departures.value].sort((a, b) => a.departureMinutes - b.departureMinutes))
 
-const cnNum: Record<string, number> = { '一': 1, '二': 2, '三': 3, '四': 4, '五': 5 }
+const cnNum: Record<string, number> = { '一':1,'二':2,'三':3,'四':4,'五':5,'六':6,'七':7,'八':8,'九':9,'十':10 }
 function shiftOrder(name: string): number {
   for (const [cn, n] of Object.entries(cnNum)) if (name.includes(cn)) return n
   return 0

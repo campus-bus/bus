@@ -104,13 +104,8 @@ async function readDbCache(year) {
 async function writeDbCache(year, holidays, workdays) {
   const data = { holidays, workdays, updatedAt: Date.now() }
   try {
-    await db.collection('holiday_cache').doc(String(year)).update({ data })
-    return
-  } catch (e) {
-    // 文档不存在，尝试插入
-  }
-  try {
-    await db.collection('holiday_cache').add({ data: { _id: String(year), ...data } })
+    // doc().set() 是 upsert：文档不存在时直接创建，无需先 update 再兜底 add
+    await db.collection('holiday_cache').doc(String(year)).set({ data })
   } catch (e) {
     // 集合不存在：忽略，缓存不是必需项
   }

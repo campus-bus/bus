@@ -66,13 +66,8 @@ async function readCache() {
 async function writeCache(payload) {
   const data = { payload, updatedAt: Date.now() }
   try {
-    await db.collection('weather_cache').doc('current').update({ data })
-    return
-  } catch (e) {
-    // 文档不存在时 update 会失败，尝试 add 插入
-  }
-  try {
-    await db.collection('weather_cache').add({ data: { _id: 'current', ...data } })
+    // doc().set() 是 upsert：文档不存在时直接创建，无需先 update 再兜底 add
+    await db.collection('weather_cache').doc('current').set({ data })
   } catch (e) {
     // 集合不存在等异常：忽略，缓存不是必需项
   }

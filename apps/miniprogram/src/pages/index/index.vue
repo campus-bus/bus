@@ -60,12 +60,12 @@ function onLocateTap() {
   else requestLocation()
 }
 
-const dateType = computed<DateType>(() => getDateType(getNow()))
-const dateTypeLabel = computed(() => getDateLabel(getNow()))
-const todayDate = computed(() => formatDate(getNow()))
-
 // ─── 秒级刷新 ───
+// 时间相关派生值统一依赖 nowTick：既驱动倒计时，也保证节假日数据异步到达、跨天后能自动纠正
 const nowTick = ref(0)
+const dateType = computed<DateType>(() => { void nowTick.value; return getDateType(getNow()) })
+const dateTypeLabel = computed(() => { void nowTick.value; return getDateLabel(getNow()) })
+const todayDate = computed(() => { void nowTick.value; return formatDate(getNow()) })
 const secondsNow = computed(() => { void nowTick.value; return getSecondsSinceMidnight(getNow()) })
 let timer: ReturnType<typeof setInterval> | null = null
 function startTimer() { if (!timer) timer = setInterval(() => { nowTick.value++ }, 1000) }
@@ -78,12 +78,23 @@ onUnmounted(stopTimer)
 const selectedStop = ref<string | null>(null)
 const stopSearch = ref('')
 const stopExpanded = ref(false)
-const clickFreq = ref<Record<string, number>>(
-  JSON.parse(uni.getStorageSync('stop_click_freq') || '{}')
-)
-const groupFreq = computed(() => {
+/** 读取点击频次（storage 损坏时回退为空，避免首页 setup 抛错白屏） */
+function readClickFreq(): Record<string, number> {
+  try {
+    return JSON.parse(uni.getStorageSync('stop_click_freq') || '{}')
+  } catch {
+    return {}
+  }
+}
+const initialClickFreq = readClickFreq()
+// 点击计数：实时累加并持久化，仅用于记录偏好
+const clickFreq = ref<Record<string, number>>(initialClickFreq)
+// 排序依据：页面创建时冻结，避免点击后站点按钮立即跳位（与 H5 版一致）
+const sortOrder = ref<Record<string, number>>({ ...initialClickFreq })
+// 组频次 = 成员频次之和（兼容旧的具体站频次数据，如「军体活动中心东」计入「军体活动中心」）
+const groupSortOrder = computed(() => {
   const agg: Record<string, number> = {}
-  for (const [stop, f] of Object.entries(clickFreq.value)) {
+  for (const [stop, f] of Object.entries(sortOrder.value)) {
     const g = toGroup(stop)
     agg[g] = (agg[g] || 0) + f
   }
@@ -91,8 +102,10 @@ const groupFreq = computed(() => {
 })
 const sortedStops = computed(() => {
   const groups = new Set(scheduleStore.stations.map(s => toGroup(s.name)))
-  return [...groups].sort((a, b) => (groupFreq.value[b] || 0) - (groupFreq.value[a] || 0))
+  return [...groups].sort((a, b) => (groupSortOrder.value[b] || 0) - (groupSortOrder.value[a] || 0))
 })
+// 频次最高的 3 个站点，展示「常去」标记
+const freqTop3 = computed(() => sortedStops.value.slice(0, 3))
 const displayStops = computed(() => {
   if (stopSearch.value) return sortedStops.value.filter(s => s.includes(stopSearch.value))
   return stopExpanded.value ? sortedStops.value : sortedStops.value.slice(0, 5)
@@ -107,6 +120,7 @@ function selectStop(name: string) {
   uni.setStorageSync('stop_click_freq', JSON.stringify(clickFreq.value))
   selectedStop.value = name
   stopSearch.value = ''
+  showAllArrivals.value = false
 }
 
 // ─── 班次预测索引 ───
@@ -327,7 +341,7 @@ const showNotice = ref(false)
         v-for="stop in displayStops" :key="stop"
         class="stop-chip" :class="{ active: selectedStop === stop }"
         @tap="selectStop(stop)"
-      >{{ stop }}</view>
+      >{{ stop }}<text v-if="freqTop3.includes(stop)" class="freq-badge">常去</text></view>
       <view v-if="!stopSearch" class="stop-chip more" @tap="stopExpanded = !stopExpanded">
         {{ stopExpanded ? '收起 ▲' : '更多 ▼' }}
       </view>
@@ -474,6 +488,7 @@ const showNotice = ref(false)
 .stop-chip { padding: 8rpx 20rpx; background: #fff; border-radius: 999rpx; font-size: 24rpx; border: 1rpx solid #E5E7EB; color: #1F2937; }
 .stop-chip.active { background: #EFF6FF; border-color: #1A56DB; color: #1A56DB; font-weight: 600; }
 .stop-chip.more { background: #F3F4F6; color: #6B7280; }
+.freq-badge { margin-left: 8rpx; padding: 0 8rpx; border-radius: 6rpx; background: #FEF3C7; color: #92400E; font-size: 18rpx; }
 
 .section { margin-top: 24rpx; }
 .section-title { font-size: 30rpx; font-weight: 600; margin-bottom: 14rpx; }

@@ -123,11 +123,22 @@ const BUS_ICON: Record<string, string> = {
   JB1_NORMAL: '/static/icons/接驳1路.png',
   JB2_NORMAL: '/static/icons/接驳2路.png',
 }
+// departureId → marker id 固定映射：车辆增减时 id 不漂移，避免地图图标跳位
+const busMarkerIdMap = new Map<string, number>()
+let nextBusMarkerId = 2001
+function busMarkerId(departureId: string): number {
+  let id = busMarkerIdMap.get(departureId)
+  if (id === undefined) {
+    id = nextBusMarkerId++
+    busMarkerIdMap.set(departureId, id)
+  }
+  return id
+}
 const busMarkers = computed(() =>
-  busPositions.value.map((b, i) => {
+  busPositions.value.map((b) => {
     const [glng, glat] = wgs84ToGcj02(b.lng, b.lat)
     return {
-      id: 2000 + i,
+      id: busMarkerId(b.departureId),
       latitude: glat,
       longitude: glng,
       iconPath: BUS_ICON[b.routeKey] || BUS_ICON.HX1_NORMAL,
@@ -272,7 +283,7 @@ function recenterAll() {
       </view>
       <scroll-view scroll-y class="panel-body">
         <view v-if="stopArrivals.length === 0" class="empty">当前时段无经过此站的班车</view>
-        <view v-for="(item, idx) in stopArrivals" :key="idx" class="panel-row">
+        <view v-for="item in stopArrivals" :key="item.departure.recordId + '_' + item.pred.stopSeq" class="panel-row">
           <view class="route-badge" :style="{ background: routeColor(item.departure.routeKey) }">
             {{ routeNameOf(item.departure.routeKey, item.departure.route) }}
           </view>
