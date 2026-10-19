@@ -30,9 +30,9 @@ function loadAutomator() {
 
 const automator = loadAutomator()
 
-// 校园内定位：理学院与高超楼之间（WGS-84，与项目站点数据同坐标系）
+// 校园内定位：理学院与高超楼之间（GCJ-02，小程序数据/定位/地图统一口径）
 // 选点原则：避开终点站（起终点同站会过滤掉全部到站记录），且 200m 内有多个站点
-const CAMPUS = { latitude: 28.269813, longitude: 113.036712, accuracy: 18, speed: 0 }
+const CAMPUS = { latitude: 28.266567, longitude: 113.042489, accuracy: 18, speed: 0 }
 
 // 模拟时间：2026-10-19（周一）08:00 —— 工作日有车次，页面内容完整
 const SIM_DATE = { year: 2026, month: 10, day: 19, hour: 8, minute: 0 }

@@ -1,5 +1,21 @@
 # 数据变更记录
 
+## 2026-10-19 小程序数据改为 GCJ-02（运行期零坐标转换）
+
+**变更类型**：数据口径（`apps/miniprogram/src/data/*.json` 的经纬度由 WGS-84 改为 GCJ-02），原始数据与 H5 不变
+
+**原因**：微信 `onLocationChange`、腾讯 `<map>`、腾讯 LBS 只认 GCJ-02，小程序此前在运行期做 WGS-84↔GCJ-02 转换，边界混用曾导致约 670m 定位偏移。
+
+**做法**：
+- `public/data/*.json`（H5 / 归档）仍为 **WGS-84**，一行未动
+- `scripts/sync_miniprogram_data.js` 同步时把 `stations`/`route_stops`/`route_paths` 转成 **GCJ-02**
+- 新增 `scripts/lib/coord.js`（`wgs84ToGcj02` + `selfCheck()`，偏移不在 550-800m 直接抛错）
+- 小程序端删除全部运行期转换：`map.vue`（5 处）、`useWeather.ts`（1 处）、`useGeolocation.ts`（1 处）
+
+**等价性校验**：新数据 GCJ 值与旧方案运行期转换结果最大差异 **0.066m**（6 位小数舍入），地图渲染输入等价，视觉无变化；站点间距离与坐标系无关（最大差 2.8m）。
+
+**验证**：`mp_probe location` 正常；首页附近站点 = 高超楼/理学院（94m）、空天楼（160m）；地图中心与首个 marker = `28.254769, 113.051463`（研究生宿舍楼 GCJ）；`vue-tsc` 通过；`test_scenarios` 24/24；生产构建 1.04MB。
+
 ## 2026-10-18 小程序端联调修复
 
 - **云环境 ID 修正**：`campus-bus-d5q9cli...` → `campus-bus-d5g9cli...`（单个字符错误导致云函数全部报 `[100003] Env Not Exists`）

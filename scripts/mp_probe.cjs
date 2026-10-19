@@ -182,51 +182,51 @@ function probeGeo() {
   return 'started'
 }
 
-/** 调天气云函数，返回完整 errMsg（含 errCode） */
+/**
+ * 探针腾讯位置服务天气（2026-10-19 起不再走云函数）
+ *
+ * 注意：`wx.cloud` 已被弃用；直接调 LBS WebService，key 与
+ * `apps/miniprogram/src/config.ts` 保持一致（改 key 时两处都要改）。
+ */
 function probeWeather() {
   const KEY = '__mp_probe_result'
+  const LBS_KEY = 'QNABZ-3MULC-S6X2Q-A2W65-2KFGO-67BWY'
+  // 研究生宿舍楼（GCJ-02，小程序数据口径）
+  const LOCATION = '28.254769,113.051463'
   wx.setStorageSync(KEY, '{"status":"pending"}')
-  wx.cloud.callFunction({
-    name: 'weather',
+  wx.request({
+    url: 'https://apis.map.qq.com/ws/weather/v1/',
+    data: { key: LBS_KEY, location: LOCATION },
+    timeout: 5000,
     success: (res) => {
-      wx.setStorageSync(KEY, JSON.stringify({ status: 'ok', result: res.result }))
-    },
-    fail: (err) => {
       wx.setStorageSync(
         KEY,
         JSON.stringify({
-          status: 'fail',
-          errMsg: err && err.errMsg,
-          errCode: err && err.errCode,
-          message: err && err.message,
+          status: res.statusCode === 200 ? 'ok' : 'http_error',
+          statusCode: res.statusCode,
+          result: res.data,
         })
       )
+    },
+    fail: (err) => {
+      wx.setStorageSync(KEY, JSON.stringify({ status: 'fail', errMsg: err && err.errMsg }))
     },
   })
   return 'started'
 }
 
-/** 调节假日云函数 */
+/** 探针节假日：已改为内置数据，不再有云函数/网络调用 */
 function probeHolidays() {
   const KEY = '__mp_probe_result'
-  wx.setStorageSync(KEY, '{"status":"pending"}')
-  wx.cloud.callFunction({
-    name: 'holidays',
-    success: (res) => {
-      wx.setStorageSync(KEY, JSON.stringify({ status: 'ok', result: res.result }))
-    },
-    fail: (err) => {
-      wx.setStorageSync(
-        KEY,
-        JSON.stringify({
-          status: 'fail',
-          errMsg: err && err.errMsg,
-          errCode: err && err.errCode,
-          message: err && err.message,
-        })
-      )
-    },
-  })
+  wx.setStorageSync(
+    KEY,
+    JSON.stringify({
+      status: 'ok',
+      deprecated: true,
+      note: '节假日已内置在 apps/miniprogram/src/utils/holidays.ts，无网络请求；如需核对请直接看该文件或首页“工作日/周末”文案',
+      today: new Date().toISOString().slice(0, 10),
+    })
+  )
   return 'started'
 }
 

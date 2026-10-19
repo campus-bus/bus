@@ -10,6 +10,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **H5 PWA 版**（`src/`）：https://campus-bus.github.io/bus/ ，主仓 `campus-bus/bus`，GitHub Pages 部署
 - **微信小程序版**（`apps/miniprogram/`）：uni-app Vue3 重构，腾讯 map 组件 + 微信云开发，**开发中（待发布）**
 
+> **🔒 PWA 冻结规则（2026-10-19 起，强制）**：H5 PWA 版正在线上服役，**`src/`、`public/`、`docs/`、`vite.config.ts`、`index.html` 一律不得改动**（含注释、格式、文案）。PWA 只作为对照参照。所有新功能与修复**只改 `apps/miniprogram/`**。若某改动必须触及 `public/data/`（例如发车时刻/站点数据本身变化），需先向用户确认；坐标转换等平台差异一律在 `scripts/sync_miniprogram_data.js` 里解决，不回头改 PWA。`src/utils/geo.ts` 与 `apps/miniprogram/src/utils/geo.ts` 仍保持字节一致（共用工具函数），改动需双向同步并经用户确认。
+
 > **2026-10-18 线路调整**：原环线2路与环线3路合并为一条接驳环线，双向运行——**接驳2路（逆时针）**与**接驳1路（顺时针，同一物理环反向）**；军体活动中心拆分为东侧/南侧两站；门诊部、1号宿舍楼、图书馆不再经停。环线1路与就餐专线不变。工作日时刻表已同步更新（132 条：环1 62 + 就餐 10 + 接驳1路 35 + 接驳2路 25）；**周末/节假日时刻表待补充，目前周末无任何车次**。旧环2/环3共 104 条班次已移除，备份于 `data/backups/hx2_hx3_departures_removed_2026-10-18.json`。
 
 ## 技术栈
@@ -64,7 +66,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | `src/types/index.ts` | 全部 TypeScript 类型定义 |
 | `vite.config.ts` | Vite 配置（含 basicSsl 插件） |
 - **PWA**：vite-plugin-pwa，workbox generateSW 模式
-- **坐标系**：全项目统一 WGS-84（卫星瓦片、站点数据、GPS 定位均为 WGS-84，无坐标转换）
+- **坐标系**：**H5 全程 WGS-84**（卫星瓦片、站点数据、浏览器 GPS 均为 WGS-84，零转换）；**小程序全程 GCJ-02**（`public/data` 在 `sync_miniprogram_data.js` 同步时转成 GCJ-02 写入 `apps/miniprogram/src/data/`，运行期零转换）。两套数据来源同一份 WGS-84，严禁跨端粘贴坐标
 
 ## 已实现的功能
 
@@ -176,11 +178,11 @@ MapView.vue
 - 站点和路线固定视觉大小：不随地图缩放变化
 - 回中按钮：点击恢复显示整个校园
 
-**定位功能**：使用浏览器原生 `navigator.geolocation`，**不调用任何第三方 API**。GPS 返回 WGS-84，经 `wgs84ToGcj02()` 转换后用于地图定位。
+**定位功能**：使用浏览器原生 `navigator.geolocation`，**不调用任何第三方 API**。GPS 返回 WGS-84，与 `public/data` 站点数据、ESRI 卫星底图同系，直接经 `wgs84ToPixel()` 投影，**无需任何坐标转换**。
 
 **已废弃/删除的文件**：
 - `src/utils/amap.ts` — 高德 SDK 加载器（已删除）
-- `src/utils/geo.ts` 中 GCJ-02 转换函数 — 已删除，全部使用 WGS-84
+- `src/utils/geo.ts` 中 `gcj02ToPixel` 等地图投影用 GCJ-02 函数 — 已删除（H5 全程 WGS-84）；仅保留 `wgs84ToGcj02`/`gcj02ToWgs84` 作为双向转换工具函数，当前运行期无调用（小程序端改由 `scripts/lib/coord.js` 在构建期转换）
 - `src/utils/map_project.ts` 中 `gcj02ToPixel`/`gcj02ToWgs84` — 已删除（2026-10-17 清理，无任何调用）
 - `src/components/common/AutoRecordPanel.vue` — UI 已隐藏（`UploadView.vue` 中不再引用）
 - `scripts/extract_data.py`、`scripts/fix_*.js`、`scripts/add_missing_stations.js` — 一次性历史脚本，已移至 `scripts/archive/`（2026-10-17）
@@ -534,7 +536,7 @@ git push          # 直接推 master，GitHub Pages 自动部署
 | **腾讯 `<map>` 组件** | 免费不限调用量（H5 时代因高德按量收费才改静态卫星图）；markers/polyline/rotate/show-location 原生支持，卫星图方案在小程序端彻底废弃 |
 | **微信云开发（云数据库+云函数）** | Supabase 域名无法过小程序 ICP 白名单；云开发免域名备案、原生集成、有免费体验期 |
 | **数据 import 加载** | `src/data/*.json` 打进包内（同步脚本压缩，总包 1.5MB < 2MB 限制），启动即读无网络请求；开启 `lazyCodeLoading` |
-| **WGS-84 定位 + GCJ-02 转换** | `uni.getLocation(type:'wgs84')` 与数据同系；仅腾讯地图显示层用 `utils/geo.ts` 的 `wgs84ToGcj02` 转换 |
+| **小程序数据统一 GCJ-02** | 微信定位（`onLocationChange`）、腾讯 `<map>`、腾讯 LBS 只认 GCJ-02；在 `sync_miniprogram_data.js` 同步时一次性转换，运行期零转换。改动前曾是运行期转换，正是这种边界混用导致过 670m 偏移 |
 | **UI 原生组件重写** | Vant 不能在小程序用；第一版全部原生 view/text/picker/map 组件 + rpx，未引入 uv-ui（后续可按需） |
 
 ### 云开发配置（已生效）
@@ -556,15 +558,15 @@ apps/miniprogram/
 │   ├── pages/{index,schedule,map,record,about}/   # 5 页，与 H5 一一对应
 │   ├── stores/      # schedule(import JSON)/location/upload/global-time
 │   ├── utils/       # 与 H5 同源（station_group/countdown/geo/bus_position/datetime/holidays/time）
-│   ├── composables/ # useGeolocation（WGS-84）、useWeather（云函数 weather 代理）
-│   ├── data/        # sync_miniprogram_data.js 生成（勿手改）
+│   ├── composables/ # useGeolocation（GCJ-02）、useWeather（腾讯位置服务）
+│   ├── data/        # sync_miniprogram_data.js 生成（GCJ-02，勿手改）
 │   ├── static/icons/# 公交图标（暂沿用 H5 素材）
 │   └── static/tabbar/# tabBar 图标（81×81 PNG，generate_tabbar_icons.py 生成）
 ├── cloudfunctions/  # weather / holidays
 └── project.config.json  # miniprogramRoot=dist/dev/mp-weixin, cloudfunctionRoot=cloudfunctions/
 ```
 
-**数据同步流程**：改 `public/data/` → `node scripts/regenerate_predictions.js`（如涉及预测） → `node scripts/sync_miniprogram_data.js`（压缩同步到 `apps/miniprogram/src/data/`） → 两端各自构建发布。
+**数据同步流程**：改 `public/data/` → `node scripts/regenerate_predictions.js`（如涉及预测） → `node scripts/sync_miniprogram_data.js`（压缩同步 + 经纬度 WGS-84→GCJ-02，写入 `apps/miniprogram/src/data/`） → 两端各自构建发布。
 
 **逻辑双向同步约定**：`apps/miniprogram/src/utils/` 与 `src/utils/` 同名文件为复制关系（station_group/countdown/geo/bus_position/time 完全一致，datetime/holidays 为小程序适配版）。修改任一侧逻辑时，必须同步另一侧并跑 `node scripts/test_scenarios.cjs` 回归。
 
@@ -639,14 +641,16 @@ apps/miniprogram/
 17. **automator 依赖不要装在 `%TEMP%`**：临时目录会被系统清理，导致探针突然报 `Cannot find module`。应装为项目 devDependency：
     `npm i -D miniprogram-automator --registry=https://registry.npmmirror.com --legacy-peer-deps`（不加 `--legacy-peer-deps` 会因 `@vitejs/plugin-basic-ssl` 的 peer 冲突失败）。
     另注意：`cli.bat close` + `open` 重置项目后，自动化端口 9420 会失效，需重新执行 `cli.bat auto --project <项目> --auto-port 9420`。
-18. **微信侧位置一律按 GCJ-02 解读，项目内部一律 WGS-84**（坐标系唯一约定）：
-    - `wx.onLocationChange` 官方文档明确回调「使用 gcj02 国测局坐标系」，不受 `startLocationUpdate` 的 `type` 影响，**没有 WGS-84 可选**；
-    - `wx.getLocation` 虽支持 `type:'wgs84'`，但**开发者工具忽略 type**，两种取值原样返回同一个模拟点（`node scripts/mp_probe.cjs geo` 可复现：wgs84/gcj02 完全相同）；
-    - 因此代码里 `getLocation` 也显式要 `gcj02`，与监听共用 `handleWechatLocation()` 统一逆解成 WGS-84 后再入库。规则只有一条：**凡是微信交出来的位置都是 GCJ-02，只在这一处转**。
-    - 若把 GCJ-02 当 WGS-84 直接用，长沙地区固定偏移 **约 670m**（实测 18 个站点里 14 个会误判到别的站：把 GCJ 的「理学院」当成 WGS，最近站会变成「网球场」，仅 23m）。
-    - 反方向（给地图渲染）用 `utils/geo.ts` 的 `wgs84ToGcj02()`：`<map>` 的 markers/polyline/latitude/longitude、`wx.openLocation`、`wx.chooseLocation`、腾讯 LBS（天气）全部只认 GCJ-02。
+18. **坐标系：H5 = WGS-84，小程序 = GCJ-02，转换只发生在同步脚本里**（2026-10-19 调整）：
+    - `public/data/*.json` 仍是 **WGS-84**（H5 卫星底图、浏览器 GPS 都是 WGS-84，不能动）。
+    - `apps/miniprogram/src/data/*.json` 由 `scripts/sync_miniprogram_data.js` 在同步时把 `stations`/`route_stops`/`route_paths` 转成 **GCJ-02** 写入；小程序运行期（定位/渲染/天气）**零坐标转换**。
+    - 转换实现：`scripts/lib/coord.js`（与 `src/utils/geo.ts` 的 `wgs84ToGcj02` 逐行一致），脚本启动时跑 `selfCheck()`，偏移量不在 550-800m 直接抛错，防止算法漂移后静默产出错数据。
+    - **新增含坐标的数据文件必须加进 `COORD_FILES`**，否则漏转 = 该文件整体偏移约 670m。
+    - `wx.onLocationChange` 官方文档固定回调 GCJ-02，不受 `startLocationUpdate` 的 `type` 影响；`wx.getLocation` 虽支持 `type:'wgs84'`，但**开发者工具忽略 type**（`node scripts/mp_probe.cjs geo` 可复现：两种类型返回同一模拟点）。既然数据已是 GCJ-02，`handleWechatLocation()` 直接入库即可。
+    - 若把 GCJ-02 当 WGS-84 用（或反之），长沙地区固定偏移 **约 670m**（实测 18 个站点里 14 个会误判到别的站：把 GCJ 的「理学院」当成 WGS，最近站会变成「网球场」，仅 23m）。
     - 距离计算对坐标系不敏感：153 个站对在 WGS-84 与 GCJ-02 下算出的距离最大只差 **2.8m**，远小于 GPS 精度（20-50m）与 200m 附近站阈值——**只要不混用就行**，混用才是 670m。
-    - 开发者工具没有真实 GPS，模拟定位点常驻上次设置的值（且面板用的是 GCJ-02）。想在工具里模拟「研究生宿舍楼」，应填 `28.254769, 113.051463`（该站 WGS-84 的 GCJ-02 值），不是 `28.257994, 113.045661`。
+    - 开发者工具没有真实 GPS，模拟定位点常驻上次设置的值（面板用 GCJ-02）。想在工具里模拟「研究生宿舍楼」，填 `28.254769, 113.051463`（该站的 GCJ-02 值）。
+    - 排查口诀：**看文件名就知道坐标系**——`public/data` 是 WGS，`apps/miniprogram/src/data` 是 GCJ。
 
 ### 待办（按优先级）
 
@@ -672,7 +676,7 @@ apps/miniprogram/
 5. 环线1路就餐车次按「班次+时刻」判定（第一班 11:20-12:40、第五班 16:30-17:50），其他班次相同时刻不受影响
 6. 预测到站时间是估算结果；JB 各段复用原环2/环3实测段秒数，理学院→激光所、军体东→军体南、305→研究生（绕行）三段为距离估算待实测
 7. 所有路线都是环线，起终点同站需要特殊处理：首页过滤 isReturnStop，地图点站保留 isReturnStop
-8. 卫星底图使用 WGS-84，站点数据使用 WGS-84（已废弃 GCJ-02）
+8. H5 卫星底图与 `public/data` 站点数据均为 WGS-84；小程序 `src/data` 为 GCJ-02（同步脚本转换），**两套坐标严禁互粘**
 9. `showDebugTools = false`，调试时改为 `true` 恢复时间和定位覆写面板
 10. 地图 overlay 层使用 CSS `@property` + `calc()` 定位，修改时注意不要引入 Vue 响应式依赖 `scale`/`panX`/`panY`
 11. `route_params.json` 中仅有 `finalSegmentSeconds` 和 `cumulativeSeconds`，无 `baseSegmentSeconds`

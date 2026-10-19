@@ -16,7 +16,6 @@
 import { ref } from 'vue'
 import { TENCENT_LBS_KEY } from '@/config'
 import { useLocationStore } from '@/stores/location'
-import { wgs84ToGcj02 } from '@/utils/geo'
 
 export interface WeatherInfo {
   icon: string
@@ -26,9 +25,9 @@ export interface WeatherInfo {
 
 const CACHE_KEY = 'weather_cache_v2'
 const CACHE_MS = 60 * 60 * 1000 // 本地缓存 60 分钟
-/** 未定位时按研究生宿舍楼取天气 */
-const DEFAULT_LNG = 113.045661
-const DEFAULT_LAT = 28.257994
+/** 未定位时按研究生宿舍楼取天气（GCJ-02，与腾讯接口一致） */
+const DEFAULT_LNG = 113.051463
+const DEFAULT_LAT = 28.254769
 
 /** 腾讯天气返回中文描述，映射成 emoji 图标 */
 function descToIcon(desc: string): string {
@@ -72,13 +71,12 @@ function fetchWeather(): Promise<WeatherInfo | null> {
     const store = useLocationStore()
     const lng = store.userLng ?? DEFAULT_LNG
     const lat = store.userLat ?? DEFAULT_LAT
-    // 腾讯地图使用 GCJ-02，本项目数据为 WGS-84，需转换
-    const [glng, glat] = wgs84ToGcj02(lng, lat)
+    // 小程序侧坐标统一为 GCJ-02（微信定位、腾讯地图同源），无需转换
     uni.request({
       url: 'https://apis.map.qq.com/ws/weather/v1/',
       data: {
         key: TENCENT_LBS_KEY,
-        location: `${glat},${glng}`,
+        location: `${lat},${lng}`,
         type: 'now',
       },
       timeout: 8000,

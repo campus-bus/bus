@@ -1,9 +1,8 @@
 import { onMounted, ref } from 'vue'
 import { useLocationStore } from '@/stores/location'
-import { gcj02ToWgs84 } from '@/utils/geo'
 
 /**
- * 小程序定位（WGS-84）
+ * 小程序定位（GCJ-02）
  *
  * 隐私合规要点：
  * 1. 不在页面加载时自动调用 getLocation，必须由用户主动点击触发，
@@ -14,10 +13,10 @@ import { gcj02ToWgs84 } from '@/utils/geo'
  * 4. 精度 > 500m 的定位丢弃（与 H5 策略一致）。
  *
  * 坐标系约定（重要）：
- * 项目内部（站点数据、距离计算、store）**只存 WGS-84**；
- * 微信侧交出的一切位置都按 **GCJ-02** 解读，在 handleWechatLocation 里
- * 统一转成 WGS-84 后才入库；反过来给地图渲染时再用 wgs84ToGcj02。
- * 只在这两个边界转换，业务代码永远不需要关心坐标系。
+ * 小程序侧全部是 **GCJ-02**——微信定位、腾讯 `<map>`、腾讯 LBS 同源；
+ * 站点/路线数据在 `scripts/sync_miniprogram_data.js` 同步时已从 WGS-84 转成 GCJ-02。
+ * 因此这里不做任何坐标转换，运行期零转换。
+ * H5 侧（另一套代码，共用同一份 public/data）仍全程 WGS-84，两边互不影响。
  *
  * 单例说明：
  * 定位监听是全局资源（首页、地图页都要用），状态和监听器都放在模块级，
@@ -42,24 +41,18 @@ let watching = false
 let starting = false
 
 /**
- * 统一处理「微信交给我们的位置」→ 一律按 GCJ-02 解读，转成 WGS-84 后入库
+ * 处理「微信交给我们的位置」→ 直接入库
  *
- * 为什么全部走 GCJ-02 入口：
- * 1. `wx.onLocationChange` 官方文档明确回调「使用 gcj02 国测局坐标系」，
- *    且不受 `startLocationUpdate` 的 type 参数影响，没有 WGS-84 可选；
- * 2. `wx.getLocation` 虽然支持 `type: 'wgs84'`，但实测开发者工具会忽略 type，
- *    把模拟定位点（GCJ-02）原样返回两种类型，开发者工具里就会偏 670m；
- * 3. 因此取「微信边界上一切位置都是 GCJ-02」这一条规则，只在这里转换一次，
- *    不再依赖某个 API 是否真的兑现 type 参数。
- *
- * 真机不会因此产生误差：请求 gcj02 时微信自己做了 WGS→GCJ，
- * 我们再逆解回 WGS，往返误差 < 1m，远小于 GPS 自身 20-50m 的精度。
+ * 小程序侧坐标系统一为 GCJ-02：
+ * 1. `wx.onLocationChange` 回调固定是 GCJ-02（官方文档写死，无 WGS-84 可选）；
+ * 2. 站点/路线数据在 `scripts/sync_miniprogram_data.js` 里已从 WGS-84 转成 GCJ-02；
+ * 3. 腾讯 `<map>` 与腾讯 LBS 也只认 GCJ-02。
+ * 三者同源，所以这里不做任何转换，运行期零坐标转换。
  */
 function handleWechatLocation(res: LocationResult) {
   // 过滤极低精度定位（Wi-Fi 定位精度通常 20-200m）
   if (res.accuracy && res.accuracy > 500) return
-  const [lng, lat] = gcj02ToWgs84(res.longitude, res.latitude)
-  useLocationStore().setUserLocation(lat, lng)
+  useLocationStore().setUserLocation(res.latitude, res.longitude)
   error.value = null
 }
 

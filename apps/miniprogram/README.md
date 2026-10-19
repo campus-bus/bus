@@ -8,13 +8,24 @@
 
 | 层 | 复用方式 |
 |---|---|
-| 数据 | `scripts/sync_miniprogram_data.js` 从 `public/data/` 压缩同步到 `src/data/`（import 加载） |
+| 数据 | `scripts/sync_miniprogram_data.js` 从 `public/data/` 压缩同步到 `src/data/`（import 加载），**同步时把经纬度从 WGS-84 转成 GCJ-02**；两份数据坐标系不同，见下 |
 | 业务逻辑 | `src/utils/`（station_group/countdown/geo/bus_position/datetime）与 H5 同源复制，改动需双向同步 |
 | UI | 全部重写（Vant → 原生组件 + rpx），页面一一对应 |
 
+## 坐标系（重要）
+
+| 位置 | 坐标系 | 说明 |
+|---|---|---|
+| `public/data/*.json`（H5 用） | **WGS-84** | 与 ESRI 卫星底图、浏览器 GPS 一致 |
+| `apps/miniprogram/src/data/*.json` | **GCJ-02** | 同步脚本转换后产出，与腾讯 `<map>`、微信定位、腾讯 LBS 一致 |
+| 小程序运行期（store/渲染/请求） | **GCJ-02** | **不做任何坐标转换** |
+
+因此**不要手改 `src/data/*.json`**，也不要把 `public/data` 的坐标直接粘进小程序；
+加站点请改 `data/geo/*.txt` 或 `public/data`，然后重跑同步脚本。
+
 ## 技术架构
 
-- **地图**：腾讯 `<map>` 组件（免费不限量），WGS-84→GCJ-02 由 `utils/geo.ts` 的 `wgs84ToGcj02` 转换；站点/路线/公交用 markers+polyline，用户位置用原生 `show-location`
+- **地图**：腾讯 `<map>` 组件（免费不限量），站点/路线/公交用 markers+polyline，用户位置用原生 `show-location`；坐标已在数据同步阶段转为 GCJ-02，渲染时无需转换
 - **数据加载**：`stores/schedule.ts` 直接 import 打包 JSON（无网络请求，启动即读；lazyCodeLoading 按需注入）
 - **节假日**：`utils/holidays.ts` 内置当年法定节假日与调休安排，**不请求网络**；每年 11 月补齐次年数据后发版
 - **天气**：`composables/useWeather.ts` 调腾讯位置服务 `apis.map.qq.com`（个人开发者 1 万次/天免费），本地缓存 60 分钟；**未配置 Key 时不展示天气**，其余功能不受影响
@@ -67,8 +78,8 @@ src/
 ├── pages/           # index(首页) schedule(行程) map(地图) record(维护者记录) about(关于)
 ├── stores/          # schedule(数据) location(定位) upload(记录，本地) global-time(调试)
 ├── utils/           # 业务逻辑（与 H5 同源）+ dev(维护者开关)
-├── composables/     # useGeolocation（WGS-84 定位）、useWeather（腾讯位置服务）
-├── data/            # sync_miniprogram_data.js 生成，勿手改
+├── composables/     # useGeolocation（GCJ-02 定位）、useWeather（腾讯位置服务）
+├── data/            # sync_miniprogram_data.js 生成（GCJ-02），勿手改
 ├── types/           # index(业务类型，与 H5 一致)、wx(微信原生 API 声明)
 ├── static/icons/    # 公交图标
 ├── static/tabbar/   # tabBar 图标（generate_tabbar_icons.py 生成）

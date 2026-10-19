@@ -13,4 +13,4 @@
  *
  * 留空时首页不显示天气，其余功能完全不受影响。
  */
-export const TENCENT_LBS_KEY = ''
+export const TENCENT_LBS_KEY = 'QNABZ-3MULC-S6X2Q-A2W65-2KFGO-67BWY'

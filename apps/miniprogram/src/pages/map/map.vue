@@ -7,7 +7,6 @@ import { useGeolocation } from '@/composables/useGeolocation'
 import { getDateType, getSecondsSinceMidnight } from '@/utils/datetime'
 import { getNow } from '@/utils/time'
 import { computeActiveBusPositions } from '@/utils/bus_position'
-import { wgs84ToGcj02 } from '@/utils/geo'
 import { arrivalCountdown } from '@/utils/countdown'
 import type { BusPosition, ArrivalPrediction } from '@/types'
 
@@ -16,8 +15,9 @@ const locationStore = useLocationStore()
 // 地图页本身就是位置功能页：进入时请求定位（内部会先过隐私协议授权）
 useGeolocation({ autoStart: true })
 
-// ─── 地图中心（研究生宿舍楼，GCJ-02） ───
-const [centerLng, centerLat] = wgs84ToGcj02(113.045661, 28.257994)
+// ─── 地图中心（研究生宿舍楼，GCJ-02；站点数据已在同步阶段转好，无需再转换） ───
+const centerLat = 28.254769
+const centerLng = 113.051463
 const latitude = ref(centerLat)
 const longitude = ref(centerLng)
 const scale = ref(15)
@@ -39,7 +39,7 @@ function toggleRoute(key: string) {
 }
 function toggleLabels() { showLabels.value = !showLabels.value }
 
-// ─── 路线折线（polyline，WGS-84→GCJ-02） ───
+// ─── 路线折线（polyline，数据已是 GCJ-02，直接渲染） ───
 const ROUTE_COLORS: Record<string, string> = {
   HX1_NORMAL: '#2563EB', HX1_DINING: '#F59E0B',
   JB1_NORMAL: '#10B981', JB2_NORMAL: '#8B5CF6',
@@ -54,10 +54,7 @@ const polyline = computed(() => {
     const path = scheduleStore.routePaths[rp.routeKey]
     if (!path || path.length < 2) continue
     lines.push({
-      points: path.map(([lng, lat]) => {
-        const [glng, glat] = wgs84ToGcj02(lng, lat)
-        return { latitude: glat, longitude: glng }
-      }),
+      points: path.map(([lng, lat]) => ({ latitude: lat, longitude: lng })),
       color: ROUTE_COLORS[rp.routeKey] || '#6B7280',
       width: 4,
       dottedLine: rp.routeKey === 'HX1_DINING',
@@ -86,11 +83,10 @@ const stationMarkers = computed(() => {
   }
   let id = 1000
   for (const [name, info] of shown) {
-    const [glng, glat] = wgs84ToGcj02(info.lng, info.lat)
     markers.push({
       id: id++,
-      latitude: glat,
-      longitude: glng,
+      latitude: info.lat,
+      longitude: info.lng,
       width: 1, height: 1, // 用 callout 画点，图标透明
       title: name,
       callout: {
@@ -136,11 +132,10 @@ function busMarkerId(departureId: string): number {
 }
 const busMarkers = computed(() =>
   busPositions.value.map((b) => {
-    const [glng, glat] = wgs84ToGcj02(b.lng, b.lat)
     return {
       id: busMarkerId(b.departureId),
-      latitude: glat,
-      longitude: glng,
+      latitude: b.lat,
+      longitude: b.lng,
       iconPath: BUS_ICON[b.routeKey] || BUS_ICON.HX1_NORMAL,
       width: b.routeKey.includes('HX1') ? 30 : 26,
       height: b.routeKey.includes('HX1') ? 30 : 26,
@@ -224,9 +219,8 @@ function etaClass(status?: string) {
 // 定位按钮
 function recenterOnUser() {
   if (locationStore.userLat === null || locationStore.userLng === null) return
-  const [glng, glat] = wgs84ToGcj02(locationStore.userLng, locationStore.userLat)
-  latitude.value = glat
-  longitude.value = glng
+  latitude.value = locationStore.userLat
+  longitude.value = locationStore.userLng
   scale.value = 16
 }
 function recenterAll() {
