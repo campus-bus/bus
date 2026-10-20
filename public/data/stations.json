@@ -24,6 +24,12 @@
     "serviceRoutes": "HX1_NORMAL,JB2_NORMAL,JB1_NORMAL"
   },
   {
+    "name": "网球场",
+    "lat": 28.265592,
+    "lng": 113.04268,
+    "serviceRoutes": "HX1_NORMAL,JB2_NORMAL,JB1_NORMAL"
+  },
+  {
     "name": "激光所",
     "lat": 28.268547,
     "lng": 113.041763,
@@ -82,12 +88,6 @@
     "lat": 28.260462,
     "lng": 113.037881,
     "serviceRoutes": "HX1_DINING"
-  },
-  {
-    "name": "网球场",
-    "lat": 28.265592,
-    "lng": 113.04268,
-    "serviceRoutes": "JB2_NORMAL,JB1_NORMAL"
   },
   {
     "name": "空天楼",

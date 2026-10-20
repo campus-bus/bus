@@ -1,5 +1,21 @@
 # 数据变更记录
 
+## 2026-10-20 环线1路补回「网球场」站
+
+**变更类型**：站点序列（`HX1_NORMAL` 由 13 站改为 14 站）
+
+**原因**：用户确认环线1路经军体活动中心东之后应先到网球场，再到激光所；此前该站被漏录（接驳1/2路的同区间一直有网球场）。
+
+**做法**：
+- `data/geo/站点经纬度信息路径细化.txt`：环线1路段在「军体活动中心东」后插入 `网球场 28.265592, 113.042680`
+- `scripts/regenerate_from_txt.js`：`ROUTE_STOP_SEQUENCES.HX1_NORMAL` 同步插入 `'网球场'`
+- `route_params.json`：原「军体东→激光所 0.4km/76s」按距离拆为「军体东→网球场 0.15km/28s」+「网球场→激光所 0.25km/48s」
+- 重跑 `regenerate_from_txt.js` → `regenerate_predictions.js` → `sync_miniprogram_data.js`
+
+**影响范围**：**总运行时长仍为 827s**，激光所以后各站 `cumulativeSeconds` 一个未变，仅新增 stopSeq=5 的网球场（cum 255s），原 seq5 起整体后移一位。预测总数 2028 → 2038 条（环1 每班 +1 站）。
+
+**验证**：`test_scenarios` 24/24 通过（A4 军体组→激光所仍选军体东 seq4；H8 seq 严格递增）。
+
 ## 2026-10-19 小程序数据改为 GCJ-02（运行期零坐标转换）
 
 **变更类型**：数据口径（`apps/miniprogram/src/data/*.json` 的经纬度由 WGS-84 改为 GCJ-02），原始数据与 H5 不变

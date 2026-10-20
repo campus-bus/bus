@@ -5,7 +5,7 @@
     "patternName": "环线1路普通路线（研究生宿舍楼发车）",
     "departureStation": "研究生宿舍楼",
     "totalSeconds": 827,
-    "stopCount": 13,
+    "stopCount": 14,
     "stops": [
       {
         "routeStopKey": "HX1_NORMAL|1",
@@ -60,10 +60,10 @@
         "routeKey": "HX1_NORMAL",
         "stopSeq": 5,
         "prevStop": "军体活动中心东",
-        "currentStop": "激光所",
-        "distanceKm": 0.4,
-        "finalSegmentSeconds": 76,
-        "cumulativeSeconds": 283,
+        "currentStop": "网球场",
+        "distanceKm": 0.15,
+        "finalSegmentSeconds": 28,
+        "cumulativeSeconds": 255,
         "isDepartureStop": false,
         "isReturnStop": false
       },
@@ -71,6 +71,18 @@
         "routeStopKey": "HX1_NORMAL|6",
         "routeKey": "HX1_NORMAL",
         "stopSeq": 6,
+        "prevStop": "网球场",
+        "currentStop": "激光所",
+        "distanceKm": 0.25,
+        "finalSegmentSeconds": 48,
+        "cumulativeSeconds": 283,
+        "isDepartureStop": false,
+        "isReturnStop": false
+      },
+      {
+        "routeStopKey": "HX1_NORMAL|7",
+        "routeKey": "HX1_NORMAL",
+        "stopSeq": 7,
         "prevStop": "激光所",
         "currentStop": "超算中心",
         "distanceKm": 0.35,
@@ -80,9 +92,9 @@
         "isReturnStop": false
       },
       {
-        "routeStopKey": "HX1_NORMAL|7",
+        "routeStopKey": "HX1_NORMAL|8",
         "routeKey": "HX1_NORMAL",
-        "stopSeq": 7,
+        "stopSeq": 8,
         "prevStop": "超算中心",
         "currentStop": "北门",
         "distanceKm": 0.55,
@@ -92,9 +104,9 @@
         "isReturnStop": false
       },
       {
-        "routeStopKey": "HX1_NORMAL|8",
+        "routeStopKey": "HX1_NORMAL|9",
         "routeKey": "HX1_NORMAL",
-        "stopSeq": 8,
+        "stopSeq": 9,
         "prevStop": "北门",
         "currentStop": "高超楼",
         "distanceKm": 0.35,
@@ -104,9 +116,9 @@
         "isReturnStop": false
       },
       {
-        "routeStopKey": "HX1_NORMAL|9",
+        "routeStopKey": "HX1_NORMAL|10",
         "routeKey": "HX1_NORMAL",
-        "stopSeq": 9,
+        "stopSeq": 10,
         "prevStop": "高超楼",
         "currentStop": "理学院",
         "distanceKm": 0.35,
@@ -116,9 +128,9 @@
         "isReturnStop": false
       },
       {
-        "routeStopKey": "HX1_NORMAL|10",
+        "routeStopKey": "HX1_NORMAL|11",
         "routeKey": "HX1_NORMAL",
-        "stopSeq": 10,
+        "stopSeq": 11,
         "prevStop": "理学院",
         "currentStop": "二食堂",
         "distanceKm": 1,
@@ -128,9 +140,9 @@
         "isReturnStop": false
       },
       {
-        "routeStopKey": "HX1_NORMAL|11",
+        "routeStopKey": "HX1_NORMAL|12",
         "routeKey": "HX1_NORMAL",
-        "stopSeq": 11,
+        "stopSeq": 12,
         "prevStop": "二食堂",
         "currentStop": "5号宿舍楼",
         "distanceKm": 0.35,
@@ -140,9 +152,9 @@
         "isReturnStop": false
       },
       {
-        "routeStopKey": "HX1_NORMAL|12",
+        "routeStopKey": "HX1_NORMAL|13",
         "routeKey": "HX1_NORMAL",
-        "stopSeq": 12,
+        "stopSeq": 13,
         "prevStop": "5号宿舍楼",
         "currentStop": "305教学楼",
         "distanceKm": 0.4,
@@ -152,9 +164,9 @@
         "isReturnStop": false
       },
       {
-        "routeStopKey": "HX1_NORMAL|13",
+        "routeStopKey": "HX1_NORMAL|14",
         "routeKey": "HX1_NORMAL",
-        "stopSeq": 13,
+        "stopSeq": 14,
         "prevStop": "305教学楼",
         "currentStop": "研究生宿舍楼",
         "distanceKm": 0.55,
