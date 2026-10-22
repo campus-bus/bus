@@ -374,6 +374,10 @@ const stopArrivals = computed(() => {
   const base = minuteBaseSec.value
   const preds = scheduleStore.getPredictionsForStop(selectedStop.value, dateType.value)
   return preds
+    // 只过滤 isDepartureStop（本站就是发车站）：用户点地图上的站点，
+    // 想知道的是「哪些车会经过这里」，回程到站（isReturnStop）同样是有效信息。
+    // 首页不同——首页是「我现在能不能上车」，回程到站与「即将发车」重复且不能上车，
+    // 那里必须两个都过滤。这是有意为之的差异，不是漏写条件。
     .filter(p => !p.isDepartureStop)
     .map(p => {
       const delta = Math.round(p.arrivalMinutes * 60 - base)
