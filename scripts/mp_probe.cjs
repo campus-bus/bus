@@ -67,6 +67,11 @@ function parseArgs(argv) {
     url: null,
     /** data 探针要取的字段（逗号分隔）；不传则只列字段名 */
     keys: null,
+    /** text 探针只取该选择器的节点（如 .board-btn） */
+    selector: null,
+    /** text 探针取文本前先点一个元素：在 tap 选择器里找文本包含 tapText 的那个 */
+    tap: null,
+    tapText: null,
   }
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i]
@@ -75,6 +80,9 @@ function parseArgs(argv) {
     else if (a === '--ws') opts.ws = argv[++i]
     else if (a === '--url') opts.url = argv[++i]
     else if (a === '--keys') opts.keys = argv[++i]
+    else if (a === '--selector') opts.selector = argv[++i]
+    else if (a === '--tap') opts.tap = argv[++i]
+    else if (a === '--tap-text') opts.tapText = argv[++i]
     else if (!opts.probe) opts.probe = a
   }
   return opts
@@ -354,8 +362,10 @@ function sleep(ms) {
 async function main() {
   const opts = parseArgs(process.argv.slice(2))
   if (!opts.probe && !opts.expr) {
-    console.error('用法: node scripts/mp_probe.cjs <location|setting|weather|holidays|storage|page|data|--expr "js">')
+    console.error('用法: node scripts/mp_probe.cjs <location|setting|weather|holidays|storage|page|data|text|--expr "js">')
     console.error('  可选: --url /pages/xxx/xxx（先跳页）  --keys a,b,c（data 探针取哪些字段）')
+    console.error('        --selector .board-btn（text 探针只取该选择器）')
+    console.error('        --tap .route-opt --tap-text 接2（text 探针取文本前先点一下）')
     process.exit(3)
   }
 
@@ -403,7 +413,28 @@ async function main() {
     // text 探针走 automator 的页面 API（script setup 的 ref 不在 page.data 上，只能读渲染结果）
     if (opts.probe === 'text') {
       const page = await mp.currentPage()
-      const nodes = await page.$$('view,text,button')
+      // 可选：先点一下（例如切线路），在 tap 选择器里找文本包含 tapText 的元素
+      if (opts.tap) {
+        const cands = await page.$$(opts.tap)
+        let target = null
+        for (const c of cands) {
+          let t = ''
+          try {
+            t = String(await c.text()).trim()
+          } catch (e) {
+            continue
+          }
+          if (!opts.tapText || t.includes(opts.tapText)) {
+            target = c
+            break
+          }
+        }
+        if (!target) throw new Error(`未找到可点击元素: ${opts.tap}${opts.tapText ? ` 含「${opts.tapText}」` : ''}`)
+        await target.tap()
+        await new Promise((r) => setTimeout(r, 1200))
+      }
+
+      const nodes = await page.$$(opts.selector || 'view,text,button')
       const lines = []
       for (const n of nodes) {
         try {
@@ -413,7 +444,10 @@ async function main() {
           /* 节点可能已失效 */
         }
       }
-      console.log(JSON.stringify({ status: 'ok', route: page.path, lines }, null, 2))
+      const out = { status: 'ok', route: page.path, count: lines.length, lines }
+      // 传了选择器时按「清单」输出，便于直接比对文案是否统一
+      if (opts.selector) out.unique = [...new Set(lines)]
+      console.log(JSON.stringify(out, null, 2))
       return
     }
 

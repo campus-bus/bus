@@ -177,28 +177,6 @@ function stopState(idx: number): number {
  */
 const stopStates = computed(() => routeStops.value.map((_, idx) => stopState(idx)))
 
-/**
- * 出现多次的站名的行索引
- *
- * 用来给「上车」按钮补上站序：一圈过两次的站（军体东/网球场/激光所）
- * 光看名字满屏都一样，点之前必须能看出自己点的是第几站。
- */
-const duplicatedIdxs = computed(() => {
-  const seen = new Map<string, number[]>()
-  routeStops.value.forEach((s, i) => {
-    const list = seen.get(s)
-    if (list) list.push(i)
-    else seen.set(s, [i])
-  })
-  const out = new Set<number>()
-  for (const list of seen.values()) if (list.length > 1) list.forEach(i => out.add(i))
-  return out
-})
-
-function boardLabel(idx: number): string {
-  return duplicatedIdxs.value.has(idx) ? `上车 · 第${idx + 1}站` : '上车'
-}
-
 /** store 被重置（切线路、提交完成）时，页面高亮必须跟着清掉，否则会停在旧的站序上 */
 watch(() => uploadStore.timingActive, (active) => {
   if (!active) boardIdx.value = -1
@@ -367,7 +345,9 @@ function formatTime(ts: number) {
           <text class="stop-name" :class="{ bold: stopStates[idx] === 0 }">{{ stop }}</text>
           <text v-if="stopStates[idx] === 2" class="seg-secs">{{ getSegmentSeconds(idx) }}</text>
           <view v-if="stopStates[idx] === 2 && idx === boardIdx + recordedCount" class="undo-btn" @tap="handleUndo">回退</view>
-          <view v-if="!timingActive && idx < routeStops.length - 1" class="board-btn" @tap="boardAt(idx)">{{ boardLabel(idx) }}</view>
+          <!-- 文案统一为「上车」：一圈过两次的站（军体东/网球场/激光所）靠左侧站序圆点
+               和最近站卡片的「下一班」标记区分方向，按钮上不再堆「· 第N站」 -->
+          <view v-if="!timingActive && idx < routeStops.length - 1" class="board-btn" @tap="boardAt(idx)">上车</view>
           <view v-if="stopStates[idx] === 1" class="timing-btn" @tap="tapStop(idx)">计时</view>
         </view>
 
