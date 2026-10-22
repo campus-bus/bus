@@ -1,6 +1,72 @@
-# 审阅说明（第 7 版送审包）
+# 审阅说明（第 8 版送审包 · v1.0.1）
 
 本文件只送审阅用，随源码一起提供，帮助快速定位「这轮改了什么、怎么自己验证、哪些不是缺陷」。
+
+## 本轮（v1.0.1）：修复「右上角没有转发入口」
+
+**这是真缺陷，且是上一版送审包（第 7 版）里存在、但静态阅读看不出来的问题。**
+
+上一版 `src/utils/share.ts` 用 `useShare()` 封装了 `onShareAppMessage` / `onShareTimeline`，
+首页、行程页、地图页都调用了它。**从代码上看完全正确，运行期也不报任何错，但微信右上角
+`···` 菜单里没有「转发给朋友」**，群聊/好友这条入口实际是断的。
+
+### 根因（uni-app 编译期机制，不是调用写法问题）
+
+`node_modules/@dcloudio/uni-mp-vite/dist/plugins/runtimeHooks.js`（插件名 `uni:mp-runtime-hooks`）
+**用正则扫描「页面文件自身的源码」**，匹配到 `onShareAppMessage` / `onShareTimeline` 这些**字面量**，
+才给页面组件补上 `__runtimeHooks` 位掩码：
+
+```js
+const matches = source.match(new RegExp(`(${Object.keys(MINI_PROGRAM_PAGE_RUNTIME_HOOKS).join('|')})`, 'g'));
+if (!matches) {
+    return null;             // ← 匹配不到就什么都不加
+}
+```
+
+运行时侧（`@dcloudio/uni-mp-weixin` 的 `uni.mp.esm.js`）里，`onShareAppMessage` / `onShareTimeline`
+**不在**自动注入的 `PAGE_INIT_HOOKS` 列表里（源码第 219–222 行是注释掉的），只能靠
+`initRuntimeHooks(pageOptions, vueOptions.__runtimeHooks)` 按位加进去。
+
+于是：钩子调用被藏进 `utils/share.ts` 后，页面源码里只剩 `useShare()` 五个字，正则匹配不到
+→ 位掩码不生成 → 微信 Page options 里没有转发钩子 → 菜单项灰掉。**全程无报错**，
+所以只读代码或只看控制台都会误判为「已配置」。
+
+### 修法
+
+- `src/utils/share.ts` 改为**只导出常量** `SHARE_TITLE` / `SHARE_PATH`，不再注册钩子
+  （文件头注释写明原因，防止以后再被封装回去）
+- `pages/index` / `pages/schedule` / `pages/map` / `pages/about` 各自
+  `import { onShareAppMessage, onShareTimeline } from '@dcloudio/uni-app'`，
+  在 `<script setup>` **顶层直接调用**
+- 落地页固定为 `/pages/index/index`：好友点开都是首页，不依赖原页面状态
+- 版本号 `1.0.0` → `1.0.1`
+
+### 如何自己验证（可量化，不依赖肉眼）
+
+```bash
+cd apps/miniprogram && npm run build:mp-weixin
+# 1) 编译期：产物里必须出现位掩码 = 6（2=好友，4=朋友圈）
+node -e "const s=require('fs').readFileSync('dist/build/mp-weixin/pages/index/index.js','utf8');console.log(/__runtimeHooks=(\d+)/.exec(s)?.[1])"
+# 期望输出 6；index / schedule / map / about 四页都应是 6
+
+# 2) 运行时：微信 Page 实例上必须是 function
+#    （用 miniprogram-automator 在开发者工具里执行）
+#    getCurrentPages().at(-1).onShareAppMessage   → 'function'
+#    getCurrentPages().at(-1).onShareTimeline      → 'function'
+```
+
+第 7 版送审包实测：四页位掩码**均未生成**，运行时两者都是 `undefined`。
+本版实测：四页位掩码均为 `6`，运行时两者均为 `function`。
+
+对照实验（用于确认根因）：给第 7 版的产物**仅**注入一句 `__runtimeHooks=6`（不动任何业务代码），
+同一页面立即从 `undefined` 变成 `function`。
+
+### 平台限制（非缺陷）
+
+`onShareTimeline`（分享到朋友圈）微信目前**仅 Android 支持**，iOS 上即使配置正确也没有入口。
+这是微信平台限制，不作为缺陷处理。
+
+---
 
 ## 包结构与运行前提
 
@@ -9,10 +75,10 @@
   运行方式见 `_upstream_data/README.md`（需先还原仓库布局）
 - 已排除：`node_modules/`、`dist/`、`dev-build.log`、开发截图、接口申请截图（均可重建或与代码无关）
 
-## 本轮（用户场景验收之后）的修改：记录页三条 + 行程规划（已在上一版修）
+## 上一版（第 7 版）：记录页三条 + 行程规划
 
-送审依据是 `miniprogram-full-source(4).zip`，其中的行程规划问题已在第 6 版修复；本版按同一份验收报告
-补齐了记录功能的三条。三条我都在真实数据/真实页面上复现过，不是按描述改的。
+送审依据是 `miniprogram-full-source(4).zip`，其中的行程规划问题已在第 6 版修复；这一版按同一份验收报告
+补齐了记录功能的三条。三条都在真实数据/真实页面上复现过，不是按描述改的。
 
 ### 1. 记录中退出页面再进入，计时与提交入口会消失（已修）
 
@@ -71,9 +137,7 @@ X3 要求两者不同（过滤失效会立刻红）、X4 要求结果只含本�
 - 生产构建与包体积：`vue-tsc` 0 错误、`build:mp-weixin` 成功、主包 1.17 MB、
   `requiredPrivateInfos` 三接口齐备
 
-## 上一轮（最终上线评估之后）的修改
-
-## 上一轮（最终上线评估之后）的修改
+## 更早（第 6 版）：最终上线评估提出的三条
 
 上一轮评估提出「1 个必修 + 2 个顺带」，三条全部处理，并补上了评估环境做不了的生产构建验证。
 
@@ -127,7 +191,7 @@ app.json                        requiredPrivateInfos = getLocation, startLocatio
 > 注意：`requiredPrivateInfos` 在 dev 产物里曾因「同时跑两个 watcher」丢失（见踩坑 12）。
 > 本次是**单 watcher** 构建，已逐字段核对产物，不只看构建成功。
 
-## 上一轮（第四轮复核之后）的修改
+## 更早（第 5 版）：第四轮复核之后的修改
 
 ### 1. 修复持续定位状态机卡死（对应第四轮 P1，确认为真缺陷）
 
@@ -180,6 +244,9 @@ node scripts/test_geo_state.mjs
 |---|---|
 | 地图页保留 `isReturnStop`（回程到站） | 用户点站点只想看「哪些车会经过」；首页才过滤回程到站，避免与「即将发车」重复。见首页/地图差异化处理 |
 | 地图顶部「距「XX」N 米」HUD | 位置接口申请材料的文案与 3/8–7/8 截图都围绕这行写，删除会导致材料与界面不一致；不要建议移除 |
+| 分享落地页统一为首页 | 三类页面发起分享都落到首页，避免好友打开时缺原页面状态（如行程页的查询条件）。属刻意取舍，不是遗漏 |
+| iOS 无「分享到朋友圈」 | 微信平台限制，`onShareTimeline` 目前仅 Android 生效，不作为缺陷 |
+| 记录页未配置转发 | 维护者专用页（口令进入），不需要对外分享入口 |
 | 未做真机验收 | 模拟器与真机行为差异已知（见下），不作为「已验证」声明 |
 
 ## 已知未覆盖
@@ -196,7 +263,8 @@ node scripts/test_core_logic.mjs    # 64 通过（直接 import 小程序源码�
 node scripts/check_coord.js         # 10 通过（370 个坐标全量比对）
 node scripts/test_geo_state.mjs     # 17 通过（持续定位状态机）
 cd apps/miniprogram && npx vue-tsc --noEmit   # 0 错误
-cd apps/miniprogram && npm run build:mp-weixin # DONE，主包 1.17 MB
+cd apps/miniprogram && npm run build:mp-weixin # DONE，主包 1.18 MB
+# 转发钩子：四页产物 __runtimeHooks 均为 6，运行时 onShareAppMessage/onShareTimeline 均为 function
 ```
 
 ## 已知未覆盖（补充）
@@ -206,6 +274,9 @@ cd apps/miniprogram && npm run build:mp-weixin # DONE，主包 1.17 MB
 
 ## 仍需真机/后台确认（代码侧无法覆盖）
 
+- **转发真机验证**：本版的转发钩子只在开发者工具里通过 automator 断言（编译期位掩码 + 运行时
+  `typeof` 均为 `function`）。微信原生 `···` 菜单项是否真的出现、分享卡片点开后是否正确进入首页，
+  需在真机体验版上点一次确认（开发者工具无法渲染原生菜单）
 - 微信后台的 `getLocation`、`startLocationUpdate`、`onLocationChange` 接口权限与隐私指引是否已通过配置/审批
 - 体验版真机：拒绝定位仍可查时刻、快速切页、授权弹窗期间切走、前后台恢复
 - 腾讯地图 Key 的额度与域名限制（Key 在前端属于已知取舍，非本轮阻断项）
