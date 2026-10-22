@@ -9,7 +9,7 @@
 | 层 | 复用方式 |
 |---|---|
 | 数据 | `scripts/sync_miniprogram_data.js` 从 `public/data/` 压缩同步到 `src/data/`（import 加载），**同步时把经纬度从 WGS-84 转成 GCJ-02**；两份数据坐标系不同，见下 |
-| 业务逻辑 | `src/utils/`（station_group/countdown/geo/bus_position/datetime）与 H5 同源复制，改动需双向同步 |
+| 业务逻辑 | `src/utils/`（station_group/ride_rank/stop_seq/countdown/geo/bus_position 等）**为权威版本**，与 H5 的 `src/utils/` 不再要求字节一致（2026-10-22 起）；两端**业务语义**必须一致——同名站取最优上下车组合、环线首尾同站过滤、5 分钟保留窗口、日期类型判定 |
 | UI | 全部重写（Vant → 原生组件 + rpx），页面一一对应 |
 
 ## 坐标系（重要）
@@ -76,9 +76,9 @@ npm run build:mp-weixin  # 生产构建（压缩）
 ```
 src/
 ├── pages/           # index(首页) schedule(行程) map(地图) record(维护者记录) about(关于)
-├── stores/          # schedule(数据) location(定位) upload(记录，本地) global-time(调试)
+├── stores/          # schedule(数据) location(定位) upload(记录，本地) preference map_focus
 ├── utils/           # 业务逻辑（与 H5 同源）+ dev(维护者开关)
-├── composables/     # useGeolocation（GCJ-02 定位）、useWeather（腾讯位置服务）
+├── composables/     # useGeolocation(GCJ-02 定位) + watch_machine(定位状态机，纯逻辑可回归)、useWeather(腾讯位置服务)
 ├── data/            # sync_miniprogram_data.js 生成（GCJ-02），勿手改
 ├── types/           # index(业务类型，与 H5 一致)、wx(微信原生 API 声明)
 ├── static/icons/    # 公交图标

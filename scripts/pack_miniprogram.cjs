@@ -54,6 +54,9 @@ const PIPELINE = [
   { from: 'scripts/regenerate_predictions.js', to: '_upstream_data/scripts/regenerate_predictions.js' },
   { from: 'scripts/test_scenarios.cjs', to: '_upstream_data/scripts/test_scenarios.cjs' },
   { from: 'scripts/test_core_logic.mjs', to: '_upstream_data/scripts/test_core_logic.mjs' },
+  // 持续定位状态机回归：审阅方第四轮明确建议「定位生命周期要有基于 mock 的自动化测试」，
+  // 缺了它审阅方无法自己验证 P1 是否真修好
+  { from: 'scripts/test_geo_state.mjs', to: '_upstream_data/scripts/test_geo_state.mjs' },
   { from: 'scripts/lib/data_pipeline_readme.md', to: '_upstream_data/README.md' },
 ]
 /** 源数据目录里只要 JSON（卫星底图 JPEG 是 H5 专用，1.5MB 且与小程序无关） */

@@ -38,10 +38,13 @@ cp -r src apps/miniprogram/src
 | `_upstream_data/scripts/regenerate_predictions.js` | `scripts/regenerate_predictions.js` | 按 `route_params.json` 重新生成 `arrival_predictions.json` |
 | `_upstream_data/scripts/test_scenarios.cjs` | `scripts/test_scenarios.cjs` | 数据层回归断言（节假日、环线首尾同站、最优上下车组合等） |
 | `_upstream_data/scripts/test_core_logic.mjs` | `scripts/test_core_logic.mjs` | 核心逻辑回归：直接 import 小程序源码里的 TS 模块，测的是线上实现 |
+| `_upstream_data/scripts/test_geo_state.mjs` | `scripts/test_geo_state.mjs` | 持续定位状态机回归：假端口重放 `startLocationUpdate` 回调晚到等交错顺序 |
 | `_upstream_data/public/data/*.json` | `public/data/*.json` | 源数据（**WGS-84**，供 H5 卫星地图使用） |
 
-> `test_core_logic.mjs` 用 Node 24 的 TypeScript 类型擦除直接 `import` 小程序源码，
-> 因此它必须能找到 `apps/miniprogram/src/utils/*.ts`（上面还原布局时已一并放好）。
+> `test_core_logic.mjs` 与 `test_geo_state.mjs` 都用 Node 的 TypeScript 类型擦除直接 `import`
+> 小程序源码，因此必须能找到 `apps/miniprogram/src/` 下的 `.ts`——`test_core_logic.mjs` 读
+> `src/utils/*.ts`，`test_geo_state.mjs` 读 `src/composables/watch_machine.ts`
+> （所以上面还原布局时要把「压缩包根目录的 `src/`」整体放回 `apps/miniprogram/src`）。
 > Node 需 ≥ 22.6（`--experimental-strip-types`）；Node 23.6+ 默认开启，本项目用 Node 24。
 
 ## 坐标系（最容易踩的坑）
@@ -61,10 +64,11 @@ cp -r src apps/miniprogram/src
 node scripts/regenerate_predictions.js
 # 3. 同步到小程序（压缩 + 坐标转换）
 node scripts/sync_miniprogram_data.js
-# 4. 三项校验，缺一不可
+# 4. 四项校验，缺一不可
 node scripts/test_scenarios.cjs     # 数据层断言
 node scripts/test_core_logic.mjs    # 核心逻辑（直接 import 小程序源码）
 node scripts/check_coord.js         # 坐标一致性（锚点快照 + 370 点全量比对）
+node scripts/test_geo_state.mjs     # 持续定位状态机（改 useGeolocation / watch_machine 后必跑）
 ```
 
 **为什么坐标要单独一项校验**：`coord.js` 的 `selfCheck()` 只看「偏移量是否在 550-800m」，
