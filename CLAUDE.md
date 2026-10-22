@@ -672,7 +672,8 @@ apps/miniprogram/
 - **申请文案 + 上传清单**：`apps/miniprogram/docs/接口权限申请材料.md`（含两段互不重复的 300 字文案、8 张图的逐张说明、驳回对策）。
 - **图片生成**：`node scripts/capture_location_permission_shots.cjs`（automator 抓 8 张原图到 `docs/接口申请截图-持续定位/原图/`）→ `powershell -File scripts/annotate_location_shots.ps1` 加底部说明条输出到 `上传用/`（**上传这个目录**）。
 - **图形依据（重要）**：单张静止图无法证明「必须持续定位」——`getLocation` + `<map show-location>` 也能画出蓝点。所以截图做成**同一地图页 5 帧连续画面**（网球场→激光所，距离 135→98→69→49→14 米）。
-- **已清理**：当时为截图临时加过 `nearestStopInfo`（左上角距离 HUD）与 `userMarker`（自绘蓝色定位点，`src/static/icons/user-location.png`）。两者均已按用户要求删除——原生 `show-location` 蓝点风格与微信统一、位置无偏移，自绘 marker 因默认锚点是底边中点，会偏离真实坐标约 26m（scale 16 下 22px 图标上浮 11px），视觉上和原生蓝点打架。
+- **已清理**：当时为截图临时加过 `nearestStopInfo`（左上角距离 HUD）与 `userMarker`（自绘蓝色定位点，`src/static/icons/user-location.png`）。自绘 marker 已删除——原生 `show-location` 蓝点风格与微信统一、位置无偏移，自绘 marker 因默认锚点是底边中点，会偏离真实坐标约 26m（scale 16 下 22px 图标上浮 11px），视觉上和原生蓝点打架。
+- **`nearestStopInfo` 于 2026-10-22 恢复（顶部距离 HUD）**：它曾于 10-19 一并删除，但位置接口申请材料的第一、二节文案和 3/8–7/8 截图都是围绕这行「距「激光所」135 米 · 步行约1分44秒」写的——删掉它等于材料与界面不一致，提审会被判「使用场景无法确认」。恢复的是**纯文字 HUD**（不涉及自绘 marker），数值随 `onLocationChange` 刷新，是本项目持续定位唯一可被截图证明的使用场景。**不要再次删除**。
 
 - **合规落地**：`useGeolocation.ts` 新增 `onAppHide`/`onAppShow` 钩子，切后台立即 `stopLocationUpdate` + `offLocationChange`，回前台恢复；关于页新增「位置信息」声明。
 - **PowerShell 脚本必须存 UTF-8 带 BOM**：无 BOM 时 PS 5.1 按 GBK 解析，中文注释里的字节可能被当成反引号续行，导致 `Add-Type` 被吞、报「找不到类型 System.Drawing」。用 Node 写入 `'\ufeff' + s` 即可。

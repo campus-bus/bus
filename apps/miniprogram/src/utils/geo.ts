@@ -89,6 +89,22 @@ export function formatWalkTime(seconds: number): string {
   return `步行约${min}分钟`
 }
 
+/** 步行速度（m/s），1.3 ≈ 4.7km/h，成年人常规步速 */
+export const WALK_SPEED_MPS = 1.3
+
+/**
+ * 精确到秒的步行时间（地图页顶部「距 X 米 · 步行约1分44秒」用）
+ *
+ * 与 formatWalkTime 的分钟级并存是有意的：那处数字是**位置接口申请材料里
+ * 逐张截图核对的那个数值**（审核会对着材料看截图），必须保持一致；
+ * 卡片列表里则用分钟级，避免假精确。
+ */
+export function formatWalkTimePrecise(seconds: number): string {
+  const s = Math.max(1, Math.round(seconds))
+  if (s < 60) return `步行约${s}秒`
+  return `步行约${Math.floor(s / 60)}分${s % 60}秒`
+}
+
 /**
  * 计算两点之间的方位角（度）
  */

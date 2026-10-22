@@ -10,7 +10,7 @@ import { useWeather } from '@/composables/useWeather'
 import { getDateType, getSecondsSinceMidnight, formatDate } from '@/utils/datetime'
 import { getDateLabel } from '@/utils/holidays'
 import { getNow } from '@/utils/time'
-import { findNearestStop, findNearestStops, formatWalkTime } from '@/utils/geo'
+import { findNearestStop, findNearestStops, formatWalkTime, WALK_SPEED_MPS } from '@/utils/geo'
 import { arrivalCountdown, departureCountdown } from '@/utils/countdown'
 import { toGroup, groupMembers, findBestRide } from '@/utils/station_group'
 import { useShare } from '@/utils/share'
@@ -18,8 +18,8 @@ import ArrivalCard from '@/components/ArrivalCard.vue'
 import BusStopTimeline from '@/components/BusStopTimeline.vue'
 import type { Departure, DateType, RideInfo } from '@/types'
 
-/** 步行速度（m/s），1.3 ≈ 4.7km/h，成年人常规步速 */
-const WALK_SPEED = 1.3
+/** 步行速度（m/s）来自 utils/geo，地图页顶部距离提示用同一个值，避免两处口径不一致 */
+const WALK_SPEED = WALK_SPEED_MPS
 /** 附近站搜索半径（米）与最多展示站数 */
 const NEARBY_RADIUS_M = 200
 const NEARBY_LIMIT = 3

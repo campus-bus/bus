@@ -189,6 +189,22 @@ assert('P2 不存在「有可上车方案却选了已过站方案」的班次',
     return !rawCandidates.some(x => x.dep === id && x.tier < 2)
   }))
 
+// ═══ U. 地图顶部距离提示（申请材料截图里的数值） ═══
+// 位置接口申请材料 3/8–7/8 拍的正是这行「距「激光所」135 米 · 步行约1分44秒」。
+// 步行速度一改，材料里的数字就对不上了（审核会对着截图核），所以固化为断言。
+console.log('\n【U. 地图顶部距离提示】')
+const geoSrc = fs.readFileSync('apps/miniprogram/src/utils/geo.ts', 'utf8')
+const speedMps = Number((geoSrc.match(/WALK_SPEED_MPS\s*=\s*([\d.]+)/) || [])[1])
+// 复刻 formatWalkTimePrecise
+function walkPrecise(meters) {
+  const s = Math.max(1, Math.round(meters / speedMps))
+  if (s < 60) return `步行约${s}秒`
+  return `步行约${Math.floor(s / 60)}分${s % 60}秒`
+}
+assert('U1 geo.ts 定义了步行速度', Number.isFinite(speedMps) && speedMps > 0, `(${speedMps} m/s)`)
+assert('U2 135m → 「步行约1分44秒」（与申请材料截图一致）', walkPrecise(135) === '步行约1分44秒', `(${walkPrecise(135)})`)
+assert('U3 14m → 秒级提示', /^步行约\d+秒$/.test(walkPrecise(14)), `(${walkPrecise(14)})`)
+
 // ═══ D. 日期类型（节假日表） ═══
 // 依据国办发明电〔2025〕7 号逐日核对 2026 年。曾出现 7 天误判
 // （元旦未补 1/4 上班、春节漏 2/15-2/16、清明整体偏移一天、劳动节漏 5/9 上班），

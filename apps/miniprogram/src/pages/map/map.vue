@@ -10,6 +10,7 @@ import { getNow } from '@/utils/time'
 import { computeActiveBusPositions } from '@/utils/bus_position'
 import { STATION_MARKER_META } from '@/utils/station_marker_meta'
 import { arrivalCountdown, etaClassOf } from '@/utils/countdown'
+import { findNearestStop, formatWalkTimePrecise, WALK_SPEED_MPS } from '@/utils/geo'
 import { routeColorOf, routeLabelOf, busIconOf } from '@/constants/routes'
 import { useShare } from '@/utils/share'
 import type { BusPosition } from '@/types'
@@ -343,6 +344,34 @@ onUnmounted(() => {
 
 // ─── 点站面板 ───
 const selectedStop = ref<string | null>(null)
+
+/**
+ * 顶部「距「激光所」135 米 · 步行约1分44秒」提示
+ *
+ * 这行字有两个用途：
+ * 1. 用户走在路上时能判断「继续走还是换一个站」——它必须随位置变化刷新，
+ *    单次 getLocation 拿到的静止坐标做不到，这也是申请
+ *    startLocationUpdate / onLocationChange 的实际使用场景；
+ * 2. 位置接口申请材料第三节的 8 张截图就是拍这行数字从 135 米变到 14 米，
+ *    删掉它材料就与界面不一致（2026-10-22 按用户要求恢复，勿再随手删除）。
+ *
+ * 只显示 3km 内最近的一个站：超出范围说明人不在校园，报「距北门 12 公里」没有意义。
+ */
+const HUD_MAX_DISTANCE_M = 3000
+const nearestStopInfo = computed(() => {
+  const lat = locationStore.userLat
+  const lng = locationStore.userLng
+  if (lat === null || lng === null) return null
+  const nearest = findNearestStop(lat, lng, scheduleStore.stations)
+  if (!nearest || nearest.distance > HUD_MAX_DISTANCE_M) return null
+  const distance = Math.round(nearest.distance)
+  return {
+    name: nearest.station.name,
+    distance,
+    walk: formatWalkTimePrecise(distance / WALK_SPEED_MPS),
+  }
+})
+
 const nowTick = ref(0)
 const secondsNow = computed(() => { void nowTick.value; return getSecondsSinceMidnight(getNow()) })
 /** 列表结构按分钟重建，倒计时文案仍逐秒派生（与首页同一策略） */
@@ -486,6 +515,12 @@ function onRegionChange(e: {
       @regionchange="onRegionChange"
     />
 
+    <!-- 顶部距离提示：随位置变化刷新（申请持续定位的实际使用场景，勿删） -->
+    <view v-if="nearestStopInfo" class="loc-hud">
+      <text class="loc-hud-main">距「{{ nearestStopInfo.name }}」{{ nearestStopInfo.distance }} 米</text>
+      <text class="loc-hud-sub">· {{ nearestStopInfo.walk }}</text>
+    </view>
+
     <!-- 图例 -->
     <view class="legend">
       <view
@@ -549,6 +584,17 @@ function onRegionChange(e: {
 <style scoped>
 .map-page { position: relative; width: 100%; height: 100vh; overflow: hidden; }
 .campus-map { width: 100%; height: 100%; }
+
+/* 顶部距离提示：贴在左上角，给图例（右上角）让位；宽度上限防止长站名把图例挤掉 */
+.loc-hud {
+  position: absolute; top: 20rpx; left: 20rpx; z-index: 10;
+  max-width: 60%;
+  background: rgba(255, 255, 255, 0.96); border-radius: 999rpx;
+  padding: 10rpx 22rpx; box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.12);
+  display: flex; align-items: baseline; gap: 6rpx;
+}
+.loc-hud-main { font-size: 24rpx; font-weight: 600; color: var(--color-text); }
+.loc-hud-sub { font-size: 22rpx; color: var(--color-text-secondary); }
 
 .legend {
   position: absolute; top: 20rpx; right: 20rpx; z-index: 10;
