@@ -35,6 +35,7 @@ const { boardTierOf, isBetterBoard, compareArrivalResults, BOARD_TIER } = await 
 const { formatWalkTimePrecise, WALK_SPEED_MPS, findNearestStops, haversineDistance } = await importSrc('geo.ts')
 const { arrivalCountdown, departureCountdown } = await importSrc('countdown.ts')
 const { findStopIndexes, stopStateOf, nextArrivalsBySeq, recommendedPass } = await importSrc('stop_seq.ts')
+const { isCatchable } = await importSrc('plan_window.ts')
 
 const readData = (f) => JSON.parse(fs.readFileSync(path.join(ROOT, 'public/data', f), 'utf8'))
 const departures = readData('departures.json')
@@ -278,6 +279,22 @@ assert('T7 深夜无车时返回 null（不替用户猜，界面并列展示）'
 assert('T8 刚过站的班次标为 passed（用于「刚过站」提示）',
   nextArrivalsBySeq([3], arrivalsOf('JB2_NORMAL', '军体活动中心东'), 16 * 3600 + 30 * 60 + 0)
     .every((p) => typeof p.passed === 'boolean'))
+
+// ── W. 行程规划：今天已错过的班次不得推荐（真实 isCatchable） ──
+// 场景来源：第四轮之后的复核发现「20:01 查 20:00 前到达」返回 108 趟全是已发出的车
+console.log('\n【W. 行程规划可乘窗口（真实 isCatchable）】')
+assert('W1 今天 20:01、班次 07:30 上车 → 不再推荐',
+  !isCatchable(7 * 60 + 30, 20 * 3600 + 60, true))
+assert('W2 今天 20:01、班次 20:30 上车 → 仍推荐',
+  isCatchable(20 * 60 + 30, 20 * 3600 + 60, true))
+assert('W3 今天 20:01、班次正好 20:01 上车 → 视为已过（不推荐，避免让用户追开走的车）',
+  !isCatchable(20 * 60 + 1, 20 * 3600 + 60, true))
+assert('W4 今天 20:01、班次 20:02 上车 → 仍推荐（还有 1 分钟）',
+  isCatchable(20 * 60 + 2, 20 * 3600 + 60, true))
+assert('W5 查未来日期时不受当前时间影响：早上 07:30 的班次照样推荐',
+  isCatchable(7 * 60 + 30, 20 * 3600, false))
+assert('W6 凌晨 00:00 查今天：当天所有班次都还没开',
+  isCatchable(7 * 60 + 30, 0, true) && isCatchable(22 * 60 + 30, 0, true))
 
 console.log('\n══════════════════════════════')
 console.log(`断言结果: 通过 ${pass} / 失败 ${fail} ${fail === 0 ? '✅ 全部通过（测试的就是线上实现）' : '❌ 存在失败项'}`)

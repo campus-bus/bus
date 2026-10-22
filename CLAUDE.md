@@ -312,6 +312,14 @@ MapView.vue
 - 涉及文件：`src/composables/useNextBus.ts`、`src/utils/countdown.ts`、`src/views/HomeView.vue`
 - 之前为 1 分钟（-60），改为 5 分钟以避免用户看到班车突然消失
 
+## 行程规划：今天已错过的班次不推荐（2026-10-22）
+
+- 「到达期限」只约束**何时到达**，不约束**现在几点**。20:01 查「20:00 前到达」时，不看过车时间就会把 07:30 起全部已发出的车列出来（**实测 108 趟全是过去的**，用户按它去等车会白等）。
+- 规则：`planDate === 今天` 时，上车时间（`best.origin.arrivalMinutes`）已过的班次剔除；查未来日期时不受当前时间影响。实现在 `apps/miniprogram/src/utils/plan_window.ts` 的 `isCatchable()`，`schedule.vue` 的 `doSearch()` 调用。
+- **为什么抽成纯函数**：这条语义曾回退过一次，放在 `.vue` 里 Node 无法直接 import，只能靠人肉复刻测试。现由 `scripts/test_core_logic.mjs` 的 W1–W6 断言覆盖（含「正好到点算已过」「未来日期不受影响」两个边界）。
+- 查全天/历史班次仍走「总时刻表」tab，那里保持全量清单，不做过滤。
+- 相关文案：首页 `outOfCampus` 提示卡位于 `v-if="!selectedStop"` 内，**里面的 `selectedStop` 必然是 null**，任何 `{{ selectedStop }}` 插值都会渲染成「null」，不要再往里加站名插值。
+
 ## 自动记录功能
 
 ### 到站检测

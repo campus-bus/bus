@@ -510,7 +510,7 @@ function departingCardKey(recordId: string) { return `dep-${recordId}` }
       </view>
 
       <view v-if="outOfCampus" class="hint-card">
-        <text>你当前不在校园附近，已隐藏步行赶车建议；下面是「{{ selectedStop }}」的到站时刻</text>
+        <text>你当前不在校园附近，已隐藏步行赶车建议；可从上方列表手动选择站点查看该站到站时刻</text>
       </view>
       <view v-else-if="hasLocation && !noServiceToday && nearbySections.length === 0" class="hint-card">
         <text>当前时段附近暂无到站车次，可从上方列表手动选择站点</text>

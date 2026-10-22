@@ -3,11 +3,12 @@ import { ref, computed, watch } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import { useScheduleStore } from '@/stores/schedule'
 import { usePreferenceStore } from '@/stores/preference'
-import { getDateType, localDateStr, parseDateStr } from '@/utils/datetime'
+import { getDateType, localDateStr, parseDateStr, getSecondsSinceMidnight } from '@/utils/datetime'
 import { getDateLabel } from '@/utils/holidays'
 import { getNow } from '@/utils/time'
 import { toGroup, groupMembers, findBestRide } from '@/utils/station_group'
 import { routeColorOf, routeLabelOf } from '@/constants/routes'
+import { isCatchable } from '@/utils/plan_window'
 import { useShare } from '@/utils/share'
 import BusStopTimeline from '@/components/BusStopTimeline.vue'
 import type { Departure, RouteName, DateType } from '@/types'
@@ -86,11 +87,22 @@ function doSearch() {
   const originMembers = groupMembers(planOrigin.value)
   const destMembers = groupMembers(planDest.value)
   const results: PlanResult[] = []
+  /**
+   * 查「今天」时要排除已经错过上车时间的班次
+   *
+   * 期限只约束「何时到达」，不约束「现在几点」。20:01 查「20:00 前到达」时，
+   * 若不看过车时间，07:30 那趟早已发出的车也会被列出来（实测 108 趟全是过去的），
+   * 用户按它去等车会白等。查未来日期时车本来就还没开，保持原逻辑。
+   * 想查全天班次仍可用「总时刻表」。
+   */
+  const isToday = planDate.value === localDateStr()
+  const nowSec = getSecondsSinceMidnight(getNow())
 
   for (const r of routes) {
     for (const dep of scheduleStore.getDepartures(dt, r)) {
       const best = findBestRide(scheduleStore.getPredictions(dep.recordId), originMembers, destMembers)
       if (!best) continue
+      if (!isCatchable(best.origin.arrivalMinutes, nowSec, isToday)) continue
       if (best.dest.arrivalMinutes > deadlineMin) continue
       results.push({
         departure: dep,

@@ -54,9 +54,9 @@ function exitDev() {
 
     <view class="section">
       <view class="section-title">位置信息</view>
-      <view class="text">· 仅在你点击「允许定位」或打开地图页时获取位置，用于计算你与站点的距离、在地图上显示你的位置</view>
+      <view class="text">· 首次使用定位功能时需主动授权。授权后，停留在首页或地图页时会持续更新位置，用于计算附近站点、步行距离与在地图上显示你的位置；离开这些页面时立即停止</view>
       <view class="text">· 位置只在本机参与计算与显示，不上传服务器、不保存、不生成行程轨迹、不共享给第三方</view>
-      <view class="text">· 仅在小程序处于前台时使用；切到后台立即停止，回到前台自动恢复</view>
+      <view class="text">· 仅在小程序处于前台时使用（未申请后台定位能力）：切到后台立即停止，回到前台且仍停留在上述页面时自动恢复</view>
       <view class="text">· 拒绝授权仍可手动搜索并选择站点，时刻查询功能不受影响</view>
     </view>
 

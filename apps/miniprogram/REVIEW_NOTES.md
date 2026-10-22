@@ -1,4 +1,4 @@
-# 审阅说明（第 5 版送审包）
+# 审阅说明（第 6 版送审包）
 
 本文件只送审阅用，随源码一起提供，帮助快速定位「这轮改了什么、怎么自己验证、哪些不是缺陷」。
 
@@ -9,7 +9,61 @@
   运行方式见 `_upstream_data/README.md`（需先还原仓库布局）
 - 已排除：`node_modules/`、`dist/`、`dev-build.log`、开发截图、接口申请截图（均可重建或与代码无关）
 
-## 本轮（第四轮复核之后）的修改
+## 本轮（最终上线评估之后）的修改
+
+上一轮评估提出「1 个必修 + 2 个顺带」，本轮三条全部处理，并补上了评估环境做不了的生产构建验证。
+
+### 1. 行程规划不再推荐今天已错过的班次（必修项，已用真实数据复现并修复）
+
+**问题确认**：`doSearch()` 只比较「到达时间 ≤ 期限」，不比较「上车时间 vs 现在」。
+我用包内真实数据复刻了评估给出的场景（工作日 20:01、研究生宿舍楼 → 高超楼、20:00 前到达）：
+**返回 108 趟，其中 108 趟的上车时间都已过去**（首条是 07:30 上车），与评估结论一致。
+
+**修法**：这条规则抽成纯函数 `src/utils/plan_window.ts` 的 `isCatchable(boardMinutes, nowSeconds, isToday)`，
+`doSearch()` 在 `findBestRide()` 之后剔除上车时间已过的班次；**查未来日期时不受当前时间影响**。
+总时刻表 tab 保持全量清单，不做过滤（历史班次仍可查）。
+
+边界取「正好到点算已过」（20:01:00 的班次在 20:01 不再推荐），避免让用户去追已经开走的车。
+
+**如何自己验证**：
+
+```bash
+node scripts/test_core_logic.mjs   # W1–W6 六条断言，直接 import 真实 isCatchable
+```
+
+实测（真实页面，非 mock）：19:30 查默认的 20:00 期限，只返回 2 趟（19:35、19:40 上车），
+修复前会返回上百趟从 07:30 开始的已发车次。
+
+### 2. 定位隐私说明与实际行为对齐（必修核对项）
+
+`about.vue` 原文写「仅在你点击允许定位或打开地图页时获取位置」，但实际是**授权后只要停留在首页/地图页
+就持续更新**（`startLocationUpdate` + `onLocationChange`），回到首页会自动恢复监听。原文与行为不符，
+也与位置接口申请材料里的使用场景描述不一致。
+
+已改为：首次使用需主动授权；授权后停留在首页或地图页时持续更新位置，用于计算附近站点、步行距离与地图定位，
+**离开这些页面时立即停止**；并补充「仅前台使用（未申请后台定位能力），切后台立即停止，回前台且仍在上述页面时自动恢复」。
+
+### 3. 首页「null」文案（顺带项）
+
+`outOfCampus` 提示卡位于 `v-if="!selectedStop"` 内，其中的 `selectedStop` **必然为 null**，
+所以原句「下面是「null」的到站时刻」在校园外且未选站时**每次都会出现**（不是偶发）。
+已改为不引用站名的「可从上方列表手动选择站点查看该站到站时刻」。
+
+### 4. 生产构建与包体积（评估环境因缺依赖未能完成的部分，这边补齐）
+
+```
+npx vue-tsc --noEmit            0 错误
+npm run build:mp-weixin         DONE Build complete.
+主包总体积                      1.17 MB（上限 2 MB）
+js 979KB / png 176KB / wxss 23KB / wxml 22KB
+app.json                        requiredPrivateInfos = getLocation, startLocationUpdate, onLocationChange
+                                permission.scope.userLocation 文案齐备，lazyCodeLoading=requiredComponents
+```
+
+> 注意：`requiredPrivateInfos` 在 dev 产物里曾因「同时跑两个 watcher」丢失（见踩坑 12）。
+> 本次是**单 watcher** 构建，已逐字段核对产物，不只看构建成功。
+
+## 上一轮（第四轮复核之后）的修改
 
 ### 1. 修复持续定位状态机卡死（对应第四轮 P1，确认为真缺陷）
 
@@ -74,8 +128,14 @@ node scripts/test_geo_state.mjs
 
 ```bash
 node scripts/test_scenarios.cjs     # 32 通过
-node scripts/test_core_logic.mjs    # 49 通过（直接 import 小程序源码真实模块）
+node scripts/test_core_logic.mjs    # 55 通过（直接 import 小程序源码真实模块，本轮新增 W1–W6）
 node scripts/check_coord.js         # 10 通过（370 个坐标全量比对）
 node scripts/test_geo_state.mjs     # 17 通过（持续定位状态机）
 cd apps/miniprogram && npx vue-tsc --noEmit   # 0 错误
 ```
+
+## 仍需真机/后台确认（代码侧无法覆盖）
+
+- 微信后台的 `getLocation`、`startLocationUpdate`、`onLocationChange` 接口权限与隐私指引是否已通过配置/审批
+- 体验版真机：拒绝定位仍可查时刻、快速切页、授权弹窗期间切走、前后台恢复
+- 腾讯地图 Key 的额度与域名限制（Key 在前端属于已知取舍，非本轮阻断项）
