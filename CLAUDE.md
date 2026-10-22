@@ -596,6 +596,7 @@ apps/miniprogram/
 | 现象 | 取证命令 |
 |---|---|
 | 定位失效 / 权限异常 | `node scripts/mp_probe.cjs location` |
+| 点定位毫无反应（连报错都没有） | `node scripts/mp_probe.cjs privacy`（判断是不是隐私接口不回调） |
 | 天气不显示 | `node scripts/mp_probe.cjs weather` |
 | 节假日 / 车次异常 | `node scripts/mp_probe.cjs holidays` |
 | 授权与隐私协议 | `node scripts/mp_probe.cjs setting` |
@@ -617,6 +618,7 @@ apps/miniprogram/
 3. 数据回归（三项都要，不是任选其一）：
    - `node scripts/test_scenarios.cjs`（数据层场景）
    - `node scripts/test_core_logic.mjs`（核心逻辑：**直接 import 小程序源码真实模块**，不复刻算法）
+   - `node scripts/test_geo_state.mjs`（持续定位状态机：假端口重放回调晚到/切后台/启动失败等交错顺序）
    - `node scripts/check_coord.js`（坐标一致性：锚点快照 + 370 点全量，能识别双重转换）
 
 ### 效率纪律（强制，违反即返工）
@@ -677,6 +679,13 @@ apps/miniprogram/
     因此：① 起 watcher 前先关掉项目，或起完立刻在工具里点一次「编译」；② 别在工具开着时反复重启 watcher（两个 watcher 还会互相覆盖，见踩坑 12）；③ 看到这类报错先查 `dist/dev/mp-weixin/app.json` 是否存在 + 时间戳，不要去改源码。
     取证位置：`%LOCALAPPDATA%\微信开发者工具\User Data\<hash>\WeappLog\logs\<session>.log`（`[appservice] simulator launch failed` 就是它）。判断是否真的编译失败，只看 **vite 那侧**的 `DONE Build complete` / `[plugin:vite:vue]`，开发者工具日志里的 `timingData not found`、`ideplugin manifest` 都是内部噪音。
 22. **`apps/miniprogram/dev-build.log` 是追加写入的，末尾的错误可能是几小时前的**（2026-10-22）：该文件由 watcher 重定向产出，只 append 不截断，`Get-Content -Tail` 看到 `[plugin:vite:vue] Element is missing end tag at pages/schedule/schedule.vue:251` 时不要立刻改那个文件——先跑一次全新 `npx uni build -p mp-weixin` 复现，或直接看该条错误的时间。实际那次是 13:13 中途编辑留下的历史记录，当前源码构建完全正常。
+23. **持续定位的状态机不许在「状态没变」时自增 epoch**（2026-10-22，第四轮外部复核 P1）：旧 `syncWatch()` 一进来就 `++watchEpoch`，于是「已经在启动中」那次返回前也把版本号改了；`startLocationUpdate` 的回调回来发现版本不匹配 → 直接退出 → `startingWatch` 永远是 true → 之后每次 `syncWatch()` 都在 `if (watching || startingWatch) return` 处返回，**监听再也不会建立**（定位不刷新，且没有任何报错）。触发门槛很低：`map.vue` 的 `onShow` 里 `initLocation()` 的 `getSetting` 回调与 `acquireWatch()` 各调一次 sync 就够了。
+    - 现在的约束：**只有「确实不该再监听」时才自增 epoch**，正常同步不碰版本号。见 `apps/miniprogram/src/composables/watch_machine.ts` 的 `sync()`。
+    - 状态机已拆成零依赖纯模块（不 import vue/uni/wx/store），`node scripts/test_geo_state.mjs` 用假端口重放「回调晚到 / 切后台 / 快速往返 / 启动失败 / 请求被拒 / 换页」等 17 条断言。**验证过它能抓到这个 bug**：把 `++epoch` 挪回无条件自增，17 条里会红 3 条。
+    - 排查口诀：定位「没反应」但又没有报错时，先问「是不是卡在 startingWatch=true」。日志里不会有任何提示，这是设计缺陷的特征。
+24. **探针 `reLaunch` 到「当前已在的那个页面」会伪造出 owner 竞态**（2026-10-22）：`mp_probe.cjs --url` 和临时脚本常用 `reLaunch`，若目标就是当前页，旧实例 `onHide` 的 `releaseWatch('index')` 可能晚于新实例 `onShow` 的 `acquireWatch('index')` 到达——两者 owner 名相同，于是把新页面的所有权清掉了，表现成「点定位毫无反应」。真实用户不会 reLaunch 同一个 tab，所以这是探针假象。**测定位要走真实 tab 往返**（`switchTab` 到别的页再回来），别用 `reLaunch` 到同页。
+    - 同理，临时给 `wx.getLocation` 打 patch 记录调用次数时，若 patch 没正确转发回调，会让 `loading`/`starting` 卡在 true，之后首页门禁区块被 `!locLoading` 永久隐藏，看起来像「按钮消失」。**验证完要么重启模拟器，要么在 patch 里原样转发 success/fail。**
+25. **`wx.requirePrivacyAuthorize` 在个别开发者工具版本里不回调**：表现同样是「点定位没反应、连错误都没有」。`node scripts/mp_probe.cjs privacy` 可直接判定（status 为 `timeout` 就是工具侧问题，不是业务代码）。
 
 ### 位置接口申请材料（2026-10-19，`startLocationUpdate`/`onLocationChange` 重提）
 
@@ -687,7 +696,9 @@ apps/miniprogram/
 - **`nearestStopInfo` 于 2026-10-22 恢复（顶部距离 HUD）**：它曾于 10-19 一并删除，但位置接口申请材料的第一、二节文案和 3/8–7/8 截图都是围绕这行「距「激光所」135 米 · 步行约1分44秒」写的——删掉它等于材料与界面不一致，提审会被判「使用场景无法确认」。恢复的是**纯文字 HUD**（不涉及自绘 marker），数值随 `onLocationChange` 刷新，是本项目持续定位唯一可被截图证明的使用场景。**不要再次删除**。
 
 - **合规落地**：`useGeolocation.ts` 新增 `onAppHide`/`onAppShow` 钩子，切后台立即 `stopLocationUpdate` + `offLocationChange`，回前台恢复；关于页新增「位置信息」声明。
-- **开关只有一个入口 `syncWatch()`（2026-10-22 修复竞态）**：`wx.startLocationUpdate` 是异步的，成功回调可能在页面已经切走 / 已切后台之后才回来。旧写法在回调里直接 `onLocationChange`，造成「人已经离开、监听才刚开始」。现在所有开关都走 `syncWatch()`，由 `shouldWatch()`（前台 && 有页面持有 && 用户愿意 && 未被拒）决定目标状态，并用 `watchEpoch` 序号让过期回调自我作废。**不要在别处直接调 `startLocationUpdate`/`stopLocationUpdate`**，否则竞态会回来。
+- **开关只有一个入口 `syncWatch()`（2026-10-22 修复竞态）**：`wx.startLocationUpdate` 是异步的，成功回调可能在页面已经切走 / 已切后台之后才回来。旧写法在回调里直接 `onLocationChange`，造成「人已经离开、监听才刚开始」。现在所有开关都走 `syncWatch()`，由状态机（`composables/watch_machine.ts`：前台 && 有页面持有 && 用户愿意 && 未被拒）决定目标状态，并用 epoch 序号让过期回调自我作废。**不要在别处直接调 `startLocationUpdate`/`stopLocationUpdate`**，否则竞态会回来。
+- **状态机是纯模块、可回归**：`watch_machine.ts` 不 import vue/uni/wx/store，`scripts/test_geo_state.mjs` 用假端口重放 17 条交错顺序（含第四轮复核 P1 的卡死场景）。改 `syncWatch` 附近逻辑后必须跑它。
+- **隐私授权返回后要复核页面归属（第四轮复核 P2）**：`requestLocation()` 在 `await ensurePrivacy()` 之后检查「仍有页面持有 && 在前台」，否则直接放弃本次 `getLocation`——隐私弹窗期间用户可能已经离开位置页。`openSetting()` 的成功回调同理，统一走 `syncWatch()` 而不是直接 `startWatch()`。
 - **PowerShell 脚本必须存 UTF-8 带 BOM**：无 BOM 时 PS 5.1 按 GBK 解析，中文注释里的字节可能被当成反引号续行，导致 `Add-Type` 被吞、报「找不到类型 System.Drawing」。用 Node 写入 `'\ufeff' + s` 即可。
 
 ### 待办（按优先级）

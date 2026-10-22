@@ -1,5 +1,6 @@
 import { onMounted, ref } from 'vue'
 import { useLocationStore } from '@/stores/location'
+import { createWatchMachine } from './watch_machine'
 
 /**
  * 小程序定位（GCJ-02）
@@ -42,41 +43,8 @@ const loading = ref(false)
 const ready = ref(false)
 /** 用户是否已经授权过位置（scope.userLocation === true），用于按钮文案 */
 const authorized = ref(false)
-/** 是否已成功开启持续监听 */
-let watching = false
-/** 是否正在启动（防止并发重复调用 getLocation） */
+/** 是否正在启动单次定位（防止并发重复调用 getLocation） */
 let starting = false
-/** 是否正在启动持续监听（与 starting 区分：后者指单次 getLocation） */
-let startingWatch = false
-/**
- * 小程序当前是否在前台
- *
- * 位置接口只在用户盯着页面时才该跑。切后台时 onAppHide 会停监听，
- * 但「停」这件事必须和 shouldWatch() 一起判断，否则回前台时
- * 若页面已经离开，onAppShow 的恢复逻辑会把它错误地重新打开。
- */
-let foreground = true
-/**
- * 监听状态版本号
- *
- * `wx.startLocationUpdate` 是异步的，它的 success 可能在**页面已经离开**
- * 或**已经切到后台**之后才回来。每次状态变化都自增版本号，回调里比对：
- * 过期就说明这次启动已经没人要了，不能再挂 onLocationChange。
- * 没有这个序号时，离开页面后监听会在稍后悄悄开始，与
- * 「离开位置页立即停止」的说明不符。
- */
-let watchEpoch = 0
-/** 用户已明确拒绝授权：不再自动重试，避免回前台就反复失败 */
-let denied = false
-/**
- * 用户是否「希望」持续定位
- *
- * 与 watching 的区别：切到后台时我们主动停止监听（watching=false），
- * 但用户意愿仍在（wantWatch=true），回前台时据此自动恢复。
- */
-let wantWatch = false
-/** 前后台钩子只装一次（模块级单例） */
-let appHooksInstalled = false
 
 /**
  * 处理「微信交给我们的位置」→ 直接入库
@@ -110,13 +78,51 @@ function ensurePrivacy(): Promise<boolean> {
   })
 }
 
+/**
+ * 持续定位状态机（模块级单例）
+ *
+ * 状态判断全部在 watch_machine.ts（纯逻辑、不碰 wx），这里只提供 wx 的四个副作用。
+ * 这样 `scripts/test_geo_state.mjs` 能用假端口重放「启动回调晚到」「切后台」等交错顺序。
+ */
+const watchMachine = createWatchMachine(
+  {
+    start(done) {
+      // 注意：onLocationChange 回调固定是 gcj02，type 只写在这里表明预期，不要改成 wgs84
+      wx.startLocationUpdate({
+        type: 'gcj02',
+        success: () => done(true),
+        fail: (err) => done(false, err?.errMsg || ''),
+      })
+    },
+    stop() {
+      wx.stopLocationUpdate({})
+    },
+    attach() {
+      wx.onLocationChange(handleWechatLocation)
+    },
+    detach() {
+      wx.offLocationChange(handleWechatLocation)
+    },
+  },
+  (errMsg) => {
+    // 常见原因：后台未开通「位置信息（持续监听）」接口权限（需类目审核）
+    // 此时不影响单次定位，只是走动时位置不刷新
+    console.warn('[location] startLocationUpdate 失败:', errMsg)
+  }
+)
+
+/** 让实际监听状态向「该不该监听」收敛。所有开关都只走这一个入口 */
+function syncWatch() {
+  watchMachine.sync()
+}
+
 function startWatch(): Promise<void> {
   // 已经开了持续监听时也允许再取一次单点（例如用户点「回到我的位置」补一次坐标），
-  // 下面的 success 分支里有 watching 判断，不会重复注册 onLocationChange。
+  // 状态机里已有 watching 判断，不会重复注册 onLocationChange。
   if (starting) return Promise.resolve()
   // 已明确拒绝的不再重试（否则每次回前台都调用一次失败接口）
-  if (denied) return Promise.resolve()
-  wantWatch = true
+  if (watchMachine.isDenied()) return Promise.resolve()
+  watchMachine.setWant(true)
   starting = true
   loading.value = true
   return new Promise<void>((resolve) => {
@@ -140,8 +146,8 @@ function startWatch(): Promise<void> {
         console.warn('[location] getLocation 失败:', msg)
 
         if (msg.includes('auth') || msg.includes('deny')) {
-          denied = true
-          wantWatch = false
+          watchMachine.setDenied(true)
+          watchMachine.setWant(false)
           authorized.value = false
           useLocationStore().setPermissionDenied(true)
           error.value = '定位权限被拒绝'
@@ -164,76 +170,8 @@ function startWatch(): Promise<void> {
 
 /** 已授权时确保监听已启动：已在监听就跳过，避免每次 onShow 都调一次 getLocation */
 function ensureStarted(): Promise<void> {
-  if (watching || starting) return Promise.resolve()
+  if (watchMachine.isActive() || starting) return Promise.resolve()
   return startWatch()
-}
-
-/**
- * 此刻是否「应该」在持续监听
- *
- * 四个条件缺一不可：在前台、有页面正在用、用户愿意、没被明确拒绝。
- * 所有开关决策都收敛到这一个判断，避免某条路径漏掉某个条件。
- */
-function shouldWatch(): boolean {
-  return foreground && watchOwner !== null && wantWatch && !denied
-}
-
-/**
- * 真正关掉监听
- *
- * 只做「关」这一件事；要不要关由调用方通过 syncWatch 决定。
- * startingWatch 一并清掉：在途的启动回调靠 watchEpoch 识别并自我作废。
- */
-function teardownWatch() {
-  startingWatch = false
-  if (!watching) return
-  wx.offLocationChange(handleWechatLocation)
-  wx.stopLocationUpdate({})
-  watching = false
-}
-
-/**
- * 让实际监听状态向 shouldWatch() 收敛
- *
- * 页面进出、前后台切换、授权结果返回，全部只调这一个函数，
- * 不在各处零散地写 startLocationUpdate / stopLocationUpdate ——
- * 否则「A 路径开了、B 路径忘了关」这类竞态迟早出现。
- */
-function syncWatch() {
-  const epoch = ++watchEpoch
-  if (!shouldWatch()) {
-    teardownWatch()
-    return
-  }
-  if (watching || startingWatch) return
-  startingWatch = true
-  // 注意：onLocationChange 回调固定是 gcj02，type 只写在这里表明预期，不要改成 wgs84
-  wx.startLocationUpdate({
-    type: 'gcj02',
-    success: () => {
-      // 等回调期间状态可能已经变了（页面切走 / 切后台），见 watchEpoch 注释
-      if (epoch !== watchEpoch) {
-        // 过期回调不动全局状态（可能已有更新的一次启动在途），
-        // 但如果此刻明确「不该监听」，就把这次多开的监听收掉
-        if (!shouldWatch()) {
-          startingWatch = false
-          watching = false
-          wx.stopLocationUpdate({})
-        }
-        return
-      }
-      startingWatch = false
-      if (watching) return
-      watching = true
-      wx.onLocationChange(handleWechatLocation)
-    },
-    fail: (err) => {
-      if (epoch === watchEpoch) startingWatch = false
-      // 常见原因：后台未开通「位置信息（持续监听）」接口权限（需类目审核）
-      // 此时不影响单次定位，只是走动时位置不刷新
-      console.warn('[location] startLocationUpdate 失败:', err?.errMsg || err)
-    },
-  })
 }
 
 /**
@@ -245,19 +183,15 @@ function syncWatch() {
  * 所以记一个当前持有者：新页 onShow 抢走所有权，旧页 onHide 发现所有权已不是自己
  * 就什么都不做。这样两种顺序都正确。
  */
-let watchOwner: string | null = null
 
 /** 页面开始使用位置（onShow）。owner 用页面名，便于排查 */
 function acquireWatch(owner: string) {
-  watchOwner = owner
-  syncWatch()
+  watchMachine.acquire(owner)
 }
 
 /** 页面离开（onHide）：只有所有权还在自己手上时才停 */
 function releaseWatch(owner: string) {
-  if (watchOwner !== owner) return
-  watchOwner = null
-  syncWatch()
+  watchMachine.release(owner)
 }
 
 /** 用户主动点击定位入口时调用：先过隐私协议，再取位置。返回是否成功拿到坐标 */
@@ -269,7 +203,15 @@ async function requestLocation(): Promise<boolean> {
     error.value = '未同意《用户隐私保护指引》，无法获取位置'
     return false
   }
-  denied = false
+  // 隐私弹窗是异步的：等待期间用户可能已经离开位置页或切到后台。
+  // 这时候再发起 getLocation 就违反「只在停留于位置页且在前台时定位」的声明（第四轮复核 P2）。
+  // 注意判断的是「有页面持有 && 在前台」，而不是「有没有坐标」——首页门禁页也要能首次取位。
+  if (!watchMachine.hasOwner() || !watchMachine.isForeground()) {
+    // 不静默：正常路径下页面 onShow 已 acquire，走到这里说明页面正在离开或已切后台
+    console.warn('[location] 授权返回时已不在位置页/前台，放弃本次获取')
+    return false
+  }
+  watchMachine.setDenied(false)
   await startWatch()
   const store = useLocationStore()
   return store.userLat !== null && store.userLng !== null
@@ -287,12 +229,12 @@ function init(autoRequest = false) {
       ready.value = true
       if (auth === true) {
         authorized.value = true
-        denied = false
-        wantWatch = true
+        watchMachine.setDenied(false)
+        watchMachine.setWant(true)
         // getSetting 是异步的：这个回调可能在页面已经切走之后才回来。
-        // 没有页面持有（watchOwner 为空）时就不要再启动任何定位，
+        // 没有页面持有（owner 为空）时就不要再启动任何定位，
         // 否则会出现「人已离开、定位才刚开始」。
-        if (watchOwner === null) return
+        if (!watchMachine.hasOwner()) return
         // 已有坐标时只恢复监听，不再重复取单点：切 tab 回来每次都 getLocation
         // 既没必要，也容易撞上调用频率限制
         const store = useLocationStore()
@@ -302,7 +244,7 @@ function init(autoRequest = false) {
       }
       authorized.value = false
       if (auth === false) {
-        denied = true
+        watchMachine.setDenied(true)
         useLocationStore().setPermissionDenied(true)
         return
       }
@@ -317,10 +259,11 @@ function init(autoRequest = false) {
 }
 
 function stopWatch() {
-  wantWatch = false
-  watchOwner = null
-  syncWatch()
+  watchMachine.stopAll()
 }
+
+/** 前后台钩子只装一次（模块级单例） */
+let appHooksInstalled = false
 
 /**
  * 注册前后台钩子：切后台立即停止持续定位，回前台自动恢复
@@ -333,14 +276,12 @@ function installAppHooks() {
   if (appHooksInstalled) return
   appHooksInstalled = true
   wx.onAppHide?.(() => {
-    foreground = false
-    syncWatch()
+    watchMachine.setForeground(false)
   })
   wx.onAppShow?.(() => {
-    foreground = true
     // 只恢复监听，不重新取单点（避免频繁 getLocation）；
-    // 若期间页面已经离开，shouldWatch() 为 false，这里不会开
-    syncWatch()
+    // 若期间页面已经离开，状态机会判断出不该监听，不会开
+    watchMachine.setForeground(true)
   })
 }
 
@@ -349,10 +290,14 @@ function openSetting() {
   uni.openSetting({
     success: (res) => {
       if (res.authSetting['scope.userLocation']) {
-        denied = false
+        watchMachine.setDenied(false)
         authorized.value = true
         useLocationStore().setPermissionDenied(false)
-        startWatch()
+        // 不能再直接 startWatch：openSetting 的成功回调可能在页面 onShow 之前或
+        // 切后台之后到达。统一交给状态机按「有无页面持有、是否前台」决定；
+        // 此刻还不该开的话，之后 onShow 的 acquireWatch 会自动补上。
+        watchMachine.setWant(true)
+        syncWatch()
       }
     },
   })

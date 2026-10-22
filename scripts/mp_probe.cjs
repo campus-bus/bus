@@ -20,6 +20,7 @@
  *   node scripts/mp_probe.cjs weather            # 天气云函数
  *   node scripts/mp_probe.cjs holidays           # 节假日云函数
  *   node scripts/mp_probe.cjs storage            # 列出全部 storage 键
+ *   node scripts/mp_probe.cjs privacy            # 隐私授权是否回调（工具侧常见不回调）
  *   node scripts/mp_probe.cjs page               # 当前页面路径与标题
  *   node scripts/mp_probe.cjs --expr "wx.getSystemInfoSync().SDKVersion"   # 自定义表达式
  *
@@ -257,6 +258,42 @@ function probeStorage() {
   return 'started'
 }
 
+/**
+ * 隐私授权状态
+ *
+ * `wx.requirePrivacyAuthorize` 在个别开发者工具版本里**不回调**（既不 success 也不 fail），
+ * 表现为「点了定位毫无反应、连错误提示都没有」——很容易被误判成业务代码的 bug。
+ * 这个探针把「有没有回调」直接摊开：status 为 timeout 就是工具侧问题。
+ */
+function probePrivacy() {
+  const KEY = '__mp_probe_result'
+  const api = wx.requirePrivacyAuthorize
+  if (typeof api !== 'function') {
+    wx.setStorageSync(KEY, JSON.stringify({ status: 'ok', supported: false, note: '基础库无隐私接口，代码里直接放行' }))
+    return 'started'
+  }
+  wx.setStorageSync(KEY, '{"status":"pending"}')
+  // 6 秒还不回调就当工具侧不响应（页面侧无法取消，只能记录下来）
+  setTimeout(() => {
+    const cur = wx.getStorageSync(KEY)
+    if (cur && cur.indexOf('pending') !== -1) {
+      wx.setStorageSync(
+        KEY,
+        JSON.stringify({ status: 'timeout', supported: true, note: 'requirePrivacyAuthorize 未回调（开发者工具侧问题）' })
+      )
+    }
+  }, 6000)
+  api({
+    success: () => wx.setStorageSync(KEY, JSON.stringify({ status: 'ok', supported: true, agreed: true })),
+    fail: (e) =>
+      wx.setStorageSync(
+        KEY,
+        JSON.stringify({ status: 'ok', supported: true, agreed: false, errMsg: (e && e.errMsg) || '' })
+      ),
+  })
+  return 'started'
+}
+
 /** 当前页面 */
 function probePage() {
   const KEY = '__mp_probe_result'
@@ -309,6 +346,7 @@ const PROBES = {
   weather: probeWeather,
   holidays: probeHolidays,
   storage: probeStorage,
+  privacy: probePrivacy,
   page: probePage,
   data: probePageData,
   /** text 在 Node 侧用 automator 页面 API 实现（见 main），这里只占位通过校验 */
