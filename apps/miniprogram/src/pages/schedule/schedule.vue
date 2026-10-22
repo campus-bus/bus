@@ -2,7 +2,7 @@
 import { ref, computed, watch } from 'vue'
 import { useScheduleStore } from '@/stores/schedule'
 import { usePreferenceStore } from '@/stores/preference'
-import { getDateType, localDateStr } from '@/utils/datetime'
+import { getDateType, localDateStr, parseDateStr } from '@/utils/datetime'
 import { getDateLabel } from '@/utils/holidays'
 import { getNow } from '@/utils/time'
 import { toGroup, groupMembers, findBestRide } from '@/utils/station_group'
@@ -52,16 +52,20 @@ const planResults = ref<PlanResult[]>([])
 const planShowAll = ref(false)
 const searched = ref(false)
 
-// 切换顶部 tab、日期或起止站后，旧查询结果已失效，清空避免误导
+// 顶部 tab、日期、起止站、到达期限任一变化，旧结果都已失效，清空避免误导
+// （漏掉 planDeadline 会让「18:00 前到达」的标题下挂着 20:00 的旧结果）
 function resetPlanResults() {
   planResults.value = []
   planShowAll.value = false
+  planExpandedId.value = null
   searched.value = false
 }
-watch([activeTab, planDate, planOrigin, planDest], resetPlanResults)
+watch([activeTab, planDate, planOrigin, planDest, planDeadline], resetPlanResults)
 
-const planDateType = computed<DateType>(() => getDateType(new Date(planDate.value + 'T00:00:00+08:00')))
-const planDateLabel = computed(() => getDateLabel(new Date(planDate.value + 'T00:00:00+08:00')))
+// 用 parseDateStr 而非 `new Date(s + 'T00:00:00+08:00')`：后者是绝对时刻，
+// 在境外时区会落到前一天，星期算错就会选错工作日/周末时刻表
+const planDateType = computed<DateType>(() => getDateType(parseDateStr(planDate.value)))
+const planDateLabel = computed(() => getDateLabel(parseDateStr(planDate.value)))
 
 const routes: RouteName[] = ['环线1路', '接驳1路', '接驳2路']
 

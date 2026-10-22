@@ -36,4 +36,17 @@ export function localDateStr(date?: Date): string {
   return `${d.getFullYear()}-${m}-${day}`
 }
 
+/**
+ * YYYY-MM-DD → 日历日期（取星期、判断日期类型用）
+ *
+ * 不能写成 `new Date(s + 'T00:00:00+08:00')`：那是一个绝对时刻，
+ * 在 UTC-7 等时区会落到前一天的本地日期，getDay() 取到错误的星期，
+ * 于是把工作日查成周末（或反之）。直接拆数字构造本地日历日，
+ * 任何时区下 getDay() 都是这一天的真实星期。
+ */
+export function parseDateStr(s: string): Date {
+  const [y, m, d] = s.split('-').map(Number)
+  return new Date(y, m - 1, d)
+}
+
 export { getDateLabel }

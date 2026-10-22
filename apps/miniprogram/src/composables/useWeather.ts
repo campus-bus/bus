@@ -8,6 +8,11 @@
  * 与 H5 版的区别：H5 直接请求 Open-Meteo，但该域名无 ICP 备案，
  * 小程序正式版无法访问，因此换成国内已备案接口，不再依赖云开发。
  *
+ * 坐标策略（2026-10-22 修正）：
+ *   固定使用校园坐标，**不传用户实时位置**。校园范围约 2km，天气完全相同，
+ *   传用户坐标没有任何收益，却会让「位置不上传服务器」这一隐私承诺失真
+ *   （关于页明确写了不上传、不共享第三方）。
+ *
  * 降级策略：
  * 1. 未配置 Key → 不发任何请求，首页不显示天气
  * 2. 本地缓存 60 分钟，避免每次进首页都调接口
@@ -15,7 +20,6 @@
  */
 import { ref } from 'vue'
 import { TENCENT_LBS_KEY } from '@/config'
-import { useLocationStore } from '@/stores/location'
 
 export interface WeatherInfo {
   icon: string
@@ -25,9 +29,9 @@ export interface WeatherInfo {
 
 const CACHE_KEY = 'weather_cache_v2'
 const CACHE_MS = 60 * 60 * 1000 // 本地缓存 60 分钟
-/** 未定位时按研究生宿舍楼取天气（GCJ-02，与腾讯接口一致） */
-const DEFAULT_LNG = 113.051463
-const DEFAULT_LAT = 28.254769
+/** 校园中心点（研究生宿舍楼，GCJ-02，与腾讯接口一致）。固定值，与用户位置无关。 */
+const CAMPUS_LNG = 113.051463
+const CAMPUS_LAT = 28.254769
 
 /** 腾讯天气返回中文描述，映射成 emoji 图标 */
 function descToIcon(desc: string): string {
@@ -68,9 +72,9 @@ function fetchWeather(): Promise<WeatherInfo | null> {
       resolve(null)
       return
     }
-    const store = useLocationStore()
-    const lng = store.userLng ?? DEFAULT_LNG
-    const lat = store.userLat ?? DEFAULT_LAT
+    // 固定校园坐标：天气与用户所在位置无关，传用户坐标只会让隐私承诺失真
+    const lng = CAMPUS_LNG
+    const lat = CAMPUS_LAT
     // 小程序侧坐标统一为 GCJ-02（微信定位、腾讯地图同源），无需转换
     uni.request({
       url: 'https://apis.map.qq.com/ws/weather/v1/',

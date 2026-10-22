@@ -150,6 +150,47 @@ assert('R2 JB2 18站 军体东×2激光所×2网球场×2',
   jb2Stops.filter(s => s.currentStop === '网球场').length === 2)
 assert('R2 JB1=JB2反转', JSON.stringify(rp.find(x => x.routeKey === 'JB1_NORMAL').stops.map(s => s.currentStop)) === JSON.stringify([...jb2Stops.map(s => s.currentStop)].reverse()))
 
+// ═══ D. 日期类型（节假日表） ═══
+// 依据国办发明电〔2025〕7 号逐日核对 2026 年。曾出现 7 天误判
+// （元旦未补 1/4 上班、春节漏 2/15-2/16、清明整体偏移一天、劳动节漏 5/9 上班），
+// 这里固化为断言，改 holidays.ts 后必须仍通过。
+console.log('\n【D. 日期类型（2026 法定安排）】')
+const holSrc = fs.readFileSync('apps/miniprogram/src/utils/holidays.ts', 'utf8')
+const holMap = {}
+for (const m of holSrc.match(/const HOLIDAYS[\s\S]*?\n}/)[0].matchAll(/'(\d{4}-\d{2}-\d{2})':\s*'([^']*)'/g)) holMap[m[1]] = m[2]
+const wdMk = new Set([...holSrc.match(/WORKDAYS_ON_WEEKEND[\s\S]*?\]\)/)[0].matchAll(/'(\d{4}-\d{2}-\d{2})'/g)].map(m => m[1]))
+const pad2 = n => String(n).padStart(2, '0')
+const keyOf = d => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`
+/** 复刻 getDateLabel：假期 > 调休上班 > 周末/工作日 */
+function dateKind(s) {
+  if (holMap[s]) return 'holiday'
+  if (wdMk.has(s)) return 'workday'
+  const [y, m, d] = s.split('-').map(Number)
+  const g = new Date(y, m - 1, d).getDay()
+  return (g === 0 || g === 6) ? 'weekend' : 'workday'
+}
+// 官方区间
+const officialOff = new Set(), officialWork = new Set()
+const addRange = (a, b) => {
+  const [y1, m1, d1] = a.split('-').map(Number)
+  const [y2, m2, d2] = b.split('-').map(Number)
+  for (let t = new Date(y1, m1 - 1, d1), e = new Date(y2, m2 - 1, d2); t <= e; t = new Date(t.getFullYear(), t.getMonth(), t.getDate() + 1)) officialOff.add(keyOf(t))
+}
+addRange('2026-01-01', '2026-01-03'); addRange('2026-02-15', '2026-02-23'); addRange('2026-04-04', '2026-04-06')
+addRange('2026-05-01', '2026-05-05'); addRange('2026-06-19', '2026-06-21'); addRange('2026-09-25', '2026-09-27'); addRange('2026-10-01', '2026-10-07')
+;['2026-01-04', '2026-02-14', '2026-02-28', '2026-05-09', '2026-09-20', '2026-10-10'].forEach(x => officialWork.add(x))
+
+const wrongDays = []
+for (let t = new Date(2026, 0, 1); t.getFullYear() === 2026; t = new Date(t.getFullYear(), t.getMonth(), t.getDate() + 1)) {
+  const s = keyOf(t), g = t.getDay()
+  const shouldWork = officialWork.has(s) || (!officialOff.has(s) && !officialWork.has(s) && g !== 0 && g !== 6)
+  const nowWork = dateKind(s) === 'workday'
+  if (nowWork !== shouldWork) wrongDays.push(s)
+}
+assert('D1 2026 全年 365 天日期类型与国办发明电〔2025〕7 号一致', wrongDays.length === 0,
+  wrongDays.length ? '　不符：' + wrongDays.join(', ') : '')
+assert('D2 节假日表覆盖 2026 年（明年需补 2027）', Object.keys(holMap).length > 0 && Object.keys(holMap).every(k => k.startsWith('2026')))
+
 console.log('\n══════════════════════════════')
 console.log('断言结果: 通过', pass, '/ 失败', fail, fail === 0 ? '✅ 全部通过' : '❌ 存在失败项')
 process.exit(fail === 0 ? 0 : 1)

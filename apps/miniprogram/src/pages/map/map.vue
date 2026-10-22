@@ -347,7 +347,14 @@ function onMarkerTap(e: { detail: { markerId: number } }) {
 }
 function closePanel() { selectedStop.value = null }
 
-const dateType = computed(() => getDateType(getNow()))
+/**
+ * 当前日期类型。
+ *
+ * 必须显式依赖 nowTick：地图是 tabBar 页，实例常驻不销毁，
+ * 若 computed 里无响应式依赖，跨过午夜后会一直沿用昨天的日期类型，
+ * 与每秒重算的车辆位置（computeActiveBusPositions 里每次现算）互相矛盾。
+ */
+const dateType = computed(() => { void nowTick.value; return getDateType(getNow()) })
 const stopArrivals = computed(() => {
   if (!selectedStop.value) return []
   const base = minuteBaseSec.value
@@ -468,6 +475,10 @@ function onRegionChange(e: {
       <view class="legend-item" @tap="toggleLabels">
         <text class="legend-label">{{ showLabels ? '隐藏站名' : '显示站名' }}</text>
       </view>
+      <!-- 车辆位置由发车时刻 + 站间秒数插值推算，不是车载 GPS 实时上报，
+           必须讲清楚，否则用户会以为车真的在那个位置等它 -->
+      <view class="legend-divider"></view>
+      <view class="legend-note">车辆位置为时刻表推算</view>
     </view>
 
     <!-- 定位/回中/图层按钮 -->
@@ -524,6 +535,7 @@ function onRegionChange(e: {
 .legend-label { flex: 1; font-size: 24rpx; color: var(--color-text); }
 .legend-check { width: 26rpx; height: 26rpx; flex-shrink: 0; }
 .legend-divider { height: 1rpx; background: var(--color-border); margin: 6rpx 12rpx; }
+.legend-note { font-size: 19rpx; color: var(--color-text-tertiary); padding: 0 16rpx 10rpx; line-height: 1.4; }
 
 /* 右侧按钮贴右下角：底部留 32rpx，避开 tabBar（tabBar 由原生渲染，不占页面高度） */
 .map-controls { position: absolute; bottom: 32rpx; right: 20rpx; z-index: 10; display: flex; flex-direction: column; gap: 16rpx; }
