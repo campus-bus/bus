@@ -716,6 +716,10 @@ apps/miniprogram/
 24. **探针 `reLaunch` 到「当前已在的那个页面」会伪造出 owner 竞态**（2026-10-22）：`mp_probe.cjs --url` 和临时脚本常用 `reLaunch`，若目标就是当前页，旧实例 `onHide` 的 `releaseWatch('index')` 可能晚于新实例 `onShow` 的 `acquireWatch('index')` 到达——两者 owner 名相同，于是把新页面的所有权清掉了，表现成「点定位毫无反应」。真实用户不会 reLaunch 同一个 tab，所以这是探针假象。**测定位要走真实 tab 往返**（`switchTab` 到别的页再回来），别用 `reLaunch` 到同页。
     - 同理，临时给 `wx.getLocation` 打 patch 记录调用次数时，若 patch 没正确转发回调，会让 `loading`/`starting` 卡在 true，之后首页门禁区块被 `!locLoading` 永久隐藏，看起来像「按钮消失」。**验证完要么重启模拟器，要么在 patch 里原样转发 success/fail。**
 25. **`wx.requirePrivacyAuthorize` 在个别开发者工具版本里不回调**：表现同样是「点定位没反应、连错误都没有」。`node scripts/mp_probe.cjs privacy` 可直接判定（status 为 `timeout` 就是工具侧问题，不是业务代码）。
+26. **微信 CLI `upload` 失败时退出码仍是 0，必须解析输出**（2026-10-22，首次正式上传实测）：`cli.bat upload` 遇到网络瞬断会打印 `× Uploading` + `[error] ... read ECONNRESET ... (code 10)`，但 `$LASTEXITCODE` 依然为 0。`scripts/upload_release.ps1` 旧版只查退出码，于是在**没传上去**的情况下照样打印「[3/3] 已上传」，差点被当成发布成功。
+ - 现在的判定：输出里出现 `[error]` 或 `× Uploading` → 失败；必须出现 `√ upload` 才算成功（成功时会打印体积表 `TOTAL | 1.2 MB | 1262233`）。
+ - `ECONNRESET` 属网络瞬断，**直接重跑脚本即可**（会重新构建，几分钟）；重跑一次即成功，无需改任何代码。
+ - 上传成功后可核对体积：正式包约 1.2 MB，若明显偏大（如 1.7 MB）说明传的是 `dist/dev` 产物。
 
 ### 位置接口申请材料（2026-10-19，`startLocationUpdate`/`onLocationChange` 重提）
 

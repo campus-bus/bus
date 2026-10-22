@@ -83,9 +83,15 @@ if ($DryRun) {
   exit 0
 }
 
-& $CliPath @cliArgs
-if ($LASTEXITCODE -ne 0) {
-  throw "上传失败（exit=$LASTEXITCODE）：确认开发者工具已登录、且处于打开状态（CLI 需要工具在运行）"
+# 必须解析输出，不能只看退出码：
+# CLI 上传失败（如 [error] read ECONNRESET）时**退出码仍是 0**，
+# 曾经因此把失败当成成功、差点以为版本已上传。判定标准是出现「√ upload」。
+$uploadOut = & $CliPath @cliArgs 2>&1 | Out-String
+Write-Host $uploadOut
+$failed = ($uploadOut -match '\[error\]') -or ($uploadOut -match '× Uploading')
+$succeeded = $uploadOut -match '√ upload'
+if ($failed -or -not $succeeded) {
+  throw "上传失败：未见「√ upload」。若为 read ECONNRESET 属网络瞬断，直接重跑本脚本即可（构建可跳过）"
 }
 
 Write-Host ('[3/3] 已上传 ' + $Version + ' 为开发版 → 微信后台「管理 → 版本管理」提交审核并发布') -ForegroundColor Green
