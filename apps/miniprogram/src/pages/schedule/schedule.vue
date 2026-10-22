@@ -1,41 +1,37 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { useScheduleStore } from '@/stores/schedule'
-import { getDateType } from '@/utils/datetime'
+import { usePreferenceStore } from '@/stores/preference'
+import { getDateType, localDateStr } from '@/utils/datetime'
 import { getDateLabel } from '@/utils/holidays'
 import { getNow } from '@/utils/time'
 import { toGroup, groupMembers, findBestRide } from '@/utils/station_group'
+import { routeColorOf, routeLabelOf } from '@/constants/routes'
+import { useShare } from '@/utils/share'
 import BusStopTimeline from '@/components/BusStopTimeline.vue'
 import type { Departure, RouteName, DateType } from '@/types'
 
 const scheduleStore = useScheduleStore()
+const preferenceStore = usePreferenceStore()
+
+useShare()
 
 const activeTab = ref(0)
 
 // ─── 站点列表（组化） ───
 // 站点按组聚合显示：军体活动中心东/南 → 军体活动中心，二食堂/二食堂北 → 二食堂
+// 排序沿用首页的点击频次（启动时冻结），常用站排在前面
 const allStops = computed(() => {
   const names = new Set<string>()
   for (const rp of scheduleStore.routePatterns) {
     for (const s of rp.stops) names.add(toGroup(s.currentStop))
   }
-  // 按首页点击频次排序（组频次 = 成员频次之和），常用站排在前面
-  let freq: Record<string, number> = {}
-  try { freq = JSON.parse(uni.getStorageSync('stop_click_freq') || '{}') } catch { freq = {} }
-  const groupFreq: Record<string, number> = {}
-  for (const [stop, f] of Object.entries(freq)) {
-    const g = toGroup(stop)
-    groupFreq[g] = (groupFreq[g] || 0) + f
-  }
-  return [...names].sort((a, b) => (groupFreq[b] || 0) - (groupFreq[a] || 0))
+  const order = preferenceStore.stopOrder
+  return [...names].sort((a, b) => (order[b] || 0) - (order[a] || 0))
 })
 
 // ─── 行程规划 ───
-function todayStr() {
-  const d = getNow()
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
-}
-const planDate = ref(todayStr())
+const planDate = ref(localDateStr())
 const planOrigin = ref('研究生宿舍楼')
 const planDest = ref('高超楼')
 const planDeadline = ref('20:00')
@@ -68,15 +64,6 @@ const planDateType = computed<DateType>(() => getDateType(new Date(planDate.valu
 const planDateLabel = computed(() => getDateLabel(new Date(planDate.value + 'T00:00:00+08:00')))
 
 const routes: RouteName[] = ['环线1路', '接驳1路', '接驳2路']
-const predsByDeparture = computed(() => {
-  const m = new Map<string, typeof scheduleStore.predictions>()
-  for (const p of scheduleStore.predictions) {
-    const l = m.get(p.departureId)
-    if (l) l.push(p)
-    else m.set(p.departureId, [p])
-  }
-  return m
-})
 
 function doSearch() {
   const [dh, dm] = planDeadline.value.split(':').map(Number)
@@ -88,8 +75,7 @@ function doSearch() {
 
   for (const r of routes) {
     for (const dep of scheduleStore.getDepartures(dt, r)) {
-      const preds = (predsByDeparture.value.get(dep.recordId) || []).slice().sort((a, b) => a.stopSeq - b.stopSeq)
-      const best = findBestRide(preds, originMembers, destMembers)
+      const best = findBestRide(scheduleStore.getPredictions(dep.recordId), originMembers, destMembers)
       if (!best) continue
       if (best.dest.arrivalMinutes > deadlineMin) continue
       results.push({
@@ -117,7 +103,7 @@ const expandedId = ref<string | null>(null)
 const planExpandedId = ref<string | null>(null)
 function togglePlanExpand(id: string) { planExpandedId.value = planExpandedId.value === id ? null : id }
 /** 查询日期是今天才显示车辆运行进度（历史/未来日期用当前时间判断会误导） */
-const isPlanToday = computed(() => planDate.value === todayStr())
+const isPlanToday = computed(() => planDate.value === localDateStr())
 
 const departures = computed(() => scheduleStore.getDepartures(selectedDateType.value, selectedRoute.value))
 const timeSorted = computed(() => [...departures.value].sort((a, b) => a.departureMinutes - b.departureMinutes))
@@ -138,12 +124,6 @@ const grouped = computed(() => {
 
 function toggleExpand(id: string) { expandedId.value = expandedId.value === id ? null : id }
 
-const ROUTE_COLORS: Record<string, string> = {
-  HX1_NORMAL: '#2563EB', HX1_DINING: '#F59E0B',
-  JB1_NORMAL: '#10B981', JB2_NORMAL: '#8B5CF6',
-}
-function routeColor(routeKey?: string) { return ROUTE_COLORS[routeKey || ''] || '#6B7280' }
-function routeNameOf(dep: Departure) { return dep.routeKey === 'HX1_DINING' ? '环1·就餐' : dep.route }
 function switchRoute(r: RouteName) {
   selectedRoute.value = r
   if (r === '环线1路' && selectedDateType.value === 'weekend_holiday') selectedDateType.value = 'weekday'
@@ -162,27 +142,35 @@ function switchRoute(r: RouteName) {
     <view v-if="activeTab === 0" class="planner">
       <view class="row">
         <text class="label">日期</text>
-        <picker mode="date" :value="planDate" @change="(e: any) => planDate = e.detail.value">
-          <view class="input">{{ planDate }}</view>
+        <picker class="picker" mode="date" :value="planDate" @change="(e: any) => planDate = e.detail.value">
+          <view class="input">
+            <text class="input-text">{{ planDate }}</text>
+            <text class="date-tag" :class="planDateType === 'weekday' ? 'wd' : 'we'">{{ planDateLabel }}</text>
+          </view>
         </picker>
-        <text class="date-tag" :class="planDateType === 'weekday' ? 'wd' : 'we'">{{ planDateLabel }}</text>
       </view>
       <view class="row">
         <text class="label">出发</text>
-        <picker :range="allStops" :value="allStops.indexOf(planOrigin)" @change="(e: any) => planOrigin = allStops[e.detail.value]">
-          <view class="input">{{ planOrigin || '选择出发站' }}</view>
+        <picker class="picker" :range="allStops" :value="allStops.indexOf(planOrigin)" @change="(e: any) => planOrigin = allStops[e.detail.value]">
+          <view class="input">
+            <text class="input-text">{{ planOrigin || '选择出发站' }}</text>
+          </view>
         </picker>
       </view>
       <view class="row">
         <text class="label">到达</text>
-        <picker :range="allStops" :value="allStops.indexOf(planDest)" @change="(e: any) => planDest = allStops[e.detail.value]">
-          <view class="input">{{ planDest || '选择到达站' }}</view>
+        <picker class="picker" :range="allStops" :value="allStops.indexOf(planDest)" @change="(e: any) => planDest = allStops[e.detail.value]">
+          <view class="input">
+            <text class="input-text">{{ planDest || '选择到达站' }}</text>
+          </view>
         </picker>
       </view>
       <view class="row">
         <text class="label">期限</text>
-        <picker mode="time" :value="planDeadline" @change="(e: any) => planDeadline = e.detail.value">
-          <view class="input">{{ planDeadline }} 前到达</view>
+        <picker class="picker" mode="time" :value="planDeadline" @change="(e: any) => planDeadline = e.detail.value">
+          <view class="input">
+            <text class="input-text">{{ planDeadline }} 前到达</text>
+          </view>
         </picker>
       </view>
       <view class="search-btn" @tap="doSearch">查询可乘线路</view>
@@ -191,18 +179,18 @@ function switchRoute(r: RouteName) {
         <view class="result-title">找到 {{ planResults.length }} 趟车次（按到达时间从晚到早排列）</view>
         <view v-for="(r, i) in (planShowAll ? planResults : planResults.slice(0, 10))" :key="i" class="plan-card" :class="{ expanded: planExpandedId === r.departure.recordId }">
           <view class="plan-head" @tap="togglePlanExpand(r.departure.recordId)">
-            <view class="route-badge" :style="{ background: routeColor(r.departure.routeKey) }">{{ routeNameOf(r.departure) }}</view>
+            <view class="route-badge" :style="{ background: routeColorOf(r.departure.routeKey) }">{{ routeLabelOf(r.departure) }}</view>
             <text class="plan-shift">{{ r.departure.shiftName }}</text>
             <text v-if="r.departure.isGaochaoDeparture" class="tag-dining">高超楼发车</text>
-            <text class="card-arrow" :class="{ rotated: planExpandedId === r.departure.recordId }">▾</text>
+            <image class="chevron" :class="{ rotated: planExpandedId === r.departure.recordId }" src="/static/icons/ui/chevron-down.png" mode="aspectFit" />
           </view>
           <view class="plan-body">
             <view class="step"><view class="dot start"></view>
-              <text><text class="time-strong">{{ r.boardTime.slice(0, 5) }}</text> {{ r.isBoardDeparture ? '发车' : '上车' }} 「{{ r.boardStop }}」</text>
+              <text><text class="time-strong">{{ r.boardTime }}</text> {{ r.isBoardDeparture ? '发车' : '上车' }} 「{{ r.boardStop }}」</text>
             </view>
             <view class="step-line"></view>
             <view class="step"><view class="dot end"></view>
-              <text><text class="time-strong">{{ r.destTime.slice(0, 5) }}</text> 到达 「{{ r.destStop }}」</text>
+              <text><text class="time-strong">{{ r.destTime }}</text> 到达 「{{ r.destStop }}」</text>
             </view>
           </view>
           <BusStopTimeline
@@ -214,6 +202,7 @@ function switchRoute(r: RouteName) {
             :highlight-dest-seq="r.destSeq"
             :highlight-origin-seq="r.boardSeq"
             :show-progress="isPlanToday"
+            :show-map-btn="false"
           />
         </view>
         <view v-if="planResults.length > 10 && !planShowAll" class="show-more" @tap="planShowAll = true">
@@ -249,14 +238,14 @@ function switchRoute(r: RouteName) {
           <view v-for="dep in timeSorted" :key="dep.recordId" class="dep-row">
             <view class="dep-main" @tap="toggleExpand(dep.recordId)">
               <view class="dep-left">
-                <view class="route-badge" :style="{ background: routeColor(dep.routeKey) }">{{ routeNameOf(dep) }}</view>
+                <view class="route-badge" :style="{ background: routeColorOf(dep.routeKey) }">{{ routeLabelOf(dep) }}</view>
                 <text class="dep-time">{{ dep.departureTime }}</text>
                 <text v-if="dep.isGaochaoDeparture" class="tag-dining">高超楼发车</text>
                 <text v-if="dep.shiftName" class="dep-shift">{{ dep.shiftName }}</text>
               </view>
-              <text class="arrow" :class="{ rotated: expandedId === dep.recordId }">▾</text>
+              <image class="chevron" :class="{ rotated: expandedId === dep.recordId }" src="/static/icons/ui/chevron-down.png" mode="aspectFit" />
             </view>
-            <BusStopTimeline v-if="expandedId === dep.recordId" :departure-id="dep.recordId" :route-key="dep.routeKey" :show-progress="false" />
+            <BusStopTimeline v-if="expandedId === dep.recordId" :departure-id="dep.recordId" :route-key="dep.routeKey" :show-progress="false" :show-map-btn="false" />
           </view>
         </template>
         <!-- 按班次 -->
@@ -266,13 +255,13 @@ function switchRoute(r: RouteName) {
             <view v-for="dep in deps" :key="dep.recordId" class="dep-row">
               <view class="dep-main" @tap="toggleExpand(dep.recordId)">
                 <view class="dep-left">
-                  <view class="route-badge" :style="{ background: routeColor(dep.routeKey) }">{{ routeNameOf(dep) }}</view>
+                  <view class="route-badge" :style="{ background: routeColorOf(dep.routeKey) }">{{ routeLabelOf(dep) }}</view>
                   <text class="dep-time">{{ dep.departureTime }}</text>
                   <text v-if="dep.isGaochaoDeparture" class="tag-dining">高超楼发车</text>
                 </view>
-                <text class="arrow" :class="{ rotated: expandedId === dep.recordId }">▾</text>
+                <image class="chevron" :class="{ rotated: expandedId === dep.recordId }" src="/static/icons/ui/chevron-down.png" mode="aspectFit" />
               </view>
-              <BusStopTimeline v-if="expandedId === dep.recordId" :departure-id="dep.recordId" :route-key="dep.routeKey" :show-progress="false" />
+              <BusStopTimeline v-if="expandedId === dep.recordId" :departure-id="dep.recordId" :route-key="dep.routeKey" :show-progress="false" :show-map-btn="false" />
             </view>
           </view>
         </template>
@@ -284,56 +273,55 @@ function switchRoute(r: RouteName) {
 
 <style scoped>
 .schedule-page { padding-bottom: 24rpx; }
-.top-tabs { display: flex; background: #fff; }
-.top-tab { flex: 1; text-align: center; padding: 24rpx 0; font-size: 28rpx; color: #6B7280; border-bottom: 4rpx solid transparent; }
-.top-tab.active { color: #1A56DB; font-weight: 600; border-bottom-color: #1A56DB; }
+.top-tabs { display: flex; background: var(--color-card); }
+.top-tab { flex: 1; text-align: center; padding: 24rpx 0; font-size: 28rpx; color: var(--color-text-secondary); border-bottom: 4rpx solid transparent; }
+.top-tab.active { color: var(--color-primary); font-weight: 600; border-bottom-color: var(--color-primary); }
 
 .planner { padding: 20rpx 24rpx; }
 .row { display: flex; align-items: center; gap: 14rpx; margin-bottom: 14rpx; }
-.label { width: 72rpx; font-size: 26rpx; color: #6B7280; flex-shrink: 0; }
-.input { flex: 1; background: #fff; border-radius: 12rpx; padding: 14rpx 20rpx; font-size: 28rpx; }
+.label { width: 72rpx; font-size: 26rpx; color: var(--color-text-secondary); flex-shrink: 0; }
+/* picker 撑满剩余宽度，四个输入框才能等宽通栏 */
+.picker { flex: 1; min-width: 0; display: block; }
+.input {
+  display: flex; align-items: center; justify-content: space-between; gap: 12rpx;
+  width: 100%; box-sizing: border-box;
+  background: var(--color-card); border-radius: 12rpx; padding: 14rpx 20rpx; font-size: 28rpx;
+}
+.input-text { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .date-tag { font-size: 22rpx; padding: 4rpx 14rpx; border-radius: 999rpx; flex-shrink: 0; }
-.date-tag.wd { background: #EFF6FF; color: #1A56DB; }
-.date-tag.we { background: #FEF3C7; color: #92400E; }
-.search-btn { background: #1A56DB; color: #fff; text-align: center; padding: 18rpx; border-radius: 999rpx; font-size: 30rpx; margin: 20rpx 0; }
+.date-tag.wd { background: var(--color-primary-soft); color: var(--color-primary); }
+.date-tag.we { background: var(--color-warning-soft); color: var(--color-warning-text); }
+.search-btn { background: var(--color-primary); color: #fff; text-align: center; padding: 18rpx; border-radius: 999rpx; font-size: 30rpx; margin: 20rpx 0; }
 
-.result-title { font-size: 24rpx; color: #6B7280; margin-bottom: 12rpx; }
-.plan-card { background: #fff; border-radius: 14rpx; margin-bottom: 12rpx; overflow: hidden; }
+.result-title { font-size: 24rpx; color: var(--color-text-secondary); margin-bottom: 12rpx; }
+.plan-card { background: var(--color-card); border-radius: 14rpx; margin-bottom: 12rpx; overflow: hidden; }
 .plan-card.expanded { box-shadow: 0 4rpx 18rpx rgba(0, 0, 0, 0.08); }
 /* 内边距下放到 head/body，展开时时间线可通栏铺满卡片底部 */
 .plan-head { display: flex; align-items: center; gap: 12rpx; padding: 18rpx 22rpx 0; margin-bottom: 12rpx; }
-.card-arrow { font-size: 22rpx; color: #9CA3AF; transition: transform 0.2s; }
-.card-arrow.rotated { transform: rotate(180deg); }
-.plan-shift { font-size: 24rpx; color: #6B7280; flex: 1; }
+.plan-shift { font-size: 24rpx; color: var(--color-text-secondary); flex: 1; }
 .plan-body { padding: 0 22rpx 18rpx 30rpx; }
 .step { display: flex; align-items: center; gap: 12rpx; font-size: 26rpx; padding: 4rpx 0; }
 .dot { width: 14rpx; height: 14rpx; border-radius: 50%; flex-shrink: 0; }
-.dot.start { background: #10B981; }
-.dot.end { background: #1A56DB; }
-.step-line { width: 4rpx; height: 18rpx; background: #E5E7EB; margin: 2rpx 5rpx; }
-.time-strong { color: #1A56DB; font-weight: 700; }
-.show-more { text-align: center; padding: 16rpx; font-size: 24rpx; color: #1A56DB; }
+.dot.start { background: var(--color-success); }
+.dot.end { background: var(--color-primary); }
+.step-line { width: 4rpx; height: 18rpx; background: var(--color-border); margin: 2rpx 5rpx; }
+.time-strong { color: var(--color-primary); font-weight: 700; }
 
 .route-tabs { display: flex; gap: 12rpx; padding: 16rpx 24rpx; }
-.route-tab { flex: 1; text-align: center; padding: 12rpx 0; font-size: 26rpx; background: #fff; border-radius: 10rpx; color: #6B7280; border: 1rpx solid #E5E7EB; }
-.route-tab.active { background: #1A56DB; color: #fff; border-color: #1A56DB; }
+.route-tab { flex: 1; text-align: center; padding: 12rpx 0; font-size: 26rpx; background: var(--color-card); border-radius: 10rpx; color: var(--color-text-secondary); border: 1rpx solid var(--color-border); }
+.route-tab.active { background: var(--color-primary); color: #fff; border-color: var(--color-primary); }
 .date-toggle { display: flex; justify-content: space-between; align-items: center; padding: 0 24rpx 16rpx; }
 .dt-left { display: flex; gap: 12rpx; }
-.dt-btn { padding: 8rpx 20rpx; font-size: 24rpx; border-radius: 999rpx; background: #fff; color: #6B7280; border: 1rpx solid #E5E7EB; }
-.dt-btn.active { background: #EFF6FF; color: #1A56DB; border-color: #1A56DB; }
-.sort-toggle { font-size: 24rpx; color: #6B7280; padding: 8rpx 16rpx; border: 1rpx solid #E5E7EB; border-radius: 999rpx; background: #fff; }
-.notice { margin: 0 24rpx 16rpx; padding: 16rpx; background: #FEF3C7; color: #92400E; border-radius: 10rpx; font-size: 24rpx; text-align: center; }
+.dt-btn { padding: 8rpx 20rpx; font-size: 24rpx; border-radius: 999rpx; background: var(--color-card); color: var(--color-text-secondary); border: 1rpx solid var(--color-border); }
+.dt-btn.active { background: var(--color-primary-soft); color: var(--color-primary); border-color: var(--color-primary); }
+.sort-toggle { font-size: 24rpx; color: var(--color-text-secondary); padding: 8rpx 16rpx; border: 1rpx solid var(--color-border); border-radius: 999rpx; background: var(--color-card); }
+.notice { margin: 0 24rpx 16rpx; padding: 16rpx; background: var(--color-warning-soft); color: var(--color-warning-text); border-radius: 10rpx; font-size: 24rpx; text-align: center; }
 
 .dep-list { padding: 0 24rpx; }
-.shift-title { font-size: 24rpx; font-weight: 600; color: #6B7280; padding: 16rpx 0 8rpx; }
-.dep-row { background: #fff; border-radius: 12rpx; margin-bottom: 10rpx; overflow: hidden; }
+.shift-title { font-size: 24rpx; font-weight: 600; color: var(--color-text-secondary); padding: 16rpx 0 8rpx; }
+.dep-row { background: var(--color-card); border-radius: 12rpx; margin-bottom: 10rpx; overflow: hidden; }
 .dep-main { display: flex; justify-content: space-between; align-items: center; padding: 18rpx 22rpx; }
 .dep-left { display: flex; align-items: center; gap: 14rpx; }
 .dep-time { font-size: 34rpx; font-weight: 700; font-variant-numeric: tabular-nums; }
-.dep-shift { font-size: 22rpx; color: #9CA3AF; }
-.tag-dining { font-size: 20rpx; color: #F59E0B; }
-.route-badge { color: #fff; font-size: 22rpx; font-weight: 600; padding: 4rpx 14rpx; border-radius: 8rpx; }
-.arrow { color: #9CA3AF; transition: transform 0.2s; }
-.arrow.rotated { transform: rotate(180deg); }
-.empty { text-align: center; padding: 80rpx 24rpx; font-size: 26rpx; color: #6B7280; }
+.dep-shift { font-size: 22rpx; color: var(--color-text-tertiary); }
 </style>

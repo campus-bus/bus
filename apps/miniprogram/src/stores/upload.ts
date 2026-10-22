@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { getNow } from '@/utils/time'
+import { localDateStr } from '@/utils/datetime'
 
 export interface TimeSegment {
   from: string
@@ -21,12 +21,6 @@ export interface Measurement {
 const STORAGE_KEY = 'measurement_history_v1'
 /** 本地只保留最近 200 条，约 60KB，远低于单 key 1MB 上限 */
 const MAX_RECORDS = 200
-
-/** 本地时区的 YYYY-MM-DD（不能用 toISOString，UTC 会导致 00:00-08:00 日期串到前一天） */
-function localDateStr(): string {
-  const d = getNow()
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
-}
 
 /** 读取本地记录；storage 损坏时返回空数组，避免页面白屏 */
 function readAll(): Measurement[] {

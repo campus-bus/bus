@@ -10,7 +10,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **H5 PWA 版**（`src/`）：https://campus-bus.github.io/bus/ ，主仓 `campus-bus/bus`，GitHub Pages 部署
 - **微信小程序版**（`apps/miniprogram/`）：uni-app Vue3 重构，腾讯 map 组件 + 微信云开发，**开发中（待发布）**
 
-> **🔒 PWA 冻结规则（2026-10-19 起，强制）**：H5 PWA 版正在线上服役，**`src/`、`public/`、`docs/`、`vite.config.ts`、`index.html` 一律不得改动**（含注释、格式、文案）。PWA 只作为对照参照。所有新功能与修复**只改 `apps/miniprogram/`**。若某改动必须触及 `public/data/`（例如发车时刻/站点数据本身变化），需先向用户确认；坐标转换等平台差异一律在 `scripts/sync_miniprogram_data.js` 里解决，不回头改 PWA。`src/utils/geo.ts` 与 `apps/miniprogram/src/utils/geo.ts` 仍保持字节一致（共用工具函数），改动需双向同步并经用户确认。
+> **🔒 PWA 冻结规则（2026-10-19 起，强制）**：H5 PWA 版正在线上服役，**`src/`、`public/`、`docs/`、`vite.config.ts`、`index.html` 一律不得改动**（含注释、格式、文案）。PWA 只作为对照参照。所有新功能与修复**只改 `apps/miniprogram/`**。若某改动必须触及 `public/data/`（例如发车时刻/站点数据本身变化），需先向用户确认；坐标转换等平台差异一律在 `scripts/sync_miniprogram_data.js` 里解决，不回头改 PWA。
+>
+> **⚠️ 双端 `utils/` 同步约定已于 2026-10-22 解除**：PWA 进入退役流程、小程序为唯一在维护的产品，`apps/miniprogram/src/utils/` 现为**权威版本**，不再要求与 `src/utils/` 字节一致。已发生的有意分歧：小程序端 `geo.ts` 删除了运行期不再使用的坐标转换与路径距离函数（H5 自动记录专用），`time.ts` 不再依赖调试用的时间覆写 store，`countdown.ts` 新增 `etaClassOf()`。**再往小程序 `utils/` 里照搬 H5 代码前，先确认它是否只服务于 H5 的已废弃功能。**
 
 > **2026-10-18 线路调整**：原环线2路与环线3路合并为一条接驳环线，双向运行——**接驳2路（逆时针）**与**接驳1路（顺时针，同一物理环反向）**；军体活动中心拆分为东侧/南侧两站；门诊部、1号宿舍楼、图书馆不再经停。环线1路与就餐专线不变。工作日时刻表已同步更新（132 条：环1 62 + 就餐 10 + 接驳1路 35 + 接驳2路 25）；**周末/节假日时刻表待补充，目前周末无任何车次**。旧环2/环3共 104 条班次已移除，备份于 `data/backups/hx2_hx3_departures_removed_2026-10-18.json`。
 
@@ -568,7 +570,7 @@ apps/miniprogram/
 
 **数据同步流程**：改 `public/data/` → `node scripts/regenerate_predictions.js`（如涉及预测） → `node scripts/sync_miniprogram_data.js`（压缩同步 + 经纬度 WGS-84→GCJ-02，写入 `apps/miniprogram/src/data/`） → 两端各自构建发布。
 
-**逻辑双向同步约定**：`apps/miniprogram/src/utils/` 与 `src/utils/` 同名文件为复制关系（station_group/countdown/geo/bus_position/time 完全一致，datetime/holidays 为小程序适配版）。修改任一侧逻辑时，必须同步另一侧并跑 `node scripts/test_scenarios.cjs` 回归。
+**逻辑同步约定（2026-10-22 起）**：`apps/miniprogram/src/utils/` 是权威版本，不再与 `src/utils/` 保持复制关系（见顶部「双端 utils 同步约定已解除」）。**业务语义**（`findBestRide` 同名站取最优组合、环线首尾同站过滤、5 分钟保留窗口、日期类型判定）两端必须一致，改动后跑 `node scripts/test_scenarios.cjs` 回归；具体实现允许按平台各自优化。
 
 ### 踩坑记录（后续勿重蹈）
 
@@ -669,9 +671,9 @@ apps/miniprogram/
 
 - **申请文案 + 上传清单**：`apps/miniprogram/docs/接口权限申请材料.md`（含两段互不重复的 300 字文案、8 张图的逐张说明、驳回对策）。
 - **图片生成**：`node scripts/capture_location_permission_shots.cjs`（automator 抓 8 张原图到 `docs/接口申请截图-持续定位/原图/`）→ `powershell -File scripts/annotate_location_shots.ps1` 加底部说明条输出到 `上传用/`（**上传这个目录**）。
-- **图形依据（重要）**：单张静止图无法证明「必须持续定位」——`getLocation` + `<map show-location>` 也能画出蓝点。所以截图做成**同一地图页 5 帧连续画面**（网球场→激光所，距离 135→98→69→49→14 米）。地图页因此新增了两个真实功能：
-  - `nearestStopInfo`：左上角「距「XX」N 米 · 步行约…」，随定位回调刷新（`src/pages/map/map.vue`）；
-  - `userMarker`：自绘蓝色定位点（`src/static/icons/user-location.png`，由 `scripts/gen_user_location_icon.ps1` 生成），使开发者工具（无真实 GPS）也能呈现「我的位置」。
+- **图形依据（重要）**：单张静止图无法证明「必须持续定位」——`getLocation` + `<map show-location>` 也能画出蓝点。所以截图做成**同一地图页 5 帧连续画面**（网球场→激光所，距离 135→98→69→49→14 米）。
+- **已清理**：当时为截图临时加过 `nearestStopInfo`（左上角距离 HUD）与 `userMarker`（自绘蓝色定位点，`src/static/icons/user-location.png`）。两者均已按用户要求删除——原生 `show-location` 蓝点风格与微信统一、位置无偏移，自绘 marker 因默认锚点是底边中点，会偏离真实坐标约 26m（scale 16 下 22px 图标上浮 11px），视觉上和原生蓝点打架。
+
 - **合规落地**：`useGeolocation.ts` 新增 `onAppHide`/`onAppShow` 钩子，切后台立即 `stopLocationUpdate` + `offLocationChange`，回前台恢复；关于页新增「位置信息」声明。
 - **PowerShell 脚本必须存 UTF-8 带 BOM**：无 BOM 时 PS 5.1 按 GBK 解析，中文注释里的字节可能被当成反引号续行，导致 `Add-Type` 被吞、报「找不到类型 System.Drawing」。用 Node 写入 `'\ufeff' + s` 即可。
 

@@ -3,45 +3,67 @@ import { ref, computed, onUnmounted } from 'vue'
 import { onShow, onHide } from '@dcloudio/uni-app'
 import { useScheduleStore } from '@/stores/schedule'
 import { useLocationStore } from '@/stores/location'
+import { usePreferenceStore } from '@/stores/preference'
+import { useMapFocusStore } from '@/stores/map_focus'
 import { useGeolocation } from '@/composables/useGeolocation'
 import { useWeather } from '@/composables/useWeather'
-import { getDateType, getSecondsSinceMidnight, formatDate, getDateLabel } from '@/utils/datetime'
+import { getDateType, getSecondsSinceMidnight, formatDate } from '@/utils/datetime'
+import { getDateLabel } from '@/utils/holidays'
 import { getNow } from '@/utils/time'
 import { findNearestStop, findNearestStops, formatWalkTime } from '@/utils/geo'
 import { arrivalCountdown, departureCountdown } from '@/utils/countdown'
 import { toGroup, groupMembers, findBestRide } from '@/utils/station_group'
+import { useShare } from '@/utils/share'
+import ArrivalCard from '@/components/ArrivalCard.vue'
 import BusStopTimeline from '@/components/BusStopTimeline.vue'
-import type { Departure, ArrivalPrediction, DateType } from '@/types'
+import type { Departure, DateType, RideInfo } from '@/types'
 
+/** 步行速度（m/s），1.3 ≈ 4.7km/h，成年人常规步速 */
+const WALK_SPEED = 1.3
+/** 附近站搜索半径（米）与最多展示站数 */
+const NEARBY_RADIUS_M = 200
+const NEARBY_LIMIT = 3
+/** 列表时间窗：已过站保留 5 分钟，最多看到 60 分钟后 */
+const KEEP_PASSED_SEC = -300
+const LOOKAHEAD_SEC = 3600
+
+/**
+ * 一条到站条目。
+ *
+ * 注意只存**分钟数**，不存算好的倒计时文案：
+ * 文案每秒都变，列表结构却只随分钟变。把两者拆开，
+ * 秒级刷新就只重算屏幕上的十几行文字，不必重建整张表（2038 条预测）。
+ */
 interface ArrivalItem {
   departure: Departure
-  stopName?: string
-  candidateStop?: string
-  destStop?: string
+  /** 直达场景：预计到站时间与分钟数 */
   arrivalTime?: string
-  secondsUntil?: number
-  label?: string
-  status?: string
-  walkSeconds?: number
+  arrivalMinutes?: number
+  /** 多起点场景：上车站、步行时间、上车时刻 */
+  candidateStop?: string
   walkLabel?: string
   walkWarning?: boolean
-  departed?: boolean
   isOriginDeparture?: boolean
-  boardSec?: number
-  boardLabel?: string
-  boardStatus?: string
   boardTime?: string
+  boardMinutes?: number
   boardSeq?: number
-  destArrivalTime?: string
+  /** 下车站与到达时刻 */
+  destStop?: string
+  destTime?: string
+  destMinutes?: number
   destSeq?: number
 }
 
 const scheduleStore = useScheduleStore()
 const locationStore = useLocationStore()
+const preferenceStore = usePreferenceStore()
+const mapFocus = useMapFocusStore()
+
+useShare()
 
 // ─── 定位（用户主动点击后才获取，不在加载时自动调用） ───
 const {
-  ready: locReady, loading: locLoading, error: locError,
+  ready: locReady, loading: locLoading, error: locError, authorized: locAuthorized,
   init: initLocation, requestLocation, openSetting, openPrivacyContract,
 } = useGeolocation()
 
@@ -50,11 +72,15 @@ const { weather, initWeather } = useWeather()
 
 /** 是否已经拿到有效位置 */
 const hasLocation = computed(() => locationStore.userLat !== null && locationStore.userLng !== null)
-/** 定位卡片说明文案 */
+/**
+ * 未定位功能区块的说明文案（讲清"点了能得到什么"）
+ *
+ * 只在「已授权但暂时拿不到坐标」时叠加错误原因；未授权时说明定位能带来什么。
+ */
 const locateDesc = computed(() => {
-  if (locationStore.permissionDenied) return '点此前往设置页，把「位置信息」改为允许'
+  if (locationStore.permissionDenied) return '位置权限已关闭，开启后即可显示离你最近的站和到站时间'
   if (locError.value) return locError.value
-  return '仅在本机计算你与站点的距离，位置不会上传服务器'
+  return '定位后显示离你最近的站、步行距离和还有几分钟到站；位置仅在本机使用'
 })
 function onLocateTap() {
   if (locationStore.permissionDenied) openSetting()
@@ -62,12 +88,21 @@ function onLocateTap() {
 }
 
 // ─── 秒级刷新 ───
-// 时间相关派生值统一依赖 nowTick：既驱动倒计时，也保证节假日数据异步到达、跨天后能自动纠正
 const nowTick = ref(0)
+/** 每秒变化：只供倒计时文案使用 */
+const secondsNow = computed(() => { void nowTick.value; return getSecondsSinceMidnight(getNow()) })
+/**
+ * 每分钟变化：供列表结构使用。
+ *
+ * computed 只在值真正变化时才通知下游，所以依赖 minuteBaseSec 的列表
+ * 每分钟才重建一次，倒计时仍逐秒刷新。
+ */
+const minuteBaseSec = computed(() => Math.floor(secondsNow.value / 60) * 60)
+
 const dateType = computed<DateType>(() => { void nowTick.value; return getDateType(getNow()) })
 const dateTypeLabel = computed(() => { void nowTick.value; return getDateLabel(getNow()) })
 const todayDate = computed(() => { void nowTick.value; return formatDate(getNow()) })
-const secondsNow = computed(() => { void nowTick.value; return getSecondsSinceMidnight(getNow()) })
+
 let timer: ReturnType<typeof setInterval> | null = null
 function startTimer() { if (!timer) timer = setInterval(() => { nowTick.value++ }, 1000) }
 function stopTimer() { if (timer) { clearInterval(timer); timer = null } }
@@ -84,33 +119,14 @@ function goAbout() {
 const selectedStop = ref<string | null>(null)
 const stopSearch = ref('')
 const stopExpanded = ref(false)
-/** 读取点击频次（storage 损坏时回退为空，避免首页 setup 抛错白屏） */
-function readClickFreq(): Record<string, number> {
-  try {
-    return JSON.parse(uni.getStorageSync('stop_click_freq') || '{}')
-  } catch {
-    return {}
-  }
-}
-const initialClickFreq = readClickFreq()
-// 点击计数：实时累加并持久化，仅用于记录偏好
-const clickFreq = ref<Record<string, number>>(initialClickFreq)
-// 排序依据：页面创建时冻结，避免点击后站点按钮立即跳位（与 H5 版一致）
-const sortOrder = ref<Record<string, number>>({ ...initialClickFreq })
-// 组频次 = 成员频次之和（兼容旧的具体站频次数据，如「军体活动中心东」计入「军体活动中心」）
-const groupSortOrder = computed(() => {
-  const agg: Record<string, number> = {}
-  for (const [stop, f] of Object.entries(sortOrder.value)) {
-    const g = toGroup(stop)
-    agg[g] = (agg[g] || 0) + f
-  }
-  return agg
-})
+
+/** 全部泛站点，按启动时冻结的点击频次排序 */
 const sortedStops = computed(() => {
   const groups = new Set(scheduleStore.stations.map(s => toGroup(s.name)))
-  return [...groups].sort((a, b) => (groupSortOrder.value[b] || 0) - (groupSortOrder.value[a] || 0))
+  const order = preferenceStore.stopOrder
+  return [...groups].sort((a, b) => (order[b] || 0) - (order[a] || 0))
 })
-// 频次最高的 3 个站点，展示「常去」标记
+/** 频次最高的 3 个站点，展示「常去」标记 */
 const freqTop3 = computed(() => sortedStops.value.slice(0, 3))
 const displayStops = computed(() => {
   if (stopSearch.value) return sortedStops.value.filter(s => s.includes(stopSearch.value))
@@ -122,52 +138,46 @@ function selectStop(name: string) {
     selectedStop.value = null
     return
   }
-  clickFreq.value[name] = (clickFreq.value[name] || 0) + 1
-  uni.setStorageSync('stop_click_freq', JSON.stringify(clickFreq.value))
+  preferenceStore.recordStopClick(name)
   selectedStop.value = name
   stopSearch.value = ''
   showAllArrivals.value = false
 }
 
-// ─── 班次预测索引 ───
-const predsByDeparture = computed(() => {
-  const m = new Map<string, ArrivalPrediction[]>()
-  for (const p of scheduleStore.predictions) {
-    const l = m.get(p.departureId)
-    if (l) l.push(p)
-    else m.set(p.departureId, [p])
-  }
-  return m
-})
+// ─── 班次预测索引（departureId → 该班全部预测，已按 stopSeq 升序） ───
+// 索引由 scheduleStore 统一维护（predictionsByDeparture），这里只负责按需取用
+function predsOf(recordId: string) { return scheduleStore.getPredictions(recordId) }
 
 // ─── 附近站到站（默认视图） ───
-const WALK_SPEED = 1.3
 const nearbySections = computed(() => {
   if (selectedStop.value) return []
   if (locationStore.userLat === null || locationStore.userLng === null) return []
-  const candidates = findNearestStops(locationStore.userLat, locationStore.userLng, scheduleStore.stations, 3, 200)
+  const base = minuteBaseSec.value
+  const candidates = findNearestStops(
+    locationStore.userLat, locationStore.userLng,
+    scheduleStore.stations, NEARBY_LIMIT, NEARBY_RADIUS_M,
+  )
   const sections: Array<{ stopName: string; walkLabel: string; arrivals: ArrivalItem[] }> = []
   for (const c of candidates) {
     const walkSeconds = c.distance / WALK_SPEED
     const preds = scheduleStore.getPredictionsForStop(c.station.name, dateType.value)
     const arrivals: ArrivalItem[] = []
     for (const p of preds) {
+      // 环线首尾同站的回程到站与「即将发车」重复，且用户不能在此上车
       if (p.isDepartureStop || p.isReturnStop) continue
-      const dep = scheduleStore.departures.find(d => d.recordId === p.departureId)
+      const dep = scheduleStore.departureById.get(p.departureId)
       if (!dep) continue
-      const secondsUntil = Math.round(p.arrivalMinutes * 60 - secondsNow.value)
-      if (secondsUntil < -300 || secondsUntil > 3600) continue
-      const { label, status } = arrivalCountdown(secondsUntil)
+      const secondsUntil = Math.round(p.arrivalMinutes * 60 - base)
+      if (secondsUntil < KEEP_PASSED_SEC || secondsUntil > LOOKAHEAD_SEC) continue
       arrivals.push({
-        departure: dep, stopName: c.station.name,
-        walkSeconds, walkLabel: formatWalkTime(walkSeconds),
-        walkWarning: secondsUntil > 0 && walkSeconds > secondsUntil,
-        secondsUntil, label, status, arrivalTime: p.arrivalTime, destSeq: p.stopSeq,
-        departed: (dep.departureMinutes * 60) <= secondsNow.value,
+        departure: dep,
+        arrivalTime: p.arrivalTime,
+        arrivalMinutes: p.arrivalMinutes,
+        destSeq: p.stopSeq,
       })
     }
     if (arrivals.length > 0) {
-      arrivals.sort((a, b) => (a.secondsUntil ?? 0) - (b.secondsUntil ?? 0))
+      arrivals.sort((a, b) => (a.arrivalMinutes ?? 0) - (b.arrivalMinutes ?? 0))
       sections.push({ stopName: c.station.name, walkLabel: formatWalkTime(walkSeconds), arrivals })
     }
   }
@@ -175,36 +185,42 @@ const nearbySections = computed(() => {
 })
 
 // ─── 目的地推荐（组 + 最优组合） ───
-const destArrivals = computed(() => {
+const destArrivals = computed<ArrivalItem[]>(() => {
   if (!selectedStop.value) return []
+  const base = minuteBaseSec.value
   const destMembers = groupMembers(selectedStop.value)
   const results: ArrivalItem[] = []
   const hasGps = locationStore.userLat !== null && locationStore.userLng !== null
 
   if (hasGps) {
-    const nearStops = findNearestStops(locationStore.userLat!, locationStore.userLng!, scheduleStore.stations, 3, 200)
-    // 目的地就在附近
+    const nearStops = findNearestStops(
+      locationStore.userLat!, locationStore.userLng!,
+      scheduleStore.stations, NEARBY_LIMIT, NEARBY_RADIUS_M,
+    )
+
+    // 目的地就在附近：只报该站的到站时间，不规划乘车
     if (nearStops.some(c => destMembers.includes(c.station.name))) {
       for (const dep of scheduleStore.departures) {
         if (dep.dateType !== dateType.value) continue
-        for (const p of (predsByDeparture.value.get(dep.recordId) || [])) {
+        for (const p of predsOf(dep.recordId)) {
           if (!destMembers.includes(p.stopName)) continue
           if (p.isDepartureStop || p.isReturnStop) continue
-          const secondsUntil = Math.round(p.arrivalMinutes * 60 - secondsNow.value)
-          if (secondsUntil < -300 || secondsUntil > 3600) continue
-          const { label, status } = arrivalCountdown(secondsUntil)
+          const secondsUntil = Math.round(p.arrivalMinutes * 60 - base)
+          if (secondsUntil < KEEP_PASSED_SEC || secondsUntil > LOOKAHEAD_SEC) continue
           results.push({
-            departure: dep, destStop: p.stopName, secondsUntil, label, status,
-            arrivalTime: p.arrivalTime, destSeq: p.stopSeq,
-            departed: (dep.departureMinutes * 60) <= secondsNow.value,
+            departure: dep,
+            arrivalTime: p.arrivalTime,
+            arrivalMinutes: p.arrivalMinutes,
+            destStop: p.stopName,
+            destSeq: p.stopSeq,
           })
         }
       }
-      results.sort((a, b) => (a.secondsUntil ?? 0) - (b.secondsUntil ?? 0))
+      results.sort((a, b) => (a.arrivalMinutes ?? 0) - (b.arrivalMinutes ?? 0))
       return results
     }
 
-    // 多起点搜索
+    // 多起点搜索：附近 3 个站各尝试一次，同一班次只保留最优方案
     let candidates = nearStops
     if (candidates.length === 0) {
       const fb = findNearestStop(locationStore.userLat!, locationStore.userLng!, scheduleStore.stations)
@@ -218,60 +234,96 @@ const destArrivals = computed(() => {
       for (const dep of scheduleStore.departures) {
         if (dep.dateType !== dateType.value) continue
         if (seen.has(dep.recordId)) continue
-        const best = findBestRide(predsByDeparture.value.get(dep.recordId) || [], [candidateStop], destMembers)
+        const best = findBestRide(predsOf(dep.recordId), [candidateStop], destMembers)
         if (!best) continue
-        const secBoard = Math.round(best.origin.arrivalMinutes * 60 - secondsNow.value)
-        const secDest = Math.round(best.dest.arrivalMinutes * 60 - secondsNow.value)
-        if (secDest > 3600 || secBoard < -300) continue
+        const secBoard = Math.round(best.origin.arrivalMinutes * 60 - base)
+        const secDest = Math.round(best.dest.arrivalMinutes * 60 - base)
+        if (secDest > LOOKAHEAD_SEC || secBoard < KEEP_PASSED_SEC) continue
         const isOriginDeparture = best.origin.isDepartureStop ?? false
-        const { label, status } = isOriginDeparture ? departureCountdown(secBoard) : arrivalCountdown(secBoard)
         results.push({
-          departure: dep, candidateStop, destStop: best.dest.stopName,
-          walkSeconds, walkLabel: formatWalkTime(walkSeconds),
+          departure: dep,
+          candidateStop,
+          walkLabel: formatWalkTime(walkSeconds),
           walkWarning: secBoard > 0 && walkSeconds > secBoard,
-          isOriginDeparture, boardSec: secBoard, boardLabel: label, boardStatus: status,
-          boardTime: best.origin.arrivalTime, boardSeq: best.origin.stopSeq,
-          destArrivalTime: best.dest.arrivalTime, destSeq: best.dest.stopSeq,
-          departed: (dep.departureMinutes * 60) <= secondsNow.value,
+          isOriginDeparture,
+          boardTime: best.origin.arrivalTime,
+          boardMinutes: best.origin.arrivalMinutes,
+          boardSeq: best.origin.stopSeq,
+          destStop: best.dest.stopName,
+          destTime: best.dest.arrivalTime,
+          destMinutes: best.dest.arrivalMinutes,
+          destSeq: best.dest.stopSeq,
         })
         seen.add(dep.recordId)
       }
     }
   } else {
-    // 无 GPS
+    // 未定位：只报目的地站的到站时间
     for (const dep of scheduleStore.departures) {
       if (dep.dateType !== dateType.value) continue
-      for (const p of (predsByDeparture.value.get(dep.recordId) || [])) {
+      for (const p of predsOf(dep.recordId)) {
         if (!destMembers.includes(p.stopName)) continue
         if (p.isDepartureStop || p.isReturnStop) continue
-        const secondsUntil = Math.round(p.arrivalMinutes * 60 - secondsNow.value)
-        if (secondsUntil < -300 || secondsUntil > 3600) continue
-        const { label, status } = arrivalCountdown(secondsUntil)
+        const secondsUntil = Math.round(p.arrivalMinutes * 60 - base)
+        if (secondsUntil < KEEP_PASSED_SEC || secondsUntil > LOOKAHEAD_SEC) continue
         results.push({
-          departure: dep, destStop: p.stopName, secondsUntil, label, status,
-          arrivalTime: p.arrivalTime, destSeq: p.stopSeq,
-          departed: (dep.departureMinutes * 60) <= secondsNow.value,
+          departure: dep,
+          arrivalTime: p.arrivalTime,
+          arrivalMinutes: p.arrivalMinutes,
+          destStop: p.stopName,
+          destSeq: p.stopSeq,
         })
       }
     }
   }
-  results.sort((a, b) => (a.destArrivalTime || a.arrivalTime || '').localeCompare(b.destArrivalTime || b.arrivalTime || ''))
+  results.sort((a, b) => (a.destMinutes ?? a.arrivalMinutes ?? 0) - (b.destMinutes ?? b.arrivalMinutes ?? 0))
   return results
 })
 
 // ─── 即将发车 ───
 const departingSoon = computed(() => {
-  const deps = scheduleStore.getDepartures(dateType.value)
-  const list: Array<{ departure: Departure; secondsUntil: number; label: string; isUrgent: boolean }> = []
-  for (const dep of deps) {
-    const secondsUntil = Math.round(dep.departureMinutes * 60 - secondsNow.value)
-    if (secondsUntil < -300 || secondsUntil > 3600) continue
-    const { label, status } = departureCountdown(secondsUntil)
-    list.push({ departure: dep, secondsUntil, label, isUrgent: status === 'urgent' || status === 'arrived' })
+  const base = minuteBaseSec.value
+  const list: Array<{ departure: Departure; departureMinutes: number }> = []
+  for (const dep of scheduleStore.getDepartures(dateType.value)) {
+    const secondsUntil = Math.round(dep.departureMinutes * 60 - base)
+    if (secondsUntil < KEEP_PASSED_SEC || secondsUntil > LOOKAHEAD_SEC) continue
+    list.push({ departure: dep, departureMinutes: dep.departureMinutes })
   }
-  list.sort((a, b) => a.secondsUntil - b.secondsUntil)
+  list.sort((a, b) => a.departureMinutes - b.departureMinutes)
   return list
 })
+
+/** 当天全天无车（2026-10-18 起周末/节假日时刻表尚未公布） */
+const noServiceToday = computed(() => scheduleStore.getDepartures(dateType.value).length === 0)
+
+// ─── 倒计时（逐秒派生，不改动列表结构） ───
+function arrivalEta(item: { arrivalMinutes?: number }) {
+  return arrivalCountdown(Math.round((item.arrivalMinutes ?? 0) * 60 - secondsNow.value))
+}
+function boardEta(item: { boardMinutes?: number; isOriginDeparture?: boolean }) {
+  const seconds = Math.round((item.boardMinutes ?? 0) * 60 - secondsNow.value)
+  return item.isOriginDeparture ? departureCountdown(seconds) : arrivalCountdown(seconds)
+}
+function departingEta(item: { departureMinutes: number }) {
+  return departureCountdown(Math.round(item.departureMinutes * 60 - secondsNow.value))
+}
+
+/** 把多起点条目整理成卡片右侧要的四行信息；非多起点返回 null */
+function rideOf(item: ArrivalItem): RideInfo | null {
+  if (!item.candidateStop) return null
+  const board = boardEta(item)
+  return {
+    walkLabel: item.walkLabel || '',
+    candidateStop: item.candidateStop,
+    walkWarning: item.walkWarning,
+    boardTime: item.boardTime || '',
+    isOriginDeparture: !!item.isOriginDeparture,
+    boardLabel: board.label,
+    boardStatus: board.status,
+    destTime: item.destTime || '',
+    destStop: item.destStop || '',
+  }
+}
 
 // ─── 折叠控制 ───
 const showAllArrivals = ref(false)
@@ -293,33 +345,23 @@ function toggleCard(key: string) {
   else next.add(key)
   expandedCards.value = next
 }
+
+/**
+ * 时间线里的「在地图上查看」：只显示这条线路，并把视角落到该车当前位置。
+ * 地图是 tabBar 页，switchTab 不能带参数，先把目标车次存进 store，
+ * 由地图页 onShow 取走。
+ */
+function onViewOnMap(departureId: string, routeKey: string) {
+  mapFocus.requestFocus(departureId, routeKey)
+  uni.switchTab({ url: '/pages/map/map' })
+}
+
 /** 附近站卡片的 key 需带站名与 stopSeq：同一班车在多个附近站点、或环线同一站两次经过都会出现 */
 function nearbyCardKey(stopName: string, recordId: string, stopSeq: number) {
   return `nb-${stopName}-${recordId}-${stopSeq}`
 }
-function destCardKey(recordId: string) {
-  return `dest-${recordId}`
-}
-function departingCardKey(recordId: string) {
-  return `dep-${recordId}`
-}
-
-// ─── 展示辅助 ───
-const ROUTE_COLORS: Record<string, string> = {
-  HX1_NORMAL: '#2563EB', HX1_DINING: '#F59E0B',
-  JB1_NORMAL: '#10B981', JB2_NORMAL: '#8B5CF6',
-}
-function routeColor(routeKey?: string) { return ROUTE_COLORS[routeKey || ''] || '#6B7280' }
-function routeName(dep: Departure) {
-  return dep.routeKey === 'HX1_DINING' ? '环1·就餐' : dep.route
-}
-function etaClass(status?: string) {
-  return status === 'urgent' ? 'eta urgent' : status === 'warning' ? 'eta warning'
-    : status === 'arrived' ? 'eta arrived' : status === 'passed' ? 'eta passed' : 'eta'
-}
-
-// 公告
-const showNotice = ref(false)
+function destCardKey(recordId: string) { return `dest-${recordId}` }
+function departingCardKey(recordId: string) { return `dep-${recordId}` }
 </script>
 
 <template>
@@ -336,23 +378,24 @@ const showNotice = ref(false)
       <view class="date-tag" :class="dateType === 'weekday' ? 'wd' : 'we'">{{ dateTypeLabel }}</view>
     </view>
 
-    <!-- 公告栏 -->
-    <view class="notice-bar" @tap="showNotice = true">
-      <text class="notice-text">线路试运行，时刻与预测仅供参考。点我查看详情 ›</text>
+    <!-- 全天无车：说清原因，不要用「当前时段暂无」误导 -->
+    <view v-if="noServiceToday" class="notice-card">
+      <text class="notice-title">今天没有班车运行</text>
+      <text class="notice-text">周末 / 节假日时刻表尚未公布，全部线路目前仅工作日运行。</text>
     </view>
 
-    <!-- 定位引导：用户点击「允许定位」后才获取位置，隐私协议由微信官方弹窗兜底 -->
-    <view v-if="locReady && !hasLocation" class="locate-card">
-      <view class="locate-head">
-        <text class="locate-icon">📍</text>
-        <view class="locate-texts">
-          <text class="locate-title">{{ locationStore.permissionDenied ? '定位权限已关闭' : '开启定位，查看附近站点' }}</text>
-          <text class="locate-desc">{{ locateDesc }}</text>
-        </view>
+    <!-- 附近站点：未定位时作为首屏功能区块展示。
+         定位必须由用户点击触发（微信规范：不得进入页面即申请授权），点一次后永久静默。 -->
+    <view v-if="locReady && !hasLocation && !locLoading" class="nearby-block">
+      <view class="nearby-block-head">
+        <text class="nearby-block-title">附近站点</text>
+        <text class="nearby-block-tag">{{ locationStore.permissionDenied ? '定位未开启' : (locAuthorized ? '暂时无法定位' : '未定位') }}</text>
       </view>
-      <view class="locate-actions">
-        <view class="locate-btn" :class="{ busy: locLoading }" @tap="onLocateTap">
-          {{ locLoading ? '定位中…' : (locationStore.permissionDenied ? '去设置开启' : '允许定位') }}
+      <text class="nearby-block-desc">{{ locateDesc }}</text>
+      <view class="nearby-block-actions">
+        <view class="nearby-block-btn" @tap="onLocateTap">
+          <image class="nearby-block-btn-icon" src="/static/icons/ui/locate-white.png" mode="aspectFit" />
+          <text>{{ locationStore.permissionDenied ? '去设置开启' : (locAuthorized ? '重新定位' : '定位我的位置') }}</text>
         </view>
         <text class="locate-privacy" @tap="openPrivacyContract">隐私协议</text>
       </view>
@@ -369,7 +412,7 @@ const showNotice = ref(false)
         @tap="selectStop(stop)"
       >{{ stop }}<text v-if="freqTop3.includes(stop)" class="freq-badge">常去</text></view>
       <view v-if="!stopSearch" class="stop-chip more" @tap="stopExpanded = !stopExpanded">
-        {{ stopExpanded ? '收起 ▲' : '更多 ▼' }}
+        {{ stopExpanded ? '收起' : '更多' }}
       </view>
     </view>
 
@@ -380,34 +423,36 @@ const showNotice = ref(false)
         <view
           v-for="(item, idx) in section.arrivals" :key="item.departure.recordId + '-' + item.destSeq"
           v-show="idx < 5 || expandedSections.has(section.stopName)"
-          class="bus-card" :class="{ expanded: expandedCards.has(nearbyCardKey(section.stopName, item.departure.recordId, item.destSeq || 0)) }"
-          :style="{ borderLeftColor: routeColor(item.departure.routeKey) }"
         >
-          <view class="bus-card-main" @tap="toggleCard(nearbyCardKey(section.stopName, item.departure.recordId, item.destSeq || 0))">
-            <view class="card-left">
-              <view class="route-badge" :style="{ background: routeColor(item.departure.routeKey) }">{{ routeName(item.departure) }}</view>
-              <text v-if="item.departure.isGaochaoDeparture" class="tag-dining">高超楼发车</text>
-            </view>
-            <view class="card-right">
-              <text class="arrival-time">{{ item.arrivalTime?.slice(0, 5) }}</text>
-              <text :class="etaClass(item.status)">{{ item.label }}</text>
-            </view>
-            <text class="card-arrow" :class="{ rotated: expandedCards.has(nearbyCardKey(section.stopName, item.departure.recordId, item.destSeq || 0)) }">▾</text>
-          </view>
-          <BusStopTimeline
-            v-if="expandedCards.has(nearbyCardKey(section.stopName, item.departure.recordId, item.destSeq || 0))"
-            :departure-id="item.departure.recordId"
-            :route-key="item.departure.routeKey"
-            :highlight-origin="item.stopName"
-            :highlight-origin-seq="item.destSeq"
-          />
+          <ArrivalCard
+            :departure="item.departure"
+            :expanded="expandedCards.has(nearbyCardKey(section.stopName, item.departure.recordId, item.destSeq || 0))"
+            :time="item.arrivalTime"
+            :label="arrivalEta(item).label"
+            :status="arrivalEta(item).status"
+            @toggle="toggleCard(nearbyCardKey(section.stopName, item.departure.recordId, item.destSeq || 0))"
+          >
+            <template #detail>
+              <BusStopTimeline
+                :departure-id="item.departure.recordId"
+                :route-key="item.departure.routeKey"
+                :highlight-origin="section.stopName"
+                :highlight-origin-seq="item.destSeq"
+                @view-on-map="onViewOnMap"
+              />
+            </template>
+          </ArrivalCard>
         </view>
         <view v-if="section.arrivals.length > 5" class="show-more" @tap="toggleSection(section.stopName)">
-          {{ expandedSections.has(section.stopName) ? '收起 ▲' : `展开更多 ${section.arrivals.length - 5} 趟车次 ▼` }}
+          <text>{{ expandedSections.has(section.stopName) ? '收起' : `展开更多 ${section.arrivals.length - 5} 趟车次` }}</text>
+          <image
+            class="chevron" :class="{ rotated: expandedSections.has(section.stopName) }"
+            src="/static/icons/ui/chevron-down.png" mode="aspectFit"
+          />
         </view>
       </view>
 
-      <view v-if="hasLocation && nearbySections.length === 0" class="hint-card">
+      <view v-if="hasLocation && !noServiceToday && nearbySections.length === 0" class="hint-card">
         <text>当前时段附近暂无到站车次，可从上方列表手动选择站点</text>
       </view>
     </template>
@@ -417,45 +462,37 @@ const showNotice = ref(false)
       <view class="section-title">「{{ selectedStop }}」</view>
       <view v-if="destArrivals.length === 0" class="empty">当前时段暂无经过此站的车次</view>
       <view
-        v-for="(item, idx) in (showAllArrivals ? destArrivals : destArrivals.slice(0, 5))"
+        v-for="item in (showAllArrivals ? destArrivals : destArrivals.slice(0, 5))"
         :key="item.departure.recordId"
-        class="bus-card" :class="{ expanded: expandedCards.has(destCardKey(item.departure.recordId)) }"
-        :style="{ borderLeftColor: routeColor(item.departure.routeKey) }"
       >
-        <view class="bus-card-main" @tap="toggleCard(destCardKey(item.departure.recordId))">
-          <view class="card-left">
-            <view class="route-badge" :style="{ background: routeColor(item.departure.routeKey) }">{{ routeName(item.departure) }}</view>
-            <text v-if="item.departure.isGaochaoDeparture" class="tag-dining">高超楼发车</text>
-          </view>
-          <view class="card-right">
-            <template v-if="item.candidateStop">
-              <view class="boarding">
-                <text class="boarding-text">{{ item.walkLabel }}到「{{ item.candidateStop }}」</text>
-                <text v-if="item.walkWarning" class="walk-warn">⚠</text>
-              </view>
-              <text class="board-time">于{{ item.boardTime?.slice(0, 5) }}{{ item.isOriginDeparture ? '发车' : '到站' }}</text>
-              <text :class="etaClass(item.boardStatus)">{{ item.boardLabel }}</text>
-              <text class="dest-info">预计 {{ item.destArrivalTime?.slice(0, 5) }} 到「{{ item.destStop }}」</text>
-            </template>
-            <template v-else>
-              <text class="arrival-time">{{ item.arrivalTime?.slice(0, 5) }}</text>
-              <text :class="etaClass(item.status)">{{ item.label }}</text>
-            </template>
-          </view>
-          <text class="card-arrow" :class="{ rotated: expandedCards.has(destCardKey(item.departure.recordId)) }">▾</text>
-        </view>
-        <BusStopTimeline
-          v-if="expandedCards.has(destCardKey(item.departure.recordId))"
-          :departure-id="item.departure.recordId"
-          :route-key="item.departure.routeKey"
-          :highlight-stop="item.destStop || selectedStop || ''"
-          :highlight-origin="item.candidateStop || ''"
-          :highlight-dest-seq="item.destSeq"
-          :highlight-origin-seq="item.boardSeq"
-        />
+          <ArrivalCard
+            :departure="item.departure"
+            :expanded="expandedCards.has(destCardKey(item.departure.recordId))"
+            :time="item.arrivalTime"
+            :label="arrivalEta(item).label"
+            :status="arrivalEta(item).status"
+            :ride="rideOf(item)"
+            @toggle="toggleCard(destCardKey(item.departure.recordId))"
+          >
+            <template #detail>
+            <BusStopTimeline
+              :departure-id="item.departure.recordId"
+              :route-key="item.departure.routeKey"
+              :highlight-stop="item.destStop || selectedStop || ''"
+              :highlight-origin="item.candidateStop || ''"
+              :highlight-dest-seq="item.destSeq"
+              :highlight-origin-seq="item.boardSeq"
+              @view-on-map="onViewOnMap"
+            />
+          </template>
+        </ArrivalCard>
       </view>
       <view v-if="destArrivals.length > 5" class="show-more" @tap="showAllArrivals = !showAllArrivals">
-        {{ showAllArrivals ? '收起 ▲' : `展开更多 ${destArrivals.length - 5} 趟车次 ▼` }}
+        <text>{{ showAllArrivals ? '收起' : `展开更多 ${destArrivals.length - 5} 趟车次` }}</text>
+        <image
+          class="chevron" :class="{ rotated: showAllArrivals }"
+          src="/static/icons/ui/chevron-down.png" mode="aspectFit"
+        />
       </view>
     </view>
 
@@ -463,47 +500,37 @@ const showNotice = ref(false)
     <view v-if="departingSoon.length > 0" class="section">
       <view class="section-title">即将发车</view>
       <view
-        v-for="(item, idx) in (showAllDeparting ? departingSoon : departingSoon.slice(0, 5))"
+        v-for="item in (showAllDeparting ? departingSoon : departingSoon.slice(0, 5))"
         :key="item.departure.recordId"
-        class="bus-card" :class="{ expanded: expandedCards.has(departingCardKey(item.departure.recordId)) }"
-        :style="{ borderLeftColor: routeColor(item.departure.routeKey) }"
       >
-        <view class="bus-card-main" @tap="toggleCard(departingCardKey(item.departure.recordId))">
-          <view class="card-left">
-            <view class="route-badge" :style="{ background: routeColor(item.departure.routeKey) }">{{ routeName(item.departure) }}</view>
-            <text v-if="item.departure.isGaochaoDeparture" class="tag-dining">高超楼发车</text>
-          </view>
-          <view class="card-right">
-            <text class="arrival-time">{{ item.departure.departureTime }}</text>
-            <text :class="etaClass(item.isUrgent ? 'urgent' : undefined)">{{ item.label }}</text>
-          </view>
-          <text class="card-arrow" :class="{ rotated: expandedCards.has(departingCardKey(item.departure.recordId)) }">▾</text>
-        </view>
-        <BusStopTimeline
-          v-if="expandedCards.has(departingCardKey(item.departure.recordId))"
-          :departure-id="item.departure.recordId"
-          :route-key="item.departure.routeKey"
-        />
+        <ArrivalCard
+          :departure="item.departure"
+          :expanded="expandedCards.has(departingCardKey(item.departure.recordId))"
+          :time="item.departure.departureTime"
+          :label="departingEta(item).label"
+          :status="departingEta(item).status"
+          @toggle="toggleCard(departingCardKey(item.departure.recordId))"
+        >
+          <template #detail>
+            <BusStopTimeline
+              :departure-id="item.departure.recordId"
+              :route-key="item.departure.routeKey"
+              @view-on-map="onViewOnMap"
+            />
+          </template>
+        </ArrivalCard>
       </view>
       <view v-if="departingSoon.length > 5" class="show-more" @tap="showAllDeparting = !showAllDeparting">
-        {{ showAllDeparting ? '收起 ▲' : `展开更多 ${departingSoon.length - 5} 趟车次 ▼` }}
+        <text>{{ showAllDeparting ? '收起' : `展开更多 ${departingSoon.length - 5} 趟车次` }}</text>
+        <image
+          class="chevron" :class="{ rotated: showAllDeparting }"
+          src="/static/icons/ui/chevron-down.png" mode="aspectFit"
+        />
       </view>
     </view>
 
     <!-- 页脚 -->
     <view class="footer-link" @tap="goAbout">关于本应用</view>
-
-    <!-- 公告弹窗 -->
-    <view v-if="showNotice" class="dialog-mask" @tap="showNotice = false">
-      <view class="dialog" @tap.stop>
-        <view class="dialog-title">公告</view>
-        <view class="dialog-body">
-          <view>线路试运行，随时会调整，时间表和预测时间仅供参考。</view>
-          <view class="dialog-body-para">如需反馈时刻偏差，欢迎通过「关于 → 反馈意见」联系我们。</view>
-        </view>
-        <view class="dialog-btn" @tap="showNotice = false">我知道了</view>
-      </view>
-    </view>
   </view>
 </template>
 
@@ -514,89 +541,54 @@ const showNotice = ref(false)
 .date-text { font-size: 32rpx; font-weight: 600; }
 .weather-row { display: flex; align-items: center; gap: 8rpx; }
 .weather-icon { font-size: 26rpx; }
-.weather-text { font-size: 24rpx; color: #6B7280; }
+.weather-text { font-size: 24rpx; color: var(--color-text-secondary); }
 .date-tag { font-size: 24rpx; padding: 6rpx 18rpx; border-radius: 999rpx; }
-.date-tag.wd { background: #EFF6FF; color: #1A56DB; }
-.date-tag.we { background: #FEF3C7; color: #92400E; }
+.date-tag.wd { background: var(--color-primary-soft); color: var(--color-primary); }
+.date-tag.we { background: var(--color-warning-soft); color: var(--color-warning-text); }
 
-.notice-bar { background: #FFF7ED; border-radius: 12rpx; padding: 16rpx 20rpx; margin-bottom: 16rpx; }
-.notice-text { font-size: 24rpx; color: #9A3412; }
-
-/* 定位引导卡片 */
-.locate-card {
-  background: #fff; border-radius: 14rpx; padding: 22rpx 24rpx; margin-bottom: 16rpx;
-  border: 1rpx solid #DBEAFE;
+/* 全天无车提示 */
+.notice-card {
+  display: flex; flex-direction: column; gap: 6rpx;
+  background: var(--color-warning-soft); border-radius: 16rpx; padding: 24rpx 28rpx; margin-bottom: 18rpx;
 }
-.locate-head { display: flex; align-items: flex-start; gap: 12rpx; }
-.locate-icon { font-size: 32rpx; line-height: 1.2; }
-.locate-texts { flex: 1; display: flex; flex-direction: column; gap: 6rpx; }
-.locate-title { font-size: 28rpx; font-weight: 600; color: #1F2937; }
-.locate-desc { font-size: 22rpx; color: #6B7280; line-height: 1.5; }
-.locate-actions { display: flex; align-items: center; justify-content: space-between; margin-top: 18rpx; }
-.locate-btn {
-  background: #1A56DB; color: #fff; font-size: 26rpx; font-weight: 600;
-  padding: 14rpx 40rpx; border-radius: 999rpx;
-}
-.locate-btn.busy { background: #93B4F5; }
-.locate-privacy { font-size: 22rpx; color: #1A56DB; }
+.notice-title { font-size: 28rpx; font-weight: 700; color: var(--color-warning-text); }
+.notice-text { font-size: 24rpx; color: var(--color-warning-text); line-height: 1.6; }
 
-.hint-card { background: #F3F4F6; border-radius: 12rpx; padding: 24rpx; margin: 16rpx 0; font-size: 24rpx; color: #6B7280; text-align: center; }
+/* 附近站点：未定位时的功能区块（不是权限提示，而是首屏内容的一部分） */
+.nearby-block {
+  background: var(--color-card); border-radius: 16rpx; padding: 26rpx 28rpx 24rpx; margin-bottom: 18rpx;
+  border: 1rpx solid var(--color-border); box-shadow: 0 2rpx 10rpx rgba(17, 24, 39, 0.04);
+}
+.nearby-block-head { display: flex; align-items: center; justify-content: space-between; }
+.nearby-block-title { font-size: 30rpx; font-weight: 700; color: var(--color-text); }
+.nearby-block-tag {
+  font-size: 20rpx; color: var(--color-text-secondary); background: var(--color-bg);
+  padding: 4rpx 14rpx; border-radius: 999rpx;
+}
+.nearby-block-desc { display: block; font-size: 23rpx; color: var(--color-text-secondary); line-height: 1.6; margin-top: 10rpx; }
+.nearby-block-actions { display: flex; align-items: center; justify-content: space-between; margin-top: 22rpx; }
+.nearby-block-btn {
+  display: flex; align-items: center; gap: 10rpx;
+  background: var(--color-primary); color: #fff; font-size: 27rpx; font-weight: 600;
+  padding: 16rpx 34rpx; border-radius: 999rpx;
+}
+.nearby-block-btn-icon { width: 30rpx; height: 30rpx; }
+.locate-privacy { font-size: 22rpx; color: var(--color-primary); }
+
+.hint-card { background: var(--color-bg); border-radius: 12rpx; padding: 24rpx; margin: 16rpx 0; font-size: 24rpx; color: var(--color-text-secondary); text-align: center; }
 
 .search-box { margin-bottom: 16rpx; }
-.search-input { background: #fff; border-radius: 999rpx; padding: 14rpx 24rpx; font-size: 26rpx; }
-.ph { color: #9CA3AF; }
+.search-input { background: var(--color-card); border-radius: 999rpx; padding: 14rpx 24rpx; font-size: 26rpx; }
+.ph { color: var(--color-text-tertiary); }
 
 .stop-grid { display: flex; flex-wrap: wrap; gap: 14rpx; margin-bottom: 8rpx; }
-.stop-chip { padding: 8rpx 20rpx; background: #fff; border-radius: 999rpx; font-size: 24rpx; border: 1rpx solid #E5E7EB; color: #1F2937; }
-.stop-chip.active { background: #EFF6FF; border-color: #1A56DB; color: #1A56DB; font-weight: 600; }
-.stop-chip.more { background: #F3F4F6; color: #6B7280; }
-.freq-badge { margin-left: 8rpx; padding: 0 8rpx; border-radius: 6rpx; background: #FEF3C7; color: #92400E; font-size: 18rpx; }
+.stop-chip { padding: 8rpx 20rpx; background: var(--color-card); border-radius: 999rpx; font-size: 24rpx; border: 1rpx solid var(--color-border); color: var(--color-text); }
+.stop-chip.active { background: var(--color-primary-soft); border-color: var(--color-primary); color: var(--color-primary); font-weight: 600; }
+.stop-chip.more { background: var(--color-bg); color: var(--color-text-secondary); }
+.freq-badge { margin-left: 8rpx; padding: 0 8rpx; border-radius: 6rpx; background: var(--color-warning-soft); color: var(--color-warning-text); font-size: 18rpx; }
 
 .section { margin-top: 24rpx; }
 .section-title { font-size: 30rpx; font-weight: 600; margin-bottom: 14rpx; }
 
-.bus-card {
-  background: #fff; border-radius: 14rpx; margin-bottom: 12rpx; overflow: hidden;
-  border-left: 6rpx solid transparent;
-  transition: box-shadow 0.15s;
-}
-.bus-card.expanded { box-shadow: 0 4rpx 18rpx rgba(0, 0, 0, 0.08); }
-.bus-card-main {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 20rpx 24rpx;
-}
-.bus-card-main:active { background: #F9FAFB; }
-.card-left { display: flex; align-items: center; gap: 12rpx; flex: 1; min-width: 0; }
-.route-badge { color: #fff; font-size: 22rpx; font-weight: 600; padding: 4rpx 14rpx; border-radius: 8rpx; flex-shrink: 0; }
-.tag-dining { font-size: 20rpx; color: #F59E0B; }
-.card-right { display: flex; flex-direction: column; align-items: flex-end; gap: 2rpx; flex-shrink: 0; }
-.card-arrow {
-  font-size: 22rpx; color: #9CA3AF; margin-left: 14rpx; flex-shrink: 0;
-  transition: transform 0.2s;
-}
-.card-arrow.rotated { transform: rotate(180deg); }
-.arrival-time { font-size: 36rpx; font-weight: 700; color: #1A56DB; font-variant-numeric: tabular-nums; }
-.boarding { display: flex; align-items: center; gap: 6rpx; }
-.boarding-text { font-size: 22rpx; color: #10B981; }
-.walk-warn { font-size: 20rpx; color: #F59E0B; }
-.board-time { font-size: 22rpx; color: #6B7280; }
-.dest-info { font-size: 22rpx; color: #6B7280; }
-
-.eta { font-size: 26rpx; color: #2563EB; }
-.eta.warning { color: #F59E0B; }
-.eta.urgent { color: #DC2626; font-weight: 600; }
-.eta.arrived { color: #10B981; font-weight: 600; }
-.eta.passed { color: #9CA3AF; }
-
-.show-more { text-align: center; padding: 16rpx; font-size: 24rpx; color: #1A56DB; }
-.empty { text-align: center; padding: 48rpx; font-size: 26rpx; color: #6B7280; }
-
-.dialog-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 100; }
-.dialog { background: #fff; border-radius: 20rpx; width: 560rpx; padding: 32rpx; }
-.dialog-title { font-size: 32rpx; font-weight: 600; margin-bottom: 16rpx; }
-.dialog-body { font-size: 26rpx; color: #374151; line-height: 1.8; margin-bottom: 24rpx; }
-.dialog-body-para { margin-top: 16rpx; }
-.dialog-btn { background: #1A56DB; color: #fff; text-align: center; padding: 16rpx; border-radius: 12rpx; font-size: 28rpx; }
-
-.footer-link { text-align: center; font-size: 24rpx; color: #9CA3AF; padding: 24rpx 0 8rpx; }
+.footer-link { text-align: center; font-size: 24rpx; color: var(--color-text-tertiary); padding: 24rpx 0 8rpx; }
 </style>

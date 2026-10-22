@@ -24,4 +24,16 @@ export function formatDate(date?: Date): string {
   return `${y}年${m}月${d_}日 星期${w}`
 }
 
+/**
+ * 本地时区的 YYYY-MM-DD
+ *
+ * 不能用 toISOString：那是 UTC，00:00–08:00 之间会把日期算成前一天。
+ */
+export function localDateStr(date?: Date): string {
+  const d = date ?? getNow()
+  const m = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${d.getFullYear()}-${m}-${day}`
+}
+
 export { getDateLabel }

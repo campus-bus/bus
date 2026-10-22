@@ -99,15 +99,19 @@ export interface ArrivalPrediction {
   remark?: string
 }
 
-/** 下一班车查询结果 */
-export interface NextBusResult {
-  departure: Departure
-  stopName: string
-  arrivalTime: string
-  minutesUntilArrival: number
-  secondsUntilArrival: number
-  etaDisplay: string
-  isImminent: boolean
+/** 多起点乘车方案（首页目的地卡片右侧的四行信息） */
+export interface RideInfo {
+  /** 步行到上车站的提示文案 */
+  walkLabel: string
+  candidateStop: string
+  /** 步行时间可能赶不上这班车 */
+  walkWarning?: boolean
+  boardTime: string
+  isOriginDeparture: boolean
+  boardLabel: string
+  boardStatus: string
+  destTime: string
+  destStop: string
 }
 
 /** 公交车实时位置 */
@@ -123,11 +127,4 @@ export interface BusPosition {
   toStop: string
   progress: number
   heading: number
-}
-
-/** 即将发车的车次 */
-export interface DepartingSoon {
-  departure: Departure
-  minutesUntilDeparture: number
-  countdownDisplay: string
 }

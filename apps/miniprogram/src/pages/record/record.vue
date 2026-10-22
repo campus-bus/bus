@@ -162,14 +162,15 @@ function formatTime(ts: number) {
 
       <view v-if="routeStops.length">
         <view v-if="nearestRouteStop && !timingActive" class="nearest-card" @tap="boardAt(nearestRouteStop)">
-          <text>📍 距你最近「{{ nearestRouteStop }}」，点此一键上车</text>
+          <image class="nearest-icon" src="/static/icons/ui/locate.png" mode="aspectFit" />
+          <text>距你最近「{{ nearestRouteStop }}」，点此一键上车</text>
         </view>
         <view class="stops-title">{{ timingActive ? '到站请点「计时」' : '选择上车站点' }}</view>
 
         <view v-for="(stop, idx) in routeStops" :key="idx" class="stop-row">
           <view class="stop-dot" :class="{ boarding: stopState(idx) === 0, current: stopState(idx) === 1, done: stopState(idx) === 2 }">
             <text v-if="stopState(idx) === 0">上</text>
-            <text v-else-if="stopState(idx) === 2">✓</text>
+            <image v-else-if="stopState(idx) === 2" class="stop-dot-check" src="/static/icons/ui/check-white.png" mode="aspectFit" />
             <text v-else>{{ idx + 1 }}</text>
           </view>
           <text class="stop-name" :class="{ bold: stopState(idx) === 0 }">{{ stop }}</text>
@@ -208,42 +209,51 @@ function formatTime(ts: number) {
 </template>
 
 <style scoped>
-.record-page { padding-bottom: 24rpx; }
-.top-tabs { display: flex; background: #fff; }
-.top-tab { flex: 1; text-align: center; padding: 24rpx 0; font-size: 28rpx; color: #6B7280; border-bottom: 4rpx solid transparent; }
-.top-tab.active { color: #1A56DB; font-weight: 600; border-bottom-color: #1A56DB; }
+.record-page {
+  /* 非 tabBar 页：给 Home 指示条留安全区，避免最后一条记录被遮住 */
+  padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
+}
+.top-tabs { display: flex; background: var(--color-card); }
+.top-tab { flex: 1; text-align: center; padding: 24rpx 0; font-size: 28rpx; color: var(--color-text-secondary); border-bottom: 4rpx solid transparent; }
+.top-tab.active { color: var(--color-primary); font-weight: 600; border-bottom-color: var(--color-primary); }
 
 .panel { padding: 20rpx 24rpx; }
 .nick-row { display: flex; align-items: center; gap: 14rpx; margin-bottom: 18rpx; font-size: 28rpx; }
-.nick-input { flex: 1; border: 1rpx solid #E5E7EB; border-radius: 12rpx; padding: 12rpx 18rpx; font-size: 26rpx; background: #fff; }
+.nick-input { flex: 1; border: 1rpx solid var(--color-border); border-radius: 12rpx; padding: 12rpx 18rpx; font-size: 26rpx; background: var(--color-card); }
 
 .route-row { display: flex; gap: 12rpx; margin-bottom: 18rpx; }
-.route-opt { padding: 10rpx 22rpx; font-size: 26rpx; background: #fff; border-radius: 999rpx; border: 1rpx solid #E5E7EB; color: #6B7280; }
-.route-opt.active { background: #EFF6FF; color: #1A56DB; border-color: #1A56DB; font-weight: 600; }
+.route-opt { padding: 10rpx 22rpx; font-size: 26rpx; background: var(--color-card); border-radius: 999rpx; border: 1rpx solid var(--color-border); color: var(--color-text-secondary); }
+.route-opt.active { background: var(--color-primary-soft); color: var(--color-primary); border-color: var(--color-primary); font-weight: 600; }
 
-.nearest-card { background: #EFF6FF; border: 1rpx solid #1A56DB; border-radius: 12rpx; padding: 18rpx 20rpx; font-size: 26rpx; color: #1A56DB; margin-bottom: 16rpx; }
+.nearest-card {
+  display: flex; align-items: center; gap: 10rpx;
+  background: var(--color-primary-soft); border: 1rpx solid var(--color-primary); border-radius: 12rpx;
+  padding: 18rpx 20rpx; font-size: 26rpx; color: var(--color-primary); margin-bottom: 16rpx;
+}
+.nearest-icon { width: 30rpx; height: 30rpx; flex-shrink: 0; }
 .stops-title { font-size: 28rpx; font-weight: 600; margin-bottom: 10rpx; }
 
-.stop-row { display: flex; align-items: center; gap: 16rpx; padding: 14rpx 0; border-bottom: 1rpx solid #F3F4F6; }
-.stop-dot { width: 40rpx; height: 40rpx; border-radius: 50%; background: #E5E7EB; color: #6B7280; display: flex; align-items: center; justify-content: center; font-size: 20rpx; flex-shrink: 0; }
-.stop-dot.boarding { background: #1A56DB; color: #fff; }
-.stop-dot.current { background: #F59E0B; color: #fff; font-weight: 600; }
-.stop-dot.done { background: #10B981; color: #fff; }
+.stop-row { display: flex; align-items: center; gap: 16rpx; padding: 14rpx 0; border-bottom: 1rpx solid var(--color-divider); }
+.stop-dot { width: 40rpx; height: 40rpx; border-radius: 50%; background: var(--color-border); color: var(--color-text-secondary); display: flex; align-items: center; justify-content: center; font-size: 20rpx; flex-shrink: 0; }
+.stop-dot.boarding { background: var(--color-primary); color: #fff; }
+.stop-dot.current { background: var(--color-warning); color: #fff; font-weight: 600; }
+.stop-dot.done { background: var(--color-success); color: #fff; }
+.stop-dot-check { width: 24rpx; height: 24rpx; }
 .stop-name { flex: 1; font-size: 28rpx; }
 .stop-name.bold { font-weight: 600; }
-.seg-secs { font-size: 24rpx; color: #10B981; font-weight: 600; }
-.undo-btn { font-size: 22rpx; color: #DC2626; border: 1rpx solid #DC2626; border-radius: 8rpx; padding: 4rpx 12rpx; }
-.board-btn { background: #1A56DB; color: #fff; font-size: 24rpx; padding: 8rpx 22rpx; border-radius: 999rpx; }
-.timing-btn { background: #F59E0B; color: #fff; font-size: 24rpx; padding: 8rpx 22rpx; border-radius: 999rpx; }
+.seg-secs { font-size: 24rpx; color: var(--color-success); font-weight: 600; }
+.undo-btn { font-size: 22rpx; color: var(--color-danger); border: 1rpx solid var(--color-danger); border-radius: 8rpx; padding: 4rpx 12rpx; }
+.board-btn { background: var(--color-primary); color: #fff; font-size: 24rpx; padding: 8rpx 22rpx; border-radius: 999rpx; }
+.timing-btn { background: var(--color-warning); color: #fff; font-size: 24rpx; padding: 8rpx 22rpx; border-radius: 999rpx; }
 
 .submit-area { margin-top: 24rpx; }
-.submit-btn { background: #10B981; color: #fff; text-align: center; padding: 18rpx; border-radius: 999rpx; font-size: 30rpx; }
-.submit-btn.disabled { background: #9CA3AF; }
-.hint { text-align: center; font-size: 24rpx; color: #6B7280; padding: 24rpx; }
+.submit-btn { background: var(--color-success); color: #fff; text-align: center; padding: 18rpx; border-radius: 999rpx; font-size: 30rpx; }
+.submit-btn.disabled { background: var(--color-text-tertiary); }
+.hint { text-align: center; font-size: 24rpx; color: var(--color-text-secondary); padding: 24rpx; }
 
-.history-card { background: #fff; border-radius: 14rpx; padding: 18rpx 22rpx; margin-bottom: 12rpx; }
+.history-card { background: var(--color-card); border-radius: 14rpx; padding: 18rpx 22rpx; margin-bottom: 12rpx; }
 .history-header { display: flex; justify-content: space-between; align-items: center; font-size: 26rpx; font-weight: 600; margin-bottom: 8rpx; }
-.delete-btn { font-size: 22rpx; color: #DC2626; border: 1rpx solid #DC2626; border-radius: 8rpx; padding: 4rpx 14rpx; font-weight: 400; }
-.history-segs { font-size: 24rpx; color: #6B7280; line-height: 1.8; word-break: break-all; }
-.copy-btn { margin-top: 24rpx; text-align: center; font-size: 26rpx; color: #1A56DB; background: #EFF6FF; border-radius: 999rpx; padding: 18rpx; }
+.delete-btn { font-size: 22rpx; color: var(--color-danger); border: 1rpx solid var(--color-danger); border-radius: 8rpx; padding: 4rpx 14rpx; font-weight: 400; }
+.history-segs { font-size: 24rpx; color: var(--color-text-secondary); line-height: 1.8; word-break: break-all; }
+.copy-btn { margin-top: 24rpx; text-align: center; font-size: 26rpx; color: var(--color-primary); background: var(--color-primary-soft); border-radius: 999rpx; padding: 18rpx; }
 </style>

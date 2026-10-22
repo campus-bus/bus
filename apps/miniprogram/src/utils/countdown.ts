@@ -23,6 +23,17 @@ function snapTo1(seconds: number): number {
 }
 
 /**
+ * 倒计时状态 → 样式类名（首页卡片 / 地图面板共用，避免各写一份）
+ */
+export function etaClassOf(status?: string): string {
+  if (status === 'urgent') return 'eta urgent'
+  if (status === 'warning') return 'eta warning'
+  if (status === 'arrived') return 'eta arrived'
+  if (status === 'passed') return 'eta passed'
+  return 'eta'
+}
+
+/**
  * 格式化倒计时显示文字
  */
 function formatSeconds(snapped: number): string {

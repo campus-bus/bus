@@ -3,3 +3,12 @@ dist/
 .DS_Store
 *.pyc
 __pycache__/
+
+# 小程序端临时探针产物（截图、页面数据快照等），用完即删
+apps/miniprogram/.probe/
+# 一次性调试脚本，按项目纪律不留档
+**/_probe_*.cjs
+
+# 接口权限申请的一次性材料：截图只提交给微信审核，不进版本库（本机保留）。
+# 需要时用 node scripts/capture_location_permission_shots.cjs 重新生成。
+apps/miniprogram/docs/接口申请截图*/

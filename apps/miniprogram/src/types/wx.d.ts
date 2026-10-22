@@ -29,4 +29,8 @@ declare const wx: {
   requirePrivacyAuthorize?: (opts: { success?: () => void; fail?: (err: unknown) => void }) => void
   /** 打开《用户隐私保护指引》页面（基础库 2.32.3+） */
   openPrivacyContract?: (opts?: { success?: () => void; fail?: (err: unknown) => void }) => void
+  /** 小程序切到后台（用于暂停持续定位：仅前台使用） */
+  onAppHide?: (listener: () => void) => void
+  /** 小程序回到前台（用于恢复持续定位） */
+  onAppShow?: (listener: () => void) => void
 }

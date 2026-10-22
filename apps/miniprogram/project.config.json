@@ -1,5 +1,5 @@
 {
-  "description": "环线坐车小程序（uni-app Vue3）",
+  "description": "环线坐车小程序（uni-app Vue3）— 本文件指向 dist/dev（开发调试用，未压缩）。发布上传请用 scripts/upload_release.ps1，它会上传 dist/build 正式包。",
   "appid": "wx9793b294a259ec3a",
   "compileType": "miniprogram",
   "libVersion": "latest",

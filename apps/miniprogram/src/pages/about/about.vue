@@ -53,17 +53,18 @@ function exitDev() {
     </view>
 
     <view class="section">
+      <view class="section-title">位置信息</view>
+      <view class="text">· 仅在你点击「允许定位」或打开地图页时获取位置，用于计算你与站点的距离、在地图上显示你的位置</view>
+      <view class="text">· 位置只在本机参与计算与显示，不上传服务器、不保存、不生成行程轨迹、不共享给第三方</view>
+      <view class="text">· 仅在小程序处于前台时使用；切到后台立即停止，回到前台自动恢复</view>
+      <view class="text">· 拒绝授权仍可手动搜索并选择站点，时刻查询功能不受影响</view>
+    </view>
+
+    <view class="section">
       <view class="section-title">注意</view>
       <view class="text">· 全部线路目前仅工作日运行，周末/节假日时刻表待公布</view>
       <view class="text">· 标有"就餐"的车次走就餐专线，站点与普通环线1路不同</view>
       <view class="text">· 高超楼是系统工程学院所在地，就餐专线在此发车，接驳1路/2路均经过</view>
-    </view>
-
-    <view class="section">
-      <view class="section-title">网页版</view>
-      <view class="text">本应用另有 H5 网页版（可添加到手机主屏幕）：</view>
-      <text class="link" selectable user-select>https://campus-bus.github.io/bus/</text>
-      <view class="tip">长按链接可复制</view>
     </view>
 
     <view class="section feedback">
@@ -84,19 +85,23 @@ function exitDev() {
 </template>
 
 <style scoped>
-.about-page { padding: 32rpx 24rpx; }
+.about-page {
+  padding: 32rpx 24rpx;
+  /* 关于页不是 tabBar 页，页面一直延伸到屏幕底部，必须给 Home 指示条留出安全区 */
+  padding-bottom: calc(32rpx + env(safe-area-inset-bottom));
+}
 .header { text-align: center; padding: 32rpx 0 40rpx; }
-.app-name { font-size: 44rpx; font-weight: 700; color: #1A56DB; }
-.version { font-size: 24rpx; color: #6B7280; margin-top: 8rpx; }
-.section { background: #fff; border-radius: 16rpx; padding: 24rpx; margin-bottom: 16rpx; }
+.app-name { font-size: 44rpx; font-weight: 700; color: var(--color-primary); }
+.version { font-size: 24rpx; color: var(--color-text-secondary); margin-top: 8rpx; }
+.section { background: var(--color-card); border-radius: 16rpx; padding: 24rpx; margin-bottom: 16rpx; }
 .section-title { font-size: 28rpx; font-weight: 600; margin-bottom: 12rpx; }
-.text { font-size: 26rpx; color: #6B7280; line-height: 1.7; }
-.link { display: block; font-size: 26rpx; color: #1A56DB; margin-top: 10rpx; word-break: break-all; }
-.tip { font-size: 22rpx; color: #9CA3AF; margin-top: 8rpx; }
+.text { font-size: 26rpx; color: var(--color-text-secondary); line-height: 1.7; }
+.link { display: block; font-size: 26rpx; color: var(--color-primary); margin-top: 10rpx; word-break: break-all; }
+.tip { font-size: 22rpx; color: var(--color-text-tertiary); margin-top: 8rpx; }
 .feedback { text-align: center; }
 .feedback .section-title { text-align: left; }
 .feedback .text { text-align: left; }
-.dev { background: #FAFAFA; border: 1rpx dashed #D1D5DB; }
-.dev-btn { margin-top: 16rpx; text-align: center; font-size: 26rpx; color: #6B7280; border: 1rpx solid #D1D5DB; border-radius: 999rpx; padding: 14rpx; }
-.dev-exit { margin-top: 12rpx; text-align: center; font-size: 24rpx; color: #9CA3AF; }
+.dev { background: var(--color-bg); border: 1rpx dashed var(--color-border); }
+.dev-btn { margin-top: 16rpx; text-align: center; font-size: 26rpx; color: var(--color-text-secondary); border: 1rpx solid var(--color-border); border-radius: 999rpx; padding: 14rpx; }
+.dev-exit { margin-top: 12rpx; text-align: center; font-size: 24rpx; color: var(--color-text-tertiary); }
 </style>

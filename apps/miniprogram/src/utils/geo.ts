@@ -1,62 +1,18 @@
+/**
+ * 距离与方位计算（小程序端）
+ *
+ * 坐标系约定（改代码前务必读完）
+ * - 小程序侧全程 **GCJ-02**：微信定位、腾讯 `<map>`、腾讯 LBS 同源；
+ *   `src/data/*.json` 在 `scripts/sync_miniprogram_data.js` 同步时已从 WGS-84 转成 GCJ-02。
+ * - 因此运行期**不做任何坐标转换**。转换只发生在构建期的同步脚本里
+ *   （实现见 `scripts/lib/coord.js`，启动时会自检偏移量）。
+ * - H5 版是另一套代码，全程 WGS-84，与本文件无关。
+ *
+ * 历史说明：本文件曾随 H5 版带进来 `wgs84ToGcj02` / `gcj02ToWgs84` /
+ * `computeMinDistanceToPath`（H5 自动记录下车检测用），小程序端从未调用，
+ * 且注释里「本项目全部使用 WGS-84」与现状相反，容易误导后来者，已于 2026-10-22 删除。
+ */
 import type { Station } from '@/types'
-
-/**
- * WGS-84 → GCJ-02（火星坐标系）转换
- * 浏览器 GPS 返回 WGS-84，高德地图使用 GCJ-02，直接使用会有偏移
- */
-export function wgs84ToGcj02(lng: number, lat: number): [number, number] {
-  const a = 6378245.0
-  const ee = 0.006693421622965943
-
-  function transformLat(x: number, y: number): number {
-    let ret = -100.0 + 2.0 * x + 3.0 * y + 0.2 * y * y + 0.1 * x * y + 0.2 * Math.sqrt(Math.abs(x))
-    ret += (20.0 * Math.sin(6.0 * x * Math.PI) + 20.0 * Math.sin(2.0 * x * Math.PI)) * 2.0 / 3.0
-    ret += (20.0 * Math.sin(y * Math.PI) + 40.0 * Math.sin(y / 3.0 * Math.PI)) * 2.0 / 3.0
-    ret += (160.0 * Math.sin(y / 12.0 * Math.PI) + 320.0 * Math.sin(y * Math.PI / 30.0)) * 2.0 / 3.0
-    return ret
-  }
-
-  function transformLng(x: number, y: number): number {
-    let ret = 300.0 + x + 2.0 * y + 0.1 * x * x + 0.1 * x * y + 0.1 * Math.sqrt(Math.abs(x))
-    ret += (20.0 * Math.sin(6.0 * x * Math.PI) + 20.0 * Math.sin(2.0 * x * Math.PI)) * 2.0 / 3.0
-    ret += (20.0 * Math.sin(x * Math.PI) + 40.0 * Math.sin(x / 3.0 * Math.PI)) * 2.0 / 3.0
-    ret += (150.0 * Math.sin(x / 12.0 * Math.PI) + 300.0 * Math.sin(x / 30.0 * Math.PI)) * 2.0 / 3.0
-    return ret
-  }
-
-  const dlat = transformLat(lng - 105.0, lat - 35.0)
-  const dlng = transformLng(lng - 105.0, lat - 35.0)
-  const radlat = lat / 180.0 * Math.PI
-  const magic = Math.sin(radlat)
-  const magic2 = 1 - ee * magic * magic
-  const sqrtmagic = Math.sqrt(magic2)
-  const dlat2 = (dlat * 180.0) / ((a * (1 - ee)) / (magic2 * sqrtmagic) * Math.PI)
-  const dlng2 = (dlng * 180.0) / (a / sqrtmagic * Math.cos(radlat) * Math.PI)
-  return [lng + dlng2, lat + dlat2]
-}
-
-/**
- * GCJ-02 → WGS-84（火星坐标反解）
- *
- * GCJ-02 没有解析逆变换，用正变换迭代逼近：每轮把残差补回输入，
- * 3 轮即可收敛到 1m 以内（校园尺度远优于 GPS 自身误差）。
- *
- * 使用场景：微信 `wx.onLocationChange` 的回调固定返回 GCJ-02
- * （官方文档：latitude/longitude「使用 gcj02 国测局坐标系」），
- * 而本项目站点、路线、距离计算全部使用 WGS-84，
- * 若直接混用会产生约 600-700m 的恒定偏移（长沙地区实测）。
- * 仅小程序端 wx.onLocationChange 需要；H5 端用的是原生 GPS，无需转换。
- */
-export function gcj02ToWgs84(lng: number, lat: number): [number, number] {
-  let wgsLng = lng
-  let wgsLat = lat
-  for (let i = 0; i < 3; i++) {
-    const [gLng, gLat] = wgs84ToGcj02(wgsLng, wgsLat)
-    wgsLng += lng - gLng
-    wgsLat += lat - gLat
-  }
-  return [wgsLng, wgsLat]
-}
 
 /**
  * Haversine 公式计算两点间的距离（米）
@@ -122,14 +78,15 @@ export function findNearestStops(
 }
 
 /**
- * 格式化步行时间（精确到秒）
+ * 格式化步行时间
+ *
+ * 只给到分钟级：步行速度本身是估算值（1.3m/s），报「1分23秒」是假精确，
+ * GPS 抖一下数字就变，反而不像人话。不足 1 分钟按「1分钟内」处理。
  */
 export function formatWalkTime(seconds: number): string {
-  const s = Math.round(seconds)
-  if (s < 60) return `步行约${s}秒`
-  const min = Math.floor(s / 60)
-  const sec = s % 60
-  return `步行约${min}分${sec}秒`
+  const min = Math.round(seconds / 60)
+  if (min <= 1) return '步行约1分钟'
+  return `步行约${min}分钟`
 }
 
 /**
@@ -148,50 +105,4 @@ export function computeBearing(
       Math.cos(dLng)
   const bearing = (Math.atan2(y, x) * 180) / Math.PI
   return (bearing + 360) % 360
-}
-
-/**
- * 点到线段的最短距离（米）
- */
-function pointToSegmentDistance(
-  lat: number, lng: number,
-  lat1: number, lng1: number,
-  lat2: number, lng2: number
-): number {
-  // 使用平面近似（校园尺度误差可忽略）
-  const dx = lng2 - lng1
-  const dy = lat2 - lat1
-  if (dx === 0 && dy === 0) return haversineDistance(lat, lng, lat1, lng1)
-
-  const t = Math.max(0, Math.min(1,
-    ((lng - lng1) * dx + (lat - lat1) * dy) / (dx * dx + dy * dy)
-  ))
-  const projLng = lng1 + t * dx
-  const projLat = lat1 + t * dy
-  return haversineDistance(lat, lng, projLat, projLng)
-}
-
-/**
- * 计算点到折线路径的最短距离（米）
- * 用于判断用户是否已远离公交车路线（下车检测）
- */
-export function computeMinDistanceToPath(
-  lat: number,
-  lng: number,
-  path: [number, number][]  // [[lng, lat], ...]
-): number {
-  if (path.length === 0) return Infinity
-  if (path.length === 1) return haversineDistance(lat, lng, path[0][1], path[0][0])
-
-  let minDist = Infinity
-  // 窗口搜索：从上次最近段索引附近开始
-  for (let i = 0; i < path.length - 1; i++) {
-    const d = pointToSegmentDistance(
-      lat, lng,
-      path[i][1], path[i][0],
-      path[i + 1][1], path[i + 1][0]
-    )
-    if (d < minDist) minDist = d
-  }
-  return minDist
 }

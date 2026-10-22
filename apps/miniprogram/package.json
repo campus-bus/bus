@@ -4,6 +4,7 @@
   "scripts": {
     "dev:mp-weixin": "uni -p mp-weixin",
     "build:mp-weixin": "uni build -p mp-weixin",
+    "release:upload": "powershell -ExecutionPolicy Bypass -File scripts/upload_release.ps1",
     "dev:h5": "uni",
     "build:h5": "uni build",
     "type-check": "vue-tsc --noEmit"
