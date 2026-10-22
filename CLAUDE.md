@@ -362,6 +362,43 @@ MapView.vue
 - `visibilitychange` 事件：切后台释放 wakeLock，切回前台重新获取
 - 不暂停会话，GPS 恢复后继续检测
 
+## 版本回溯（发布过的版本必须可回退）
+
+线上/已提审的版本一律打 **annotated tag** 并推送到远程，否则「改坏了想回去」只能靠翻提交历史猜。
+
+**已建立的回溯点**：
+
+| tag | 含义 |
+|---|---|
+| `v1.0.1` | 首个可转发版本（右上角转发/朋友圈钩子已注册），已上传微信后台 |
+
+**回溯做法**（任选其一，都不影响当前工作区）：
+
+```powershell
+# 只看某个版本的代码（不开新目录）
+git show v1.0.1:apps/miniprogram/src/utils/share.ts
+
+# 把工作区整体退回该版本（先建分支，别在 master 上直接 reset）
+git switch -c hotfix/from-v1.0.1 v1.0.1
+
+# 只回退单个文件到该版本
+git checkout v1.0.1 -- apps/miniprogram/src/pages/index/index.vue
+
+# 导出该版本的完整快照（演练回溯是否真的可用）
+git archive --format=zip -o snapshot.zip v1.0.1
+```
+
+**发布时的固定动作**（漏掉就会失去回溯能力）：
+
+1. 改 `src/manifest.json` 的 `versionName` / `versionCode`（两者都要改，前者给人看，后者给微信排序）
+2. 上传成功后立刻 `git tag -a v<版本> -m "<说明>"` → `git push origin v<版本>`
+3. 把实际上传产物归档到 `review/release-v<版本>-uploaded.zip`（`dist/build/mp-weixin` 在 `.gitignore` 里，
+   不归档就无法复核「当时究竟传了什么」；重新构建不保证字节一致）
+4. `git push origin master`（注意推送前确认未改动 PWA 冻结区：`git diff --name-only origin/master..HEAD`）
+
+> 归档文本类文件一律用 Node `fs.writeFileSync(..., 'utf8')` 或 `scripts/lib/zip_writer.cjs`，
+> 禁止 PowerShell `Compress-Archive`（PS 5.1 不写 UTF-8 标志位，中文名解压乱码）。
+
 ## 部署流程
 
 ```bash
