@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onUnmounted } from 'vue'
-import { onShow, onHide } from '@dcloudio/uni-app'
+import { onShow, onHide, onShareAppMessage, onShareTimeline } from '@dcloudio/uni-app'
 import { useScheduleStore } from '@/stores/schedule'
 import { useLocationStore } from '@/stores/location'
 import { usePreferenceStore } from '@/stores/preference'
@@ -14,7 +14,7 @@ import { findNearestStop, findNearestStops, formatWalkTime, WALK_SPEED_MPS } fro
 import { arrivalCountdown, departureCountdown } from '@/utils/countdown'
 import { toGroup, groupMembers, findBestRide } from '@/utils/station_group'
 import { boardTierOf, isBetterBoard, compareArrivalResults, BOARD_TIER } from '@/utils/ride_rank'
-import { useShare } from '@/utils/share'
+import { SHARE_TITLE, SHARE_PATH } from '@/utils/share'
 import ArrivalCard from '@/components/ArrivalCard.vue'
 import BusStopTimeline from '@/components/BusStopTimeline.vue'
 import type { Departure, DateType, RideInfo } from '@/types'
@@ -74,7 +74,9 @@ const locationStore = useLocationStore()
 const preferenceStore = usePreferenceStore()
 const mapFocus = useMapFocusStore()
 
-useShare()
+// 转发（钩子必须在本文件顶层直接调用，不能封装进 utils，原因见 utils/share.ts）
+onShareAppMessage(() => ({ title: SHARE_TITLE, path: SHARE_PATH }))
+onShareTimeline(() => ({ title: SHARE_TITLE }))
 
 // ─── 定位（用户主动点击后才获取，不在加载时自动调用） ───
 const {

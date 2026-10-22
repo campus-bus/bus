@@ -716,6 +716,9 @@ apps/miniprogram/
 24. **探针 `reLaunch` 到「当前已在的那个页面」会伪造出 owner 竞态**（2026-10-22）：`mp_probe.cjs --url` 和临时脚本常用 `reLaunch`，若目标就是当前页，旧实例 `onHide` 的 `releaseWatch('index')` 可能晚于新实例 `onShow` 的 `acquireWatch('index')` 到达——两者 owner 名相同，于是把新页面的所有权清掉了，表现成「点定位毫无反应」。真实用户不会 reLaunch 同一个 tab，所以这是探针假象。**测定位要走真实 tab 往返**（`switchTab` 到别的页再回来），别用 `reLaunch` 到同页。
     - 同理，临时给 `wx.getLocation` 打 patch 记录调用次数时，若 patch 没正确转发回调，会让 `loading`/`starting` 卡在 true，之后首页门禁区块被 `!locLoading` 永久隐藏，看起来像「按钮消失」。**验证完要么重启模拟器，要么在 patch 里原样转发 success/fail。**
 25. **`wx.requirePrivacyAuthorize` 在个别开发者工具版本里不回调**：表现同样是「点定位没反应、连错误都没有」。`node scripts/mp_probe.cjs privacy` 可直接判定（status 为 `timeout` 就是工具侧问题，不是业务代码）。
+26. **转发/朋友圈钩子**禁止封装进 utils，必须写在页面文件里**：uni-app 的 `uni:mp-runtime-hooks` 插件（`@dcloudio/uni-mp-vite/dist/plugins/runtimeHooks.js`）是**用正则扫页面自身的源码**，看到 `onShareAppMessage`/`onShareTimeline` 字面量才给页面组件补 `__runtimeHooks` 位掩码（2=好友，4=朋友圈）；运行时 `initRuntimeHooks()` 只有拿到位掩码才会把钩子挂进微信 Page 的 options。因此 `export function useShare(){ onShareAppMessage(...) }` 这种封装**看似正确、运行期也不报错，但微信右上角菜单里没有「转发给朋友」**——页面源码里只剩 `useShare()`，正则匹配不到 → 位掩码为 0。正确写法：`utils/share.ts` 只导出 `SHARE_TITLE`/`SHARE_PATH` 常量，各页面 `import { onShareAppMessage, onShareTimeline } from '@dcloudio/uni-app'` 后在 setup 顶层直接调用。
+ - 验收口径（可量化，别靠肉眼）：`dist/build/mp-weixin/pages/<页>/<页>.js` 里必须有 `__runtimeHooks = 6`；运行时 `typeof getCurrentPages().at(-1).onShareAppMessage === 'function'`。两者都满足才算真的能转发。v1.0.0 曾因此漏掉转发（源码里明明有 `useShare()`），v1.0.1 已修。
+ - `onShareTimeline`（朋友圈）微信目前仅 Android 支持，iOS 上即使配好也没有入口。
 26. **微信 CLI `upload` 失败时退出码仍是 0，必须解析输出**（2026-10-22，首次正式上传实测）：`cli.bat upload` 遇到网络瞬断会打印 `× Uploading` + `[error] ... read ECONNRESET ... (code 10)`，但 `$LASTEXITCODE` 依然为 0。`scripts/upload_release.ps1` 旧版只查退出码，于是在**没传上去**的情况下照样打印「[3/3] 已上传」，差点被当成发布成功。
  - 现在的判定：输出里出现 `[error]` 或 `× Uploading` → 失败；必须出现 `√ upload` 才算成功（成功时会打印体积表 `TOTAL | 1.2 MB | 1262233`）。
  - `ECONNRESET` 属网络瞬断，**直接重跑脚本即可**（会重新构建，几分钟）；重跑一次即成功，无需改任何代码。

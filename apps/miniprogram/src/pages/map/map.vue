@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onUnmounted } from 'vue'
-import { onShow, onHide, onReady } from '@dcloudio/uni-app'
+import { onShow, onHide, onReady, onShareAppMessage, onShareTimeline } from '@dcloudio/uni-app'
 import { useScheduleStore } from '@/stores/schedule'
 import { useLocationStore } from '@/stores/location'
 import { useMapFocusStore } from '@/stores/map_focus'
@@ -12,13 +12,15 @@ import { STATION_MARKER_META } from '@/utils/station_marker_meta'
 import { arrivalCountdown, etaClassOf } from '@/utils/countdown'
 import { findNearestStop, formatWalkTimePrecise, WALK_SPEED_MPS } from '@/utils/geo'
 import { routeColorOf, routeLabelOf, busIconOf } from '@/constants/routes'
-import { useShare } from '@/utils/share'
+import { SHARE_TITLE, SHARE_PATH } from '@/utils/share'
 import type { BusPosition } from '@/types'
 
 const scheduleStore = useScheduleStore()
 const locationStore = useLocationStore()
 
-useShare()
+// 转发（钩子必须在本文件顶层直接调用，不能封装进 utils，原因见 utils/share.ts）
+onShareAppMessage(() => ({ title: SHARE_TITLE, path: SHARE_PATH }))
+onShareTimeline(() => ({ title: SHARE_TITLE }))
 // 地图页不自动申请授权：进入时只检查授权状态（已授权则静默定位），
 // 未授权时由用户点右下角定位按钮主动触发（与首页门禁保持一致，符合平台规范）
 const { init: initLocation, requestLocation, openSetting, acquireWatch, releaseWatch } = useGeolocation()

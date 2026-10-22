@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { onShareAppMessage, onShareTimeline } from '@dcloudio/uni-app'
 import { isDevUnlocked, unlockDev, lockDev } from '@/utils/dev'
+import { SHARE_TITLE, SHARE_PATH } from '@/utils/share'
+
+// 转发（钩子必须在本文件顶层直接调用，不能封装进 utils，原因见 utils/share.ts）
+onShareAppMessage(() => ({ title: SHARE_TITLE, path: SHARE_PATH }))
+onShareTimeline(() => ({ title: SHARE_TITLE }))
 
 const devUnlocked = ref(isDevUnlocked())
 

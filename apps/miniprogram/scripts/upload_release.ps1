@@ -86,7 +86,13 @@ if ($DryRun) {
 # 必须解析输出，不能只看退出码：
 # CLI 上传失败（如 [error] read ECONNRESET）时**退出码仍是 0**，
 # 曾经因此把失败当成成功、差点以为版本已上传。判定标准是出现「√ upload」。
+# 注意：cli.bat 的进度日志（「- initialize」等）走 stderr，在
+# $ErrorActionPreference='Stop' 下会被 PowerShell 当成终止性错误，
+# 因此这里临时降为 Continue，只靠下面的文本判定成败。
+$prevEap = $ErrorActionPreference
+$ErrorActionPreference = 'Continue'
 $uploadOut = & $CliPath @cliArgs 2>&1 | Out-String
+$ErrorActionPreference = $prevEap
 Write-Host $uploadOut
 $failed = ($uploadOut -match '\[error\]') -or ($uploadOut -match '× Uploading')
 $succeeded = $uploadOut -match '√ upload'

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import { onShow } from '@dcloudio/uni-app'
+import { onShow, onShareAppMessage, onShareTimeline } from '@dcloudio/uni-app'
 import { useScheduleStore } from '@/stores/schedule'
 import { usePreferenceStore } from '@/stores/preference'
 import { getDateType, localDateStr, parseDateStr, getSecondsSinceMidnight } from '@/utils/datetime'
@@ -9,13 +9,15 @@ import { getNow } from '@/utils/time'
 import { toGroup, groupMembers, findBestRide } from '@/utils/station_group'
 import { routeColorOf, routeLabelOf } from '@/constants/routes'
 import { isCatchable } from '@/utils/plan_window'
-import { useShare } from '@/utils/share'
+import { SHARE_TITLE, SHARE_PATH } from '@/utils/share'
 import BusStopTimeline from '@/components/BusStopTimeline.vue'
 import type { Departure, RouteName, DateType } from '@/types'
 const scheduleStore = useScheduleStore()
 const preferenceStore = usePreferenceStore()
 
-useShare()
+// 转发（钩子必须在本文件顶层直接调用，不能封装进 utils，原因见 utils/share.ts）
+onShareAppMessage(() => ({ title: SHARE_TITLE, path: SHARE_PATH }))
+onShareTimeline(() => ({ title: SHARE_TITLE }))
 
 const activeTab = ref(0)
 
