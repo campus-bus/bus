@@ -671,6 +671,12 @@ apps/miniprogram/
     - 排查口诀：**看文件名就知道坐标系**——`public/data` 是 WGS，`apps/miniprogram/src/data` 是 GCJ。
 19. **同名站一圈过两次，禁止用 `indexOf(站名)` 定位站点**（2026-10-22）：接驳1路/2路的`军体活动中心东`、`网球场`、`激光所`在同一圈里各经过两次（去程一次、绕回来再停一次），站名完全相同。用 `indexOf(站名)` 永远只拿到**去程**那一次，本项目已因此出过三次问题：首页目的地推荐会把用户带去绕大圈的车（改用 `findBestRide()` 枚举上下车组合解决）；记录页「一键上车」（旧代码 `@tap="boardAt(stop)"` 传站名 + `indexOf`）和手动点行都会把回程上车的计时记到去程路段上（现改用 `utils/stop_seq.ts`：`findStopIndexes()` 返回**全部**站序，`nextArrivalsBySeq()` 按到站时间判断下一班是去程还是回程）。**新写任何「按站名找站」的代码，先想清楚同名站是否会出现两次；会出现就必须按站序（stopSeq）处理。**
 20. **「改了没反应」先看 `dist/dev` 时间戳，别怀疑代码**（2026-10-22）：记录页回程上车 bug 在源码 `2750ede` 已修，但开发者工具跑的是 10-20 编译的 `dist/dev`（仍是 `boardAt(stopName)` + `indexOf`），用户复测时照样复现，白折腾一轮。判别：`(Get-Item apps/miniprogram/dist/dev/mp-weixin/pages/record/record.js).LastWriteTime` 比源码旧就是产物没重建。**改完页面代码必须重建 `dist/dev`**（`npm run dev:mp-weixin` 起一次 watcher 等 `Build complete` 即可，不必常驻）；只跑过 `build:mp-weixin` 不代表开发者工具里的包更新了。
+21. **启动 dev watcher 时开发者工具会「满屏报错」，那是清空重建的时间窗，不是代码坏了**（2026-10-22）：`uni -p mp-weixin` 每次启动都会**先清空 `dist/dev/mp-weixin`** 再重建。若此时开发者工具正开着该项目，它会在那一两秒里读到「app.json 不存在」，报出一堆：
+    `Error: dist/dev/mp-weixin/app.json: 根据 project.config.json 中 miniprogramRoot 配置，在对应目录中未找到该文件` / `updateAppCode app.js Error: The file app.json doesn't exist`。
+    而且**构建完成后它不会自动恢复**，错误面板会一直留着，必须手动点「编译」或 `cli.bat open --project <apps/miniprogram绝对路径>` 才会消失。
+    因此：① 起 watcher 前先关掉项目，或起完立刻在工具里点一次「编译」；② 别在工具开着时反复重启 watcher（两个 watcher 还会互相覆盖，见踩坑 12）；③ 看到这类报错先查 `dist/dev/mp-weixin/app.json` 是否存在 + 时间戳，不要去改源码。
+    取证位置：`%LOCALAPPDATA%\微信开发者工具\User Data\<hash>\WeappLog\logs\<session>.log`（`[appservice] simulator launch failed` 就是它）。判断是否真的编译失败，只看 **vite 那侧**的 `DONE Build complete` / `[plugin:vite:vue]`，开发者工具日志里的 `timingData not found`、`ideplugin manifest` 都是内部噪音。
+22. **`apps/miniprogram/dev-build.log` 是追加写入的，末尾的错误可能是几小时前的**（2026-10-22）：该文件由 watcher 重定向产出，只 append 不截断，`Get-Content -Tail` 看到 `[plugin:vite:vue] Element is missing end tag at pages/schedule/schedule.vue:251` 时不要立刻改那个文件——先跑一次全新 `npx uni build -p mp-weixin` 复现，或直接看该条错误的时间。实际那次是 13:13 中途编辑留下的历史记录，当前源码构建完全正常。
 
 ### 位置接口申请材料（2026-10-19，`startLocationUpdate`/`onLocationChange` 重提）
 

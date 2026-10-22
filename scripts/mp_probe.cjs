@@ -58,12 +58,23 @@ function resolveAutomator() {
 
 /** 解析命令行参数 */
 function parseArgs(argv) {
-  const opts = { probe: null, expr: null, timeout: 15000, ws: 'ws://127.0.0.1:9420' }
+  const opts = {
+    probe: null,
+    expr: null,
+    timeout: 15000,
+    ws: 'ws://127.0.0.1:9420',
+    /** 先 reLaunch 到该页面再探针，例如 /pages/record/record */
+    url: null,
+    /** data 探针要取的字段（逗号分隔）；不传则只列字段名 */
+    keys: null,
+  }
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i]
     if (a === '--expr') opts.expr = argv[++i]
     else if (a === '--timeout') opts.timeout = Number(argv[++i])
     else if (a === '--ws') opts.ws = argv[++i]
+    else if (a === '--url') opts.url = argv[++i]
+    else if (a === '--keys') opts.keys = argv[++i]
     else if (!opts.probe) opts.probe = a
   }
   return opts
@@ -254,6 +265,35 @@ function probePage() {
   return 'started'
 }
 
+/** 当前页面的 data 快照（要取的字段由 Node 侧写进 storage 传入，因为 evaluate 不能带参） */
+function probePageData() {
+  const KEY = '__mp_probe_result'
+  const KEYS_KEY = '__mp_probe_keys'
+  const pages = getCurrentPages()
+  const cur = pages[pages.length - 1]
+  const out = { status: 'ok', route: cur ? cur.route : null }
+  if (cur && cur.data) {
+    const want = String((wx.getStorageSync(KEYS_KEY) || '')).trim()
+    const keys = want
+      ? want.split(',').map(function (s) { return s.trim() }).filter(Boolean)
+      : Object.keys(cur.data)
+    const data = {}
+    for (let i = 0; i < keys.length; i++) {
+      const k = keys[i]
+      const v = cur.data[k]
+      if (typeof v === 'function') { data[k] = '[function]'; continue }
+      try {
+        data[k] = v === undefined ? '[undefined]' : JSON.parse(JSON.stringify(v))
+      } catch (e) {
+        data[k] = '[unserializable]'
+      }
+    }
+    out.data = data
+  }
+  wx.setStorageSync(KEY, JSON.stringify(out))
+  return 'started'
+}
+
 const PROBES = {
   location: probeLocation,
   geo: probeGeo,
@@ -262,6 +302,9 @@ const PROBES = {
   holidays: probeHolidays,
   storage: probeStorage,
   page: probePage,
+  data: probePageData,
+  /** text 在 Node 侧用 automator 页面 API 实现（见 main），这里只占位通过校验 */
+  text: probePage,
 }
 
 /** 把自定义表达式包成探针：自动写入返回值（key 必须内联为字面量，不能用参数） */
@@ -311,7 +354,8 @@ function sleep(ms) {
 async function main() {
   const opts = parseArgs(process.argv.slice(2))
   if (!opts.probe && !opts.expr) {
-    console.error('用法: node scripts/mp_probe.cjs <location|setting|weather|holidays|storage|page|--expr "js">')
+    console.error('用法: node scripts/mp_probe.cjs <location|setting|weather|holidays|storage|page|data|--expr "js">')
+    console.error('  可选: --url /pages/xxx/xxx（先跳页）  --keys a,b,c（data 探针取哪些字段）')
     process.exit(3)
   }
 
@@ -342,6 +386,36 @@ async function main() {
     } catch (e) {
       /* 忽略 */
     }
+    // data 探针要取的字段名（evaluate 不能带参，只能先写进 storage）
+    if (opts.keys) {
+      try {
+        await mp.callWxMethod('setStorageSync', '__mp_probe_keys', opts.keys)
+      } catch (e) {
+        console.error('[警告] 写入字段清单失败: ' + e.message)
+      }
+    }
+    // 可选：先跳到目标页再探针
+    if (opts.url) {
+      await mp.reLaunch(opts.url)
+      await new Promise((r) => setTimeout(r, 1500))
+    }
+
+    // text 探针走 automator 的页面 API（script setup 的 ref 不在 page.data 上，只能读渲染结果）
+    if (opts.probe === 'text') {
+      const page = await mp.currentPage()
+      const nodes = await page.$$('view,text,button')
+      const lines = []
+      for (const n of nodes) {
+        try {
+          const t = String(await n.text()).trim()
+          if (t) lines.push(t)
+        } catch (e) {
+          /* 节点可能已失效 */
+        }
+      }
+      console.log(JSON.stringify({ status: 'ok', route: page.path, lines }, null, 2))
+      return
+    }
 
     const started = await mp.evaluate(probeFn)
     if (started !== 'started') {
@@ -360,6 +434,7 @@ async function main() {
     // 无论成功失败都必须断开，否则残留连接会拖住后续脚本
     try {
       await mp.callWxMethod('removeStorageSync', STORAGE_KEY)
+      await mp.callWxMethod('removeStorageSync', '__mp_probe_keys')
     } catch (e) {
       /* 忽略 */
     }
