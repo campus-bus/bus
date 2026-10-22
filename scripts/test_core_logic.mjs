@@ -34,13 +34,15 @@ const { toGroup, groupMembers, findBestRide } = await importSrc('station_group.t
 const { boardTierOf, isBetterBoard, compareArrivalResults, BOARD_TIER } = await importSrc('ride_rank.ts')
 const { formatWalkTimePrecise, WALK_SPEED_MPS, findNearestStops, haversineDistance } = await importSrc('geo.ts')
 const { arrivalCountdown, departureCountdown } = await importSrc('countdown.ts')
-const { findStopIndexes, stopStateOf, nextArrivalsBySeq, recommendedPass } = await importSrc('stop_seq.ts')
+const { findStopIndexes, stopStateOf, nextArrivalsBySeq, recommendedPass, collectStopArrivals } = await importSrc('stop_seq.ts')
 const { isCatchable } = await importSrc('plan_window.ts')
+const { boardingClock, calibrationRows } = await importSrc('measurement.ts')
 
 const readData = (f) => JSON.parse(fs.readFileSync(path.join(ROOT, 'public/data', f), 'utf8'))
 const departures = readData('departures.json')
 const predictions = readData('arrival_predictions.json')
 const stations = readData('stations.json')
+const routeStops = readData('route_stops.json')
 
 const predsByDep = new Map()
 for (const p of predictions) {
@@ -295,6 +297,59 @@ assert('W5 查未来日期时不受当前时间影响：早上 07:30 的班次�
   isCatchable(7 * 60 + 30, 20 * 3600, false))
 assert('W6 凌晨 00:00 查今天：当天所有班次都还没开',
   isCatchable(7 * 60 + 30, 0, true) && isCatchable(22 * 60 + 30, 0, true))
+
+// ── X. 记录页「下一班」必须按线路过滤（真实 collectStopArrivals） ──
+// 场景来源：上线前验收发现「军体活动中心东」在环线1路与接驳2路都是第 4 站，
+// 不按 routeKey 过滤会拿环线1路 07:30 那班（07:33:27）判断接驳2路的方向，
+// 而接驳2路真正下一班是 07:48 —— 差 15 分钟，用户会按错方向上车。
+console.log('\n【X. 记录页下一班按线路过滤（真实 collectStopArrivals）】')
+const jbdIdx = findStopIndexes(jb2Stops, '军体活动中心东')
+const at0700 = 7 * 3600
+const jb2Passes = nextArrivalsBySeq(
+  jbdIdx,
+  collectStopArrivals(departures, predsOf, 'JB2_NORMAL', 'weekday', '军体活动中心东'),
+  at0700,
+)
+const hx1Passes = nextArrivalsBySeq(
+  jbdIdx,
+  collectStopArrivals(departures, predsOf, 'HX1_NORMAL', 'weekday', '军体活动中心东'),
+  at0700,
+)
+const seq4 = (arr) => (arr.find((p) => p.seq === 4) || {}).etaTime
+assert('X1 接驳2路 07:00 时第 4 站下一班是 07:48:00（本线路）',
+  seq4(jb2Passes) === '07:48:00', `(实际 ${seq4(jb2Passes)})`)
+assert('X2 环线1路 07:00 时第 4 站下一班是 07:33:27（相邻线路的另一趟，证明站序会撞车）',
+  seq4(hx1Passes) === '07:33:27', `(实际 ${seq4(hx1Passes)})`)
+assert('X3 两条线路的结果必须不同（若相同说明过滤失效）',
+  seq4(jb2Passes) !== seq4(hx1Passes))
+assert('X4 站点序列只含本线路的班次（不混入环线1路/就餐专线）',
+  collectStopArrivals(departures, predsOf, 'JB2_NORMAL', 'weekday', '军体活动中心东')
+    .every((p) => {
+      const dep = departures.find((d) => d.recordId === p.departureId)
+      return dep && dep.routeKey === 'JB2_NORMAL'
+    }))
+
+// ── Y. 复制校准文本必须用上车时刻，而不是提交时刻（真实 calibrationRows） ──
+// 场景来源：10:00 上车、10:15 提交，旧实现输出 10:15，回溯班次会对应到错误的那一趟。
+console.log('\n【Y. 校准文本时刻（真实 boardingClock / calibrationRows）】')
+const at10 = new Date(2026, 9, 22, 10, 0, 0).getTime()
+const at1015 = new Date(2026, 9, 22, 10, 15, 0).getTime()
+const recFresh = {
+  date: '2026-10-22', route: '接驳2路', routeKey: 'JB2_NORMAL',
+  depart_time: '10:00', created_at: at1015,
+  segments: [{ from: '研究生宿舍楼', to: '一食堂', seconds: 95, fromSeq: 1, toSeq: 2 }],
+}
+const lineFresh = calibrationRows([recFresh])[0]
+assert('Y1 10:00 上车 / 10:15 提交 → 文本写 10:00',
+  lineFresh.includes(' 10:00 ') && !lineFresh.includes('10:15'), `(${lineFresh})`)
+assert('Y2 保留站序，便于判断同名站是哪一段',
+  lineFresh.includes('研究生宿舍楼#1→一食堂#2'))
+assert('Y3 历史记录没有 depart_time 时回退到提交时刻（不编造时间）',
+  boardingClock({ date: '2026-10-22', route: '环线1路', created_at: at1015, segments: [] }) === '10:15')
+assert('Y4 兼容 "7:30" 这类未补零的历史写法',
+  boardingClock({ date: '2026-10-22', route: '环线1路', depart_time: '7:30', created_at: at1015, segments: [] }) === '07:30')
+assert('Y5 历史卡片与复制文本用同一个上车时刻（不会一处一个时间）',
+  boardingClock(recFresh) === '10:00' && lineFresh.includes(boardingClock(recFresh)))
 
 console.log('\n══════════════════════════════')
 console.log(`断言结果: 通过 ${pass} / 失败 ${fail} ${fail === 0 ? '✅ 全部通过（测试的就是线上实现）' : '❌ 存在失败项'}`)

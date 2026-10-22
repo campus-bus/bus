@@ -54,7 +54,8 @@ export interface ArrivalSlice {
   arrivalTime: string
 }
 
-/** 同一站名某一次经过的候选上车位置 */
+/**
+ * 同一站名某一次经过的候选上车位置 */
 export interface PassCandidate {
   /** 行索引（0 起） */
   idx: number
@@ -115,6 +116,37 @@ export function nextArrivalsBySeq(
       passed: !bestFuture,
     }
   })
+}
+
+/**
+ * 收集某条线路某站名的全部到站预测
+ *
+ * **必须按 routeKey 过滤**：同一站名在不同线路的站序可能恰好相同，
+ * 例如「军体活动中心东」在环线1路与接驳2路都是第 4 站。若只按日期类型遍历全部班次，
+ * 选中接驳2路时会拿环线1路 07:30 那班的到站时间（07:33:27）去判断本站方向，
+ * 而接驳2路真正下一班是 07:48 —— 两者差 15 分钟，「下一班」标记会指错方向，
+ * 用户按它上车整条计时链都会记到错误路段。
+ *
+ * @param departures 全部班次（只用到 recordId / routeKey / dateType）
+ * @param predictionsOf 取某班次预测记录（stopName 已在内部过滤）
+ */
+export function collectStopArrivals<T extends { stopName: string }>(
+  departures: Array<{ recordId: string; routeKey?: string; dateType: string }>,
+  predictionsOf: (recordId: string) => T[],
+  routeKey: string,
+  dateType: string,
+  stopName: string,
+): T[] {
+  const out: T[] = []
+  for (const dep of departures) {
+    if (dep.dateType !== dateType) continue
+    // 少了这一行，同名站会串到别的线路的时刻上
+    if (dep.routeKey !== routeKey) continue
+    for (const p of predictionsOf(dep.recordId)) {
+      if (p.stopName === stopName) out.push(p)
+    }
+  }
+  return out
 }
 
 /**

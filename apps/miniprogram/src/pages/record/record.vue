@@ -4,9 +4,10 @@ import { useUploadStore } from '@/stores/upload'
 import { useScheduleStore } from '@/stores/schedule'
 import { useLocationStore } from '@/stores/location'
 import { findNearestStop } from '@/utils/geo'
-import { findStopIndexes, stopStateOf, nextArrivalsBySeq, recommendedPass } from '@/utils/stop_seq'
+import { findStopIndexes, stopStateOf, nextArrivalsBySeq, recommendedPass, collectStopArrivals } from '@/utils/stop_seq'
 import { getDateType, getSecondsSinceMidnight } from '@/utils/datetime'
 import { getNow } from '@/utils/time'
+import { clockOf, boardingClock } from '@/utils/measurement'
 import { isDevUnlocked } from '@/utils/dev'
 import { onShow, onLoad, onHide } from '@dcloudio/uni-app'
 
@@ -23,7 +24,13 @@ const locationStore = useLocationStore()
 
 const tabActive = ref(0)
 const nickInput = ref(uploadStore.nickname)
-const selectedRoute = ref('环线1路')
+/**
+ * 线路选择必须在页面重建时从 store 恢复
+ *
+ * 记录页是 navigateTo 打开的普通页，返回即销毁。若回到「环线1路」默认值，
+ * 而 store 里存的是接驳2路的计时数据，站序和站名会整体错位。
+ */
+const selectedRoute = ref(uploadStore.recordingRoute || '环线1路')
 
 const routeToKey: Record<string, string> = {
   '环线1路': 'HX1_NORMAL', '接驳1路': 'JB1_NORMAL', '接驳2路': 'JB2_NORMAL', '就餐专线': 'HX1_DINING',
@@ -79,14 +86,15 @@ const nearestPasses = computed(() => {
   const near = nearestRouteStop.value
   if (!near) return []
   const name = near.name
-  const dt = dateType.value
-  const arrivals: Array<{ stopSeq: number; arrivalMinutes: number; arrivalTime: string }> = []
-  for (const dep of scheduleStore.departures) {
-    if (dep.dateType !== dt) continue
-    for (const p of scheduleStore.getPredictions(dep.recordId)) {
-      if (p.stopName === name) arrivals.push(p)
-    }
-  }
+  // 必须按当前线路过滤：同名站（如「军体活动中心东」）在环线1路与接驳2路都是第 4 站，
+  // 不按 routeKey 过滤就会拿别的线路的到站时间去标「下一班」，方向判断随之出错
+  const arrivals = collectStopArrivals(
+    scheduleStore.departures,
+    (recordId) => scheduleStore.getPredictions(recordId),
+    routeToKey[selectedRoute.value],
+    dateType.value,
+    name,
+  )
   return nextArrivalsBySeq(near.idxs, arrivals, secondsNow.value)
 })
 
@@ -106,9 +114,16 @@ const singlePassEta = computed(() => {
   return p ? etaLabel(p) : ''
 })
 
-const boardIdx = ref(-1)
+/**
+ * 上车站索引：**存在 store 里**，页面重建后自动恢复
+ *
+ * 记录页是 navigateTo 打开的普通页，按返回键即销毁。以前这个索引是页面级 ref，
+ * 重新进入归 -1，而 store 的段数据还在 → 看不到计时进度与提交入口，
+ * 再点「上车」还会把已采集的段清空。
+ */
+const boardIdx = computed(() => uploadStore.boardIdx)
 const recordedCount = computed(() => uploadStore.recordedSegments.length)
-const timingActive = computed(() => boardIdx.value >= 0)
+const timingActive = computed(() => uploadStore.timingActive)
 const allRecorded = computed(() => {
   if (boardIdx.value < 0) return false
   return recordedCount.value >= routeStops.value.length - 1 - boardIdx.value
@@ -127,8 +142,8 @@ function saveNick() { uploadStore.saveNickname(nickInput.value) }
 function boardAt(idx: number) {
   const stopName = routeStops.value[idx]
   if (!stopName || idx >= routeStops.value.length - 1) return
-  boardIdx.value = idx
-  uploadStore.startRecordingAt(stopName, idx + 1)
+  // 上车站索引与线路一起写进 store，页面重建后才能接着原来的计时
+  uploadStore.startRecordingAt(stopName, idx + 1, selectedRoute.value)
   // 同名站在一圈内出现两次时，站名不足以让用户确认自己选对了哪一趟
   uni.showToast({ title: `已上车：${stopName}（第 ${idx + 1} 站）`, icon: 'none' })
 }
@@ -151,7 +166,6 @@ function reselectBoarding() {
     success: (res) => {
       if (!res.confirm) return
       uploadStore.resetRecording()
-      boardIdx.value = -1
     },
   })
 }
@@ -176,11 +190,6 @@ function stopState(idx: number): number {
  * 缓存成数组后模板只做取值，也便于给整行加高亮，让「到底选了哪一站」一眼可见。
  */
 const stopStates = computed(() => routeStops.value.map((_, idx) => stopState(idx)))
-
-/** store 被重置（切线路、提交完成）时，页面高亮必须跟着清掉，否则会停在旧的站序上 */
-watch(() => uploadStore.timingActive, (active) => {
-  if (!active) boardIdx.value = -1
-})
 
 function getSegmentSeconds(idx: number): string {
   const segIdx = idx - boardIdx.value - 1
@@ -207,12 +216,11 @@ function handleSubmit() {
       const ok = await uploadStore.submit(
         selectedRoute.value,
         '',
-        formatTime(uploadStore.boardingTime),
+        clockOf(uploadStore.boardingTime),
         routeToKey[selectedRoute.value] || '',
       )
       if (ok) {
         uni.showToast({ title: '提交成功！', icon: 'success' })
-        boardIdx.value = -1
       } else {
         uni.showToast({ title: uploadStore.nickname ? '提交失败，请重试' : '请先输入昵称', icon: 'none' })
       }
@@ -259,16 +267,12 @@ function pickRoute(r: string) {
 }
 function applyRoute(r: string) {
   selectedRoute.value = r
-  boardIdx.value = -1
+  // resetRecording 会一并清掉 store 里的上车站索引与记录中的线路
   uploadStore.resetRecording()
 }
 
 function formatSegs(segs: Array<{ from: string; to: string; seconds: number }>) {
   return segs.map(s => `${s.from}→${s.seconds}s→${s.to}`).join(' ')
-}
-function formatTime(ts: number) {
-  const d = new Date(ts)
-  return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
 }
 </script>
 
@@ -367,7 +371,7 @@ function formatTime(ts: number) {
       <view v-else-if="uploadStore.history.length === 0" class="hint">暂无记录</view>
       <view v-for="rec in uploadStore.history" :key="rec.id" class="history-card">
         <view class="history-header">
-          <text>{{ rec.date }} {{ formatTime(rec.created_at) }} {{ rec.route }}</text>
+          <text>{{ rec.date }} {{ boardingClock(rec) }} 上车 {{ rec.route }}</text>
           <text class="delete-btn" @tap="handleDelete(rec.id)">撤销</text>
         </view>
         <view class="history-segs">{{ formatSegs(rec.segments) }}</view>

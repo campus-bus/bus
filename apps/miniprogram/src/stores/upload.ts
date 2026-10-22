@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { localDateStr } from '@/utils/datetime'
+import { calibrationRows, type MeasurementSlice } from '@/utils/measurement'
 
 export interface TimeSegment {
   from: string
@@ -61,7 +62,20 @@ export const useUploadStore = defineStore('upload', () => {
   const recordedSegments = ref<TimeSegment[]>([])
   const currentFromStop = ref('')
   const segmentSeconds = ref<number[]>([])
-  const timingActive = ref(false)
+
+  /**
+   * 当前计时的上车站索引（0 起，-1 表示尚未上车）
+   *
+   * 必须放在 store 而不是页面里：记录页是 navigateTo 打开的普通页，
+   * 按返回键就销毁。以前这个索引只存在页面自己的 ref 中，重新进入时归 -1，
+   * 而 store 里的段数据还在 → 页面看不到计时进度、也看不到提交入口，
+   * 再点一次「上车」还会把已采集的段清空（真实采样十几分钟全部作废）。
+   */
+  const boardIdx = ref(-1)
+  /** 本次计时所属的线路名（记录页线路选择也是页面级 ref，重进会丢，一起存这里） */
+  const recordingRoute = ref('')
+  /** 是否正在计时：由 boardIdx 派生，保证两者不可能不一致 */
+  const timingActive = computed(() => boardIdx.value >= 0)
 
   /** 当前计时的起点站序（从 1 起），与站名一起记录，避免同名站错位 */
   const currentFromSeq = ref(0)
@@ -71,10 +85,11 @@ export const useUploadStore = defineStore('upload', () => {
     uni.setStorageSync('bus_nickname', name)
   }
 
-  function startRecordingAt(stopName: string, stopSeq = 0) {
+  function startRecordingAt(stopName: string, stopSeq = 0, route = '') {
     recordedSegments.value = []
     segmentSeconds.value = []
-    timingActive.value = true
+    boardIdx.value = stopSeq > 0 ? stopSeq - 1 : -1
+    recordingRoute.value = route
     currentFromStop.value = stopName
     currentFromSeq.value = stopSeq
     boardingTime.value = Date.now()
@@ -112,7 +127,8 @@ export const useUploadStore = defineStore('upload', () => {
     segmentSeconds.value = []
     currentFromStop.value = ''
     currentFromSeq.value = 0
-    timingActive.value = false
+    boardIdx.value = -1
+    recordingRoute.value = ''
   }
 
   /** 保存到本机；返回是否成功 */
@@ -162,23 +178,14 @@ export const useUploadStore = defineStore('upload', () => {
   }
 
   /**
-   * 生成可直接粘贴给管理员做校准的纯文本（每行一段：日期 线路 起点→终点 秒数）
-   * 用户量少时比任何云端汇总都实用，也便于人工核对异常值。
+   * 生成可直接粘贴给管理员做校准的纯文本（每行一段：日期 上车时刻 线路 起点→终点 秒数）
+   *
+   * 时刻必须用**上车时刻**而不是提交时刻：10:00 上车、10:15 提交的记录
+   * 若输出 10:15，回溯班次时会对应到错误的那一趟。格式化逻辑在 utils/measurement.ts
+   * （纯函数，可被 Node 直接测试）。
    */
   function buildCalibrationText(): string {
-    const rows: string[] = []
-    for (const rec of readAll()) {
-      const d = new Date(rec.created_at)
-      const hh = String(d.getHours()).padStart(2, '0')
-      const mm = String(d.getMinutes()).padStart(2, '0')
-      const routeLabel = rec.routeKey ? `${rec.route}(${rec.routeKey})` : rec.route
-      for (const seg of rec.segments) {
-        // 站序只在有值时拼上：接驳环线同名站一圈过两次，没有站序无法判断是哪一段
-        const from = seg.fromSeq ? `${seg.from}#${seg.fromSeq}` : seg.from
-        const to = seg.toSeq ? `${seg.to}#${seg.toSeq}` : seg.to
-        rows.push(`${rec.date} ${hh}:${mm} ${routeLabel} ${from}→${to} ${seg.seconds}s`)
-      }
-    }
+    const rows = calibrationRows(readAll() as MeasurementSlice[])
     return rows.length ? rows.join('\n') : '暂无记录'
   }
 
@@ -193,7 +200,8 @@ export const useUploadStore = defineStore('upload', () => {
   return {
     nickname, saveNickname,
     uploading, history, loadingHistory,
-    startTime, boardingTime, recordedSegments, currentFromStop, currentFromSeq, segmentSeconds, timingActive,
+    startTime, boardingTime, recordedSegments, currentFromStop, currentFromSeq, segmentSeconds,
+    boardIdx, recordingRoute, timingActive,
     startRecordingAt, recordSegment, undoLastSegment, resetRecording,
     submit, loadHistory, deleteRecord,
     buildCalibrationText, copyCalibrationText,
