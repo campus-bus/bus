@@ -12,3 +12,6 @@ apps/miniprogram/.probe/
 # 接口权限申请的一次性材料：截图只提交给微信审核，不进版本库（本机保留）。
 # 需要时用 node scripts/capture_location_permission_shots.cjs 重新生成。
 apps/miniprogram/docs/接口申请截图*/
+
+# 送外部大模型审查用的生成产物（node scripts/bundle_for_review.cjs）
+review/
