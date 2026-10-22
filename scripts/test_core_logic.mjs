@@ -34,7 +34,7 @@ const { toGroup, groupMembers, findBestRide } = await importSrc('station_group.t
 const { boardTierOf, isBetterBoard, compareArrivalResults, BOARD_TIER } = await importSrc('ride_rank.ts')
 const { formatWalkTimePrecise, WALK_SPEED_MPS, findNearestStops, haversineDistance } = await importSrc('geo.ts')
 const { arrivalCountdown, departureCountdown } = await importSrc('countdown.ts')
-const { findStopIndexes, stopStateOf } = await importSrc('stop_seq.ts')
+const { findStopIndexes, stopStateOf, nextArrivalsBySeq, recommendedPass } = await importSrc('stop_seq.ts')
 
 const readData = (f) => JSON.parse(fs.readFileSync(path.join(ROOT, 'public/data', f), 'utf8'))
 const departures = readData('departures.json')
@@ -226,6 +226,58 @@ const segs = [15, 16].map((toIdx) => ({
 assert('R11 回程上车的段序号为 15→16→17',
   segs[0].fromSeq === 15 && segs[0].toSeq === 16 && segs[1].fromSeq === 16 && segs[1].toSeq === 17,
   `(${segs.map((s) => `${s.fromSeq}→${s.toSeq}`).join(' ')}，上车站索引 ${boardIdxR})`)
+
+console.log('\n【T. 一键上车「下一班是哪一趟」（真实 nextArrivalsBySeq / recommendedPass）】')
+// 需求（用户提出）：同一站名一圈过两次时物理位置相同，靠定位分不出面前这趟是去程还是回程；
+// 但发车时刻表确定，比较「现在」与各站序的预计到站时间即可判断。
+const arrivalsOf = (routeKey, name) => {
+  const out = []
+  for (const d of departures) {
+    if (d.dateType !== 'weekday' || d.routeKey !== routeKey) continue
+    for (const p of predsOf(d.recordId)) if (p.stopName === name) out.push(p)
+  }
+  return out
+}
+const passesAt = (routeKey, name, hh, mm) => {
+  const idxs = findStopIndexes(stopsOf(routeKey), name)
+  const ps = nextArrivalsBySeq(idxs, arrivalsOf(routeKey, name), hh * 3600 + mm * 60)
+  return { ps, rec: recommendedPass(ps) }
+}
+
+// JB2 军体活动中心东：seq4（去程）、seq12（回程）
+let t = passesAt('JB2_NORMAL', '军体活动中心东', 16, 30)
+assert('T1 16:30 时下一班走回程 seq12（16:35），而不是去程 seq4（16:48）',
+  t.rec === 11 && t.ps.find((p) => p.seq === 12).etaSeconds < t.ps.find((p) => p.seq === 4).etaSeconds,
+  `(回程 ${t.ps.find((p) => p.seq === 12).etaTime} / 去程 ${t.ps.find((p) => p.seq === 4).etaTime} → 推荐 seq${t.rec + 1})`)
+
+t = passesAt('JB2_NORMAL', '军体活动中心东', 16, 0)
+assert('T2 16:00 时下一班走去程 seq4（16:08），而不是回程 seq12（16:15）',
+  t.rec === 3, `(推荐 seq${t.rec + 1}，去程 ${t.ps.find((p) => p.seq === 4).etaTime})`)
+
+t = passesAt('JB2_NORMAL', '军体活动中心东', 17, 0)
+assert('T3 17:00 时又轮到去程 seq4（17:08）',
+  t.rec === 3, `(推荐 seq${t.rec + 1})`)
+
+assert('T4 推荐结果始终是「预计到站最近且未过站」的那一次',
+  [0, 15, 30, 45].every((mm) => {
+    const r = passesAt('JB2_NORMAL', '军体活动中心东', 16, mm)
+    if (r.rec === null) return true
+    const rec = r.ps.find((p) => p.idx === r.rec)
+    return r.ps.every((p) => p.etaSeconds === null || p.etaSeconds < 0 || p.etaSeconds >= rec.etaSeconds)
+  }))
+
+// JB1 军体东：seq7（去程）、seq15（回程）
+t = passesAt('JB1_NORMAL', '军体活动中心东', 16, 30)
+assert('T5 JB1 16:30 下一班走去程 seq7', t.rec === 6, `(推荐 seq${t.rec + 1}，${t.ps.find((p) => p.seq === 7).etaTime})`)
+
+const both = passesAt('JB2_NORMAL', '军体活动中心东', 16, 30).ps
+assert('T6 两个候选都给出了到站时刻（界面可显示「第4站 16:48」这种）',
+  both.length === 2 && both.every((p) => typeof p.etaTime === 'string' && p.etaSeconds !== null))
+assert('T7 深夜无车时返回 null（不替用户猜，界面并列展示）',
+  recommendedPass(nextArrivalsBySeq([3, 11], arrivalsOf('JB2_NORMAL', '军体活动中心东'), 23 * 3600 + 50 * 60)) === null)
+assert('T8 刚过站的班次标为 passed（用于「刚过站」提示）',
+  nextArrivalsBySeq([3], arrivalsOf('JB2_NORMAL', '军体活动中心东'), 16 * 3600 + 30 * 60 + 0)
+    .every((p) => typeof p.passed === 'boolean'))
 
 console.log('\n══════════════════════════════')
 console.log(`断言结果: 通过 ${pass} / 失败 ${fail} ${fail === 0 ? '✅ 全部通过（测试的就是线上实现）' : '❌ 存在失败项'}`)

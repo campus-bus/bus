@@ -1,12 +1,14 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onUnmounted } from 'vue'
 import { useUploadStore } from '@/stores/upload'
 import { useScheduleStore } from '@/stores/schedule'
 import { useLocationStore } from '@/stores/location'
 import { findNearestStop } from '@/utils/geo'
-import { findStopIndexes, stopStateOf } from '@/utils/stop_seq'
+import { findStopIndexes, stopStateOf, nextArrivalsBySeq, recommendedPass } from '@/utils/stop_seq'
+import { getDateType, getSecondsSinceMidnight } from '@/utils/datetime'
+import { getNow } from '@/utils/time'
 import { isDevUnlocked } from '@/utils/dev'
-import { onShow, onLoad } from '@dcloudio/uni-app'
+import { onShow, onLoad, onHide } from '@dcloudio/uni-app'
 
 // 开发者专属页面：未解锁时直接退回首页，避免普通用户误入
 onLoad(() => {
@@ -57,6 +59,53 @@ const nearestRouteStop = computed(() => {
   return { name, idxs }
 })
 
+// ─── 「下一班是哪一趟」判断 ───
+// 同一站名一圈过两次时物理位置完全相同，光靠定位分不出用户面前这趟是去程还是回程。
+// 但时刻表是确定的：比较「现在」与各站序的预计到站时间，就知道下一辆到站的车走哪一趟。
+const nowTick = ref(0)
+const secondsNow = computed(() => { void nowTick.value; return getSecondsSinceMidnight(getNow()) })
+const dateType = computed(() => { void nowTick.value; return getDateType(getNow()) })
+
+let clockTimer: ReturnType<typeof setInterval> | null = null
+function startClock() { if (!clockTimer) clockTimer = setInterval(() => { nowTick.value++ }, 30000) }
+function stopClock() { if (clockTimer) { clearInterval(clockTimer); clockTimer = null } }
+
+/**
+ * 该站名各次经过的「下一次到站」
+ *
+ * 只取当天日期类型的班次（周末/节假日目前无车，结果为空 → 界面不猜，让用户选）。
+ */
+const nearestPasses = computed(() => {
+  const near = nearestRouteStop.value
+  if (!near) return []
+  const name = near.name
+  const dt = dateType.value
+  const arrivals: Array<{ stopSeq: number; arrivalMinutes: number; arrivalTime: string }> = []
+  for (const dep of scheduleStore.departures) {
+    if (dep.dateType !== dt) continue
+    for (const p of scheduleStore.getPredictions(dep.recordId)) {
+      if (p.stopName === name) arrivals.push(p)
+    }
+  }
+  return nextArrivalsBySeq(near.idxs, arrivals, secondsNow.value)
+})
+
+/** 建议上车的站序索引；null 表示不替用户猜（都过站 / 无预测） */
+const recommendedIdx = computed(() => recommendedPass(nearestPasses.value))
+
+function etaLabel(p: { etaSeconds: number | null; etaTime: string | null; passed: boolean }): string {
+  if (p.etaSeconds === null || !p.etaTime) return '暂无班次'
+  if (p.passed) return '刚过站'
+  const min = Math.max(0, Math.round(p.etaSeconds / 60))
+  return min <= 0 ? `${p.etaTime} 到站` : `${min} 分钟后到站`
+}
+
+/** 站名只经过一次时的到站提示（模板里不写内联对象，避免编译出奇怪的表达式） */
+const singlePassEta = computed(() => {
+  const p = nearestPasses.value[0]
+  return p ? etaLabel(p) : ''
+})
+
 const boardIdx = ref(-1)
 const recordedCount = computed(() => uploadStore.recordedSegments.length)
 const timingActive = computed(() => boardIdx.value >= 0)
@@ -82,6 +131,29 @@ function boardAt(idx: number) {
   uploadStore.startRecordingAt(stopName, idx + 1)
   // 同名站在一圈内出现两次时，站名不足以让用户确认自己选对了哪一趟
   uni.showToast({ title: `已上车：${stopName}（第 ${idx + 1} 站）`, icon: 'none' })
+}
+
+/**
+ * 计时已经开始后重新选上车站
+ *
+ * 用途：上了车才发现选错站序（同一站名一圈过两次时很容易选成去程），
+ * 或临时只想补测后半段。计时中列表里不显示「上车」按钮（避免误触清空），
+ * 所以这里给一个显式入口，并明确告知会清空已记录段。
+ */
+function reselectBoarding() {
+  uni.showModal({
+    title: '重新选择上车站',
+    content: recordedCount.value > 0
+      ? `将清空已记录的 ${recordedCount.value} 段，重新从你选的那一站开始计时。`
+      : '重新从你选的那一站开始计时。',
+    confirmText: '重新选择',
+    confirmColor: '#DC2626',
+    success: (res) => {
+      if (!res.confirm) return
+      uploadStore.resetRecording()
+      boardIdx.value = -1
+    },
+  })
 }
 
 function tapStop(idx: number) {
@@ -180,7 +252,12 @@ function handleDelete(id: string) {
 }
 
 watch(tabActive, (v) => { if (v === 1) uploadStore.loadHistory() })
-onShow(() => { if (tabActive.value === 1) uploadStore.loadHistory() })
+onShow(() => {
+  startClock()
+  if (tabActive.value === 1) uploadStore.loadHistory()
+})
+onHide(stopClock)
+onUnmounted(stopClock)
 
 /**
  * 切换线路
@@ -240,8 +317,8 @@ function formatTime(ts: number) {
       </view>
 
       <view v-if="routeStops.length">
-        <!-- 最近站卡片：站名只经过一次时一键上车；经过多次时必须让用户选，
-             否则会默认选中去程那一次，把回程上车的计时记到错误路段上 -->
+        <!-- 最近站卡片：站名只经过一次时一键上车；经过多次时靠「下一班到站时间」
+             判断用户面前这趟走的是去程还是回程，并让用户确认 -->
         <view v-if="nearestRouteStop && !timingActive" class="nearest-card">
           <view class="nearest-main">
             <image class="nearest-icon" src="/static/icons/ui/locate.png" mode="aspectFit" />
@@ -249,22 +326,33 @@ function formatTime(ts: number) {
           </view>
           <template v-if="nearestRouteStop.idxs.length === 1">
             <view class="nearest-btns">
-              <view class="nearest-btn" @tap="boardAt(nearestRouteStop.idxs[0])">点此上车</view>
+              <view class="nearest-btn" @tap="boardAt(nearestRouteStop.idxs[0])">
+                点此上车<text class="nearest-eta">{{ singlePassEta }}</text>
+              </view>
             </view>
           </template>
           <template v-else>
             <text class="nearest-hint">
-              这一站在一圈里经过 {{ nearestRouteStop.idxs.length }} 次，请按你上的那趟车选站序
+              这一站在一圈里经过 {{ nearestRouteStop.idxs.length }} 次（去程、回程各一次）。
+              下面按「下一班到站」标出的是这一趟车的路线方向，请点你要上的那一站：
             </text>
             <view class="nearest-btns">
               <view
-                v-for="i in nearestRouteStop.idxs" :key="i"
-                class="nearest-btn" @tap="boardAt(i)"
-              >第 {{ i + 1 }} 站</view>
+                v-for="p in nearestPasses" :key="p.idx"
+                class="nearest-btn"
+                :class="{ recommended: p.idx === recommendedIdx, faded: p.passed }"
+                @tap="boardAt(p.idx)"
+              >
+                第 {{ p.seq }} 站<text class="nearest-eta">{{ etaLabel(p) }}</text>
+                <text v-if="p.idx === recommendedIdx" class="nearest-badge">下一班</text>
+              </view>
             </view>
           </template>
         </view>
-        <view class="stops-title">{{ timingActive ? '到站请点「计时」' : '选择上车站点' }}</view>
+        <view class="stops-head">
+          <text class="stops-title">{{ timingActive ? '到站请点「计时」' : '选择上车站点' }}</text>
+          <text v-if="timingActive" class="reselect-link" @tap="reselectBoarding">改上车站</text>
+        </view>
 
         <view
           v-for="(stop, idx) in routeStops" :key="idx"
@@ -338,10 +426,22 @@ function formatTime(ts: number) {
 .nearest-hint { font-size: 22rpx; line-height: 1.5; opacity: 0.85; }
 .nearest-btns { display: flex; flex-wrap: wrap; gap: 12rpx; }
 .nearest-btn {
-  background: var(--color-primary); color: #fff; font-size: 24rpx;
-  padding: 10rpx 26rpx; border-radius: 999rpx;
+  display: flex; align-items: center; gap: 8rpx;
+  background: var(--color-card); color: var(--color-primary); border: 1rpx solid var(--color-primary);
+  font-size: 24rpx; padding: 10rpx 20rpx; border-radius: 999rpx;
 }
-.stops-title { font-size: 28rpx; font-weight: 600; margin-bottom: 10rpx; }
+/* 下一班到站的那一趟：实心高亮，避免用户在两行同名站之间犹豫 */
+.nearest-btn.recommended { background: var(--color-primary); color: #fff; }
+.nearest-btn.recommended .nearest-eta { color: rgba(255, 255, 255, 0.85); }
+.nearest-btn.faded { opacity: 0.5; }
+.nearest-eta { font-size: 20rpx; opacity: 0.85; }
+.nearest-badge {
+  font-size: 18rpx; padding: 0 8rpx; border-radius: 6rpx;
+  background: var(--color-warning); color: #fff;
+}
+.stops-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10rpx; }
+.reselect-link { font-size: 24rpx; color: var(--color-primary); }
+.stops-title { font-size: 28rpx; font-weight: 600; }
 
 .stop-row { display: flex; align-items: center; gap: 16rpx; padding: 14rpx 0; border-bottom: 1rpx solid var(--color-divider); }
 /* 整行高亮：重复站名（军体东/网球场/激光所一圈过两次）时，只靠小圆点看不出选中了哪一趟 */
