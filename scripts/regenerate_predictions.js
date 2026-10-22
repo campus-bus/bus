@@ -79,16 +79,18 @@ for (const dep of departures) {
 
 console.log('\n📊 生成预测记录数: ' + predictions.length);
 
-// 验证
-const hx3nPreds = predictions.filter(p => p.routeKey === 'HX3_NORMAL');
-const hx3gPreds = predictions.filter(p => p.routeKey === 'HX3_GAOCHAO');
-const sample = hx3nPreds.filter(p => p.departureId === departures.find(d => d.routeKey === 'HX3_NORMAL')?.recordId);
-console.log('\nHX3_NORMAL 样本班次:');
-sample.forEach(p => console.log('  seq=' + p.stopSeq + ' ' + p.stopName + ' at ' + p.arrivalTime));
-
-const gSample = hx3gPreds.filter(p => p.departureId === departures.find(d => d.routeKey === 'HX3_GAOCHAO')?.recordId);
-console.log('\nHX3_GAOCHAO 样本班次:');
-gSample.forEach(p => console.log('  seq=' + p.stopSeq + ' ' + p.stopName + ' at ' + p.arrivalTime));
+// 抽样打印：自动取数据里实际存在的路线，避免写死已下线路线后输出空样本
+// （2026-10-18 原环2/环3 已下线，写死 routeKey 会一直打印「样本班次:」后面空空如也）
+const routeKeys = [...new Set(departures.map((d) => d.routeKey))]
+for (const key of routeKeys) {
+  const first = departures.find((d) => d.routeKey === key)
+  if (!first) continue
+  const sample = predictions
+    .filter((p) => p.departureId === first.recordId)
+    .sort((a, b) => a.stopSeq - b.stopSeq)
+  console.log(`\n${key} 样本班次（${first.departureTime} 发车，${sample.length} 站）:`)
+  sample.forEach((p) => console.log('  seq=' + p.stopSeq + ' ' + p.stopName + ' at ' + p.arrivalTime))
+}
 
 // 保存
 fs.writeFileSync(

@@ -50,8 +50,10 @@ const SKIP_FILES = new Set(['dev-build.log', 'project.private.config.json'])
 const PIPELINE = [
   { from: 'scripts/sync_miniprogram_data.js', to: '_upstream_data/scripts/sync_miniprogram_data.js' },
   { from: 'scripts/lib/coord.js', to: '_upstream_data/scripts/lib/coord.js' },
+  { from: 'scripts/check_coord.js', to: '_upstream_data/scripts/check_coord.js' },
   { from: 'scripts/regenerate_predictions.js', to: '_upstream_data/scripts/regenerate_predictions.js' },
   { from: 'scripts/test_scenarios.cjs', to: '_upstream_data/scripts/test_scenarios.cjs' },
+  { from: 'scripts/test_core_logic.mjs', to: '_upstream_data/scripts/test_core_logic.mjs' },
   { from: 'scripts/lib/data_pipeline_readme.md', to: '_upstream_data/README.md' },
 ]
 /** 源数据目录里只要 JSON（卫星底图 JPEG 是 H5 专用，1.5MB 且与小程序无关） */

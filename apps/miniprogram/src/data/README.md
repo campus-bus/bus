@@ -7,7 +7,7 @@
 | 数据来源 | `public/data/*.json`（WGS-84） |
 | 本目录坐标 | **GCJ-02**（同步时由脚本转换） |
 | 为什么转 | 微信 `wx.onLocationChange`、腾讯 `<map>`、腾讯 LBS 只认 GCJ-02 |
-| 转换实现 | `scripts/lib/coord.js`（与 `src/utils/geo.ts` 的 `wgs84ToGcj02` 算法一致） |
+| 转换实现 | `scripts/lib/coord.js`（构建期唯一实现，运行期零转换） |
 | 含坐标的文件 | `stations.json`、`route_stops.json`、`route_paths.json` |
 
 因此小程序运行期**不需要任何坐标转换**：定位、站点、路线、地图渲染、天气请求全部是 GCJ-02。
@@ -22,4 +22,5 @@
 
 ```bash
 node scripts/sync_miniprogram_data.js
+node scripts/check_coord.js   # 锚点快照 + 370 个坐标全量比对
 ```

@@ -567,6 +567,9 @@ function onRegionChange(e: {
             <view class="panel-info">
               <text class="panel-time">{{ item.pred.arrivalTime }}</text>
               <text :class="etaClassOf(stopEta(item).status)">{{ stopEta(item).label }}</text>
+              <!-- 回程到站（本班车回到起点）保留显示，但必须说清不能在此上车，
+                   否则用户看到「还有 3 分钟到站」会以为可以坐 -->
+              <text v-if="item.pred.isReturnStop" class="return-tag">本班终点 · 不能在此上车</text>
               <view class="panel-note">
                 <text class="panel-note-text">{{ item.departure.departureTime }} 发车 ·</text>
                 <text :class="item.departure.departureMinutes * 60 <= secondsNow ? 'departed' : 'not-departed'">
@@ -643,4 +646,9 @@ function onRegionChange(e: {
 .panel-note .not-departed { font-size: 20rpx; color: var(--color-danger); }
 /* 面板宽度有限，倒计时字号收到 24rpx 并允许省略 */
 .panel-info .eta { font-size: 24rpx; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+/* 回程到站（本班终点）标识：面板右对齐，所以自己也靠右 */
+.return-tag {
+  font-size: 19rpx; color: var(--color-warning-text); background: var(--color-warning-soft);
+  border-radius: 6rpx; padding: 2rpx 10rpx; white-space: nowrap;
+}
 </style>

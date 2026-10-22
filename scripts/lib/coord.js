@@ -1,15 +1,18 @@
 /**
  * WGS-84 → GCJ-02 转换（构建期专用）
  *
- * 为什么脚本里要单独实现一份：
- * `src/utils/geo.ts` 是 TypeScript，Node 脚本无法直接 import；
- * 而小程序运行期已经不需要转换（数据在同步阶段就转好了），
- * 所以这里作为「构建期唯一实现」，算法与 `src/utils/geo.ts` 的
- * `wgs84ToGcj02` 逐行一致。
+ * 这是**构建期唯一实现**：小程序运行期不需要转换（数据在同步阶段就转好了），
+ * 所以不要再去找「另一份要保持一致」的副本——曾经那份在 PWA 的
+ * `src/utils/geo.ts` 里，但 PWA 已进入退役流程，引用它只会误导人。
  *
- * ⚠️ 改动本文件的算法后，必须同步 `src/utils/geo.ts`，
- * 并跑一次 `node scripts/test_scenarios.cjs` 与 `node scripts/mp_probe.cjs geo`。
- * `selfCheck()` 会在偏差明显偏离长沙地区预期值时直接抛错，防止算法漂移后静默产出错数据。
+ * ⚠️ 改动本文件的算法后，必须跑：
+ *   node scripts/check_coord.js        （锚点快照 + 全量坐标一致性）
+ *   node scripts/sync_miniprogram_data.js（重新生成小程序数据）
+ *
+ * `selfCheck()` 只保证偏移量落在长沙地区预期区间（防止算法被改错后静默产出错数据）。
+ * 它**抓不住双重转换**——把 GCJ-02 当 WGS-84 再转一次，偏移同样约 672m，
+ * 正好落在区间内。所以判断「数据有没有被转错」必须靠 `check_coord.js` 的
+ * 绝对坐标快照，而不是靠这里的偏移量。
  */
 
 const A = 6378245.0
@@ -61,6 +64,10 @@ export function haversineDistance(lat1, lng1, lat2, lng2) {
  *
  * 长沙地区 WGS-84 → GCJ-02 的偏移约 600-700m。
  * 若算法被改错（例如少乘 cos、用错椭球参数），偏移会明显跳出该区间。
+ *
+ * 局限（重要）：偏移量落在区间内**不代表数据是对的**。把 GCJ-02 当 WGS-84
+ * 再转一次，偏移同样是约 672m。要验证「转了几次、转得对不对」请用
+ * `scripts/check_coord.js`（比对绝对坐标快照）。
  */
 export function selfCheck() {
   // 研究生宿舍楼（WGS-84）：WGS 与 GCJ 的直线距离应为约 672m

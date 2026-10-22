@@ -46,6 +46,26 @@ const authorized = ref(false)
 let watching = false
 /** 是否正在启动（防止并发重复调用 getLocation） */
 let starting = false
+/** 是否正在启动持续监听（与 starting 区分：后者指单次 getLocation） */
+let startingWatch = false
+/**
+ * 小程序当前是否在前台
+ *
+ * 位置接口只在用户盯着页面时才该跑。切后台时 onAppHide 会停监听，
+ * 但「停」这件事必须和 shouldWatch() 一起判断，否则回前台时
+ * 若页面已经离开，onAppShow 的恢复逻辑会把它错误地重新打开。
+ */
+let foreground = true
+/**
+ * 监听状态版本号
+ *
+ * `wx.startLocationUpdate` 是异步的，它的 success 可能在**页面已经离开**
+ * 或**已经切到后台**之后才回来。每次状态变化都自增版本号，回调里比对：
+ * 过期就说明这次启动已经没人要了，不能再挂 onLocationChange。
+ * 没有这个序号时，离开页面后监听会在稍后悄悄开始，与
+ * 「离开位置页立即停止」的说明不符。
+ */
+let watchEpoch = 0
 /** 用户已明确拒绝授权：不再自动重试，避免回前台就反复失败 */
 let denied = false
 /**
@@ -109,7 +129,8 @@ function startWatch(): Promise<void> {
         authorized.value = true
         handleWechatLocation(res)
         resolve()
-        resumeWatch()
+        // 不直接开监听：交给 syncWatch 统一判断（期间可能已离开页面 / 切后台）
+        syncWatch()
       },
       fail: (err) => {
         loading.value = false
@@ -148,35 +169,71 @@ function ensureStarted(): Promise<void> {
 }
 
 /**
- * 开启前台持续定位（不重新取单点）
+ * 此刻是否「应该」在持续监听
  *
- * 与 startWatch 的区别：这里只挂 onLocationChange，不再调 getLocation。
- * 页面每次 onShow 都调 getLocation 会触发频率限制，也没必要——
- * 监听一接上，微信会立刻推一个当前位置过来。
+ * 四个条件缺一不可：在前台、有页面正在用、用户愿意、没被明确拒绝。
+ * 所有开关决策都收敛到这一个判断，避免某条路径漏掉某个条件。
  */
-function resumeWatch() {
-  if (watching || starting || denied) return
+function shouldWatch(): boolean {
+  return foreground && watchOwner !== null && wantWatch && !denied
+}
+
+/**
+ * 真正关掉监听
+ *
+ * 只做「关」这一件事；要不要关由调用方通过 syncWatch 决定。
+ * startingWatch 一并清掉：在途的启动回调靠 watchEpoch 识别并自我作废。
+ */
+function teardownWatch() {
+  startingWatch = false
+  if (!watching) return
+  wx.offLocationChange(handleWechatLocation)
+  wx.stopLocationUpdate({})
+  watching = false
+}
+
+/**
+ * 让实际监听状态向 shouldWatch() 收敛
+ *
+ * 页面进出、前后台切换、授权结果返回，全部只调这一个函数，
+ * 不在各处零散地写 startLocationUpdate / stopLocationUpdate ——
+ * 否则「A 路径开了、B 路径忘了关」这类竞态迟早出现。
+ */
+function syncWatch() {
+  const epoch = ++watchEpoch
+  if (!shouldWatch()) {
+    teardownWatch()
+    return
+  }
+  if (watching || startingWatch) return
+  startingWatch = true
   // 注意：onLocationChange 回调固定是 gcj02，type 只写在这里表明预期，不要改成 wgs84
   wx.startLocationUpdate({
     type: 'gcj02',
     success: () => {
+      // 等回调期间状态可能已经变了（页面切走 / 切后台），见 watchEpoch 注释
+      if (epoch !== watchEpoch) {
+        // 过期回调不动全局状态（可能已有更新的一次启动在途），
+        // 但如果此刻明确「不该监听」，就把这次多开的监听收掉
+        if (!shouldWatch()) {
+          startingWatch = false
+          watching = false
+          wx.stopLocationUpdate({})
+        }
+        return
+      }
+      startingWatch = false
       if (watching) return
       watching = true
       wx.onLocationChange(handleWechatLocation)
     },
     fail: (err) => {
+      if (epoch === watchEpoch) startingWatch = false
       // 常见原因：后台未开通「位置信息（持续监听）」接口权限（需类目审核）
       // 此时不影响单次定位，只是走动时位置不刷新
       console.warn('[location] startLocationUpdate 失败:', err?.errMsg || err)
     },
   })
-}
-
-function pauseWatch() {
-  if (!watching) return
-  wx.offLocationChange(handleWechatLocation)
-  wx.stopLocationUpdate({})
-  watching = false
 }
 
 /**
@@ -193,15 +250,14 @@ let watchOwner: string | null = null
 /** 页面开始使用位置（onShow）。owner 用页面名，便于排查 */
 function acquireWatch(owner: string) {
   watchOwner = owner
-  // 用户还没同意过定位时什么都不做：授权必须由点击触发
-  if (authorized.value && wantWatch) resumeWatch()
+  syncWatch()
 }
 
 /** 页面离开（onHide）：只有所有权还在自己手上时才停 */
 function releaseWatch(owner: string) {
   if (watchOwner !== owner) return
   watchOwner = null
-  pauseWatch()
+  syncWatch()
 }
 
 /** 用户主动点击定位入口时调用：先过隐私协议，再取位置。返回是否成功拿到坐标 */
@@ -233,10 +289,14 @@ function init(autoRequest = false) {
         authorized.value = true
         denied = false
         wantWatch = true
+        // getSetting 是异步的：这个回调可能在页面已经切走之后才回来。
+        // 没有页面持有（watchOwner 为空）时就不要再启动任何定位，
+        // 否则会出现「人已离开、定位才刚开始」。
+        if (watchOwner === null) return
         // 已有坐标时只恢复监听，不再重复取单点：切 tab 回来每次都 getLocation
         // 既没必要，也容易撞上调用频率限制
         const store = useLocationStore()
-        if (store.userLat !== null && store.userLng !== null) resumeWatch()
+        if (store.userLat !== null && store.userLng !== null) syncWatch()
         else ensureStarted()
         return
       }
@@ -259,7 +319,7 @@ function init(autoRequest = false) {
 function stopWatch() {
   wantWatch = false
   watchOwner = null
-  pauseWatch()
+  syncWatch()
 }
 
 /**
@@ -273,11 +333,14 @@ function installAppHooks() {
   if (appHooksInstalled) return
   appHooksInstalled = true
   wx.onAppHide?.(() => {
-    pauseWatch()
+    foreground = false
+    syncWatch()
   })
   wx.onAppShow?.(() => {
-    // 回前台：只恢复监听，不重新取单点（避免频繁 getLocation）
-    if (watchOwner && wantWatch) resumeWatch()
+    foreground = true
+    // 只恢复监听，不重新取单点（避免频繁 getLocation）；
+    // 若期间页面已经离开，shouldWatch() 为 false，这里不会开
+    syncWatch()
   })
 }
 

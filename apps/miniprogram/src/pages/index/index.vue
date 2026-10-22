@@ -13,6 +13,7 @@ import { getNow } from '@/utils/time'
 import { findNearestStop, findNearestStops, formatWalkTime, WALK_SPEED_MPS } from '@/utils/geo'
 import { arrivalCountdown, departureCountdown } from '@/utils/countdown'
 import { toGroup, groupMembers, findBestRide } from '@/utils/station_group'
+import { boardTierOf, isBetterBoard, compareArrivalResults, BOARD_TIER } from '@/utils/ride_rank'
 import { useShare } from '@/utils/share'
 import ArrivalCard from '@/components/ArrivalCard.vue'
 import BusStopTimeline from '@/components/BusStopTimeline.vue'
@@ -286,10 +287,10 @@ const destArrivals = computed<ArrivalItem[]>(() => {
         const secDest = Math.round(best.dest.arrivalMinutes * 60 - base)
         if (secDest > LOOKAHEAD_SEC || secBoard < KEEP_PASSED_SEC) continue
         const isOriginDeparture = best.origin.isDepartureStop ?? false
-        // 档位：0 走得到且车还没来 / 1 车还没来但走过去来不及 / 2 车已过站
-        const tier = secBoard <= 0 ? 2 : (walkSeconds > secBoard ? 1 : 0)
+        // 档位规则见 utils/ride_rank.ts（与数据回归测试共用同一份实现）
+        const tier = boardTierOf(secBoard, walkSeconds)
         const prev = bestByDep.get(dep.recordId)
-        if (prev && (prev.tier < tier || (prev.tier === tier && prev.walkSeconds <= walkSeconds))) continue
+        if (prev && !isBetterBoard({ tier, walkSeconds }, prev)) continue
         bestByDep.set(dep.recordId, {
           tier,
           walkSeconds,
@@ -297,7 +298,7 @@ const destArrivals = computed<ArrivalItem[]>(() => {
             departure: dep,
             candidateStop,
             walkLabel: formatWalkTime(walkSeconds),
-            walkWarning: tier === 1,
+            walkWarning: tier === BOARD_TIER.TOO_LATE,
             isOriginDeparture,
             boardTime: best.origin.arrivalTime,
             boardMinutes: best.origin.arrivalMinutes,
@@ -331,13 +332,8 @@ const destArrivals = computed<ArrivalItem[]>(() => {
       }
     }
   }
-  // 先按「能不能上车」分档，同档内按到目的地时间
-  results.sort((a, b) => {
-    const ta = a.boardTier ?? 0
-    const tb = b.boardTier ?? 0
-    if (ta !== tb) return ta - tb
-    return (a.destMinutes ?? a.arrivalMinutes ?? 0) - (b.destMinutes ?? b.arrivalMinutes ?? 0)
-  })
+  // 先按「能不能上车」分档，同档内按到目的地时间（规则见 utils/ride_rank.ts）
+  results.sort(compareArrivalResults)
   return results
 })
 

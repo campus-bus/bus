@@ -1,6 +1,13 @@
 // 回归测试：全功能场景化数据层断言
 // 用法：node scripts/test_scenarios.cjs（全部断言通过 exit 0，否则 exit 1）
-// 复刻前端核心逻辑（station_group.findBestRide 等），用真实 public/data 验证关键场景。
+//
+// ⚠️ 本文件为了在 Node 里跑，把 station_group.findBestRide 等逻辑**抄了一份**。
+// 抄件只能验证「数据是否自洽」，**不能证明线上实现是对的**——线上改了而这里没改，
+// 就会出现「测试全绿、页面照错」。
+// 「线上实现本身对不对」由 `node scripts/test_core_logic.mjs` 负责：
+// 它用 Node 24 的类型擦除直接 import `apps/miniprogram/src/utils/*.ts` 的真身。
+// 因此改核心判定时：先改源码 → 两边都要跑 → 若判定规则变了，本文件的抄件也要同步。
+//
 // 每次数据变更（时刻表/路线/站间秒数）后应运行本脚本做回归验证。
 const fs = require('fs')
 const deps = JSON.parse(fs.readFileSync('public/data/departures.json'))

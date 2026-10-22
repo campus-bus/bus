@@ -615,7 +615,10 @@ apps/miniprogram/
 
 1. 功能：`node scripts/mp_probe.cjs <相关探针>`
 2. 类型：`cd apps/miniprogram && npx vue-tsc --noEmit`
-3. 数据回归：`node scripts/test_scenarios.cjs`（应为 24/24 通过）
+3. 数据回归（三项都要，不是任选其一）：
+   - `node scripts/test_scenarios.cjs`（数据层场景）
+   - `node scripts/test_core_logic.mjs`（核心逻辑：**直接 import 小程序源码真实模块**，不复刻算法）
+   - `node scripts/check_coord.js`（坐标一致性：锚点快照 + 370 点全量，能识别双重转换）
 
 ### 效率纪律（强制，违反即返工）
 
@@ -659,7 +662,8 @@ apps/miniprogram/
 18. **坐标系：H5 = WGS-84，小程序 = GCJ-02，转换只发生在同步脚本里**（2026-10-19 调整）：
     - `public/data/*.json` 仍是 **WGS-84**（H5 卫星底图、浏览器 GPS 都是 WGS-84，不能动）。
     - `apps/miniprogram/src/data/*.json` 由 `scripts/sync_miniprogram_data.js` 在同步时把 `stations`/`route_stops`/`route_paths` 转成 **GCJ-02** 写入；小程序运行期（定位/渲染/天气）**零坐标转换**。
-    - 转换实现：`scripts/lib/coord.js`（与 `src/utils/geo.ts` 的 `wgs84ToGcj02` 逐行一致），脚本启动时跑 `selfCheck()`，偏移量不在 550-800m 直接抛错，防止算法漂移后静默产出错数据。
+    - 转换实现：`scripts/lib/coord.js` 是**构建期唯一实现**（PWA 的 `src/utils/geo.ts` 那份已随 PWA 退役，不要再引用它）。脚本启动时跑 `selfCheck()`，偏移量不在 550-800m 直接抛错。
+    - **`selfCheck()` 抓不住双重转换**：把 GCJ-02 当 WGS-84 再转一次，偏移同样是约 672m，照样落在区间内。判断「转了几次」必须靠 `node scripts/check_coord.js`（冻结锚点绝对坐标快照 + 370 个坐标全量比对），任何坐标相关改动都要跑它。
     - **新增含坐标的数据文件必须加进 `COORD_FILES`**，否则漏转 = 该文件整体偏移约 670m。
     - `wx.onLocationChange` 官方文档固定回调 GCJ-02，不受 `startLocationUpdate` 的 `type` 影响；`wx.getLocation` 虽支持 `type:'wgs84'`，但**开发者工具忽略 type**（`node scripts/mp_probe.cjs geo` 可复现：两种类型返回同一模拟点）。既然数据已是 GCJ-02，`handleWechatLocation()` 直接入库即可。
     - 若把 GCJ-02 当 WGS-84 用（或反之），长沙地区固定偏移 **约 670m**（实测 18 个站点里 14 个会误判到别的站：把 GCJ 的「理学院」当成 WGS，最近站会变成「网球场」，仅 23m）。
@@ -676,6 +680,7 @@ apps/miniprogram/
 - **`nearestStopInfo` 于 2026-10-22 恢复（顶部距离 HUD）**：它曾于 10-19 一并删除，但位置接口申请材料的第一、二节文案和 3/8–7/8 截图都是围绕这行「距「激光所」135 米 · 步行约1分44秒」写的——删掉它等于材料与界面不一致，提审会被判「使用场景无法确认」。恢复的是**纯文字 HUD**（不涉及自绘 marker），数值随 `onLocationChange` 刷新，是本项目持续定位唯一可被截图证明的使用场景。**不要再次删除**。
 
 - **合规落地**：`useGeolocation.ts` 新增 `onAppHide`/`onAppShow` 钩子，切后台立即 `stopLocationUpdate` + `offLocationChange`，回前台恢复；关于页新增「位置信息」声明。
+- **开关只有一个入口 `syncWatch()`（2026-10-22 修复竞态）**：`wx.startLocationUpdate` 是异步的，成功回调可能在页面已经切走 / 已切后台之后才回来。旧写法在回调里直接 `onLocationChange`，造成「人已经离开、监听才刚开始」。现在所有开关都走 `syncWatch()`，由 `shouldWatch()`（前台 && 有页面持有 && 用户愿意 && 未被拒）决定目标状态，并用 `watchEpoch` 序号让过期回调自我作废。**不要在别处直接调 `startLocationUpdate`/`stopLocationUpdate`**，否则竞态会回来。
 - **PowerShell 脚本必须存 UTF-8 带 BOM**：无 BOM 时 PS 5.1 按 GBK 解析，中文注释里的字节可能被当成反引号续行，导致 `Add-Type` 被吞、报「找不到类型 System.Drawing」。用 Node 写入 `'\ufeff' + s` 即可。
 
 ### 待办（按优先级）
