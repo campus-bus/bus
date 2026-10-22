@@ -63,8 +63,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | `src/composables/useNextBus.ts` | 首页到站车次计算逻辑 |
 | `src/composables/useGeolocation.ts` | GPS 定位（精度过滤 500m） |
 | `src/composables/useVisitorTracking.ts` | 匿名访问埋点（每设备每天一次） |
-| `src/utils/bus_position.ts` | 公交实时位置推算 + 路径匹配（maxSearch 防绕回） |
-| `src/utils/countdown.ts` | 倒计时格式化（已到站/已过站/xx分xx秒） |
+| `src/utils/bus_position.ts` | 公交实时位置推算 + 路径匹配（maxSearch 防绕回） || `src/utils/countdown.ts` | 倒计时格式化（已到站/已过站/xx分xx秒） |
 | `src/types/index.ts` | 全部 TypeScript 类型定义 |
 | `vite.config.ts` | Vite 配置（含 basicSsl 插件） |
 - **PWA**：vite-plugin-pwa，workbox generateSW 模式
@@ -670,6 +669,7 @@ apps/miniprogram/
     - 距离计算对坐标系不敏感：153 个站对在 WGS-84 与 GCJ-02 下算出的距离最大只差 **2.8m**，远小于 GPS 精度（20-50m）与 200m 附近站阈值——**只要不混用就行**，混用才是 670m。
     - 开发者工具没有真实 GPS，模拟定位点常驻上次设置的值（面板用 GCJ-02）。想在工具里模拟「研究生宿舍楼」，填 `28.254769, 113.051463`（该站的 GCJ-02 值）。
     - 排查口诀：**看文件名就知道坐标系**——`public/data` 是 WGS，`apps/miniprogram/src/data` 是 GCJ。
+19. **同名站一圈过两次，禁止用 `indexOf(站名)` 定位站点**（2026-10-22）：接驳1路/2路的`军体活动中心东`、`网球场`、`激光所`在同一圈里各经过两次（去程一次、绕回来再停一次），站名完全相同。用 `indexOf(站名)` 永远只拿到**去程**那一次，本项目已因此出过两次问题：首页目的地推荐会把用户带去绕大圈的车（改用 `findBestRide()` 枚举上下车组合解决），记录页「一键上车」把回程上车的计时记到去程路段上（改用 `utils/stop_seq.ts` 的 `findStopIndexes()` 返回**全部**站序、让用户选）。**新写任何「按站名找站」的代码，先想清楚同名站是否会出现两次；会出现就必须按站序（stopSeq）处理。**
 
 ### 位置接口申请材料（2026-10-19，`startLocationUpdate`/`onLocationChange` 重提）
 

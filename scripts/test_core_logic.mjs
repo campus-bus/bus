@@ -34,6 +34,7 @@ const { toGroup, groupMembers, findBestRide } = await importSrc('station_group.t
 const { boardTierOf, isBetterBoard, compareArrivalResults, BOARD_TIER } = await importSrc('ride_rank.ts')
 const { formatWalkTimePrecise, WALK_SPEED_MPS, findNearestStops, haversineDistance } = await importSrc('geo.ts')
 const { arrivalCountdown, departureCountdown } = await importSrc('countdown.ts')
+const { findStopIndexes, stopStateOf } = await importSrc('stop_seq.ts')
 
 const readData = (f) => JSON.parse(fs.readFileSync(path.join(ROOT, 'public/data', f), 'utf8'))
 const departures = readData('departures.json')
@@ -175,6 +176,56 @@ assert('N1 以研究生宿舍楼坐标查 200m 内站点，最近的必然是自
 const far = findNearestStops(guan.lat + 0.1, guan.lng + 0.1, stations, 3, 200)
 assert('N2 距校园约 14km 时 200m 内无站（校园服务半径逻辑的前提）',
   far.length === 0 && haversineDistance(guan.lat, guan.lng, guan.lat + 0.1, guan.lng + 0.1) > 10000)
+
+console.log('\n【R. 记录页站序（真实 findStopIndexes / stopStateOf）】')
+// 记录页是维护者如实测站间秒数用的工具：站序一旦错位，采到的段耗时全部作废，
+// 而且错的值还会被当成实测样本参与校准。这里锁死同名站的全部站序。
+const routeParams = readData('route_params.json')
+const stopsOf = (key) => {
+  const p = routeParams.find((x) => x.routeKey === key)
+  return p ? p.stops.map((s) => s.currentStop) : []
+}
+const jb1Stops = stopsOf('JB1_NORMAL')
+const jb2Stops = stopsOf('JB2_NORMAL')
+
+assert('R1 JB1 军体活动中心东 出现在第 7、15 站',
+  JSON.stringify(findStopIndexes(jb1Stops, '军体活动中心东')) === JSON.stringify([6, 14]),
+  `(${findStopIndexes(jb1Stops, '军体活动中心东').map((i) => i + 1).join(', ')})`)
+assert('R2 JB2 军体活动中心东 出现在第 4、12 站',
+  JSON.stringify(findStopIndexes(jb2Stops, '军体活动中心东')) === JSON.stringify([3, 11]),
+  `(${findStopIndexes(jb2Stops, '军体活动中心东').map((i) => i + 1).join(', ')})`)
+assert('R3 JB1 激光所 出现在第 9、13 站（一圈两次）',
+  JSON.stringify(findStopIndexes(jb1Stops, '激光所')) === JSON.stringify([8, 12]))
+assert('R4 JB2 网球场 出现在第 5、11 站（一圈两次）',
+  JSON.stringify(findStopIndexes(jb2Stops, '网球场')) === JSON.stringify([4, 10]))
+assert('R5 起终点同名站只保留起点，终点不作上车站',
+  JSON.stringify(findStopIndexes(jb1Stops, '研究生宿舍楼')) === JSON.stringify([0]),
+  `(${findStopIndexes(jb1Stops, '研究生宿舍楼').map((i) => i + 1).join(', ')})`)
+assert('R6 不在该路线上的站返回空数组',
+  findStopIndexes(jb1Stops, '二食堂北').length === 0)
+
+// 这条就是用户报的 bug：在回程那趟车前点「一键上车」，不能把上车站落成去程站序
+assert('R7 选回程军体东(第15站)后，去程第7站不会被点亮',
+  stopStateOf(14, 14, 0) === 0 && stopStateOf(6, 14, 0) === -1,
+  `(第15站=${stopStateOf(14, 14, 0)}, 第7站=${stopStateOf(6, 14, 0)})`)
+assert('R8 上车后只有下一站可计时，再往后都不亮',
+  stopStateOf(15, 14, 0) === 1 && stopStateOf(16, 14, 0) === -1 && stopStateOf(17, 14, 0) === -1)
+assert('R9 记录一段后该站转为已记录，下一站接过计时位',
+  stopStateOf(15, 14, 1) === 2 && stopStateOf(16, 14, 1) === 1)
+assert('R10 未上车时所有行都不亮',
+  [0, 6, 14, 17].every((i) => stopStateOf(i, -1, 0) === -1))
+
+// 端到端：从回程军体东上车，沿第 15→16→17 站记两段，段序号必须是 15/16/17 而不是 7/8/9
+const boardIdxR = 14
+const segs = [15, 16].map((toIdx) => ({
+  from: jb1Stops[toIdx - 1],
+  to: jb1Stops[toIdx],
+  fromSeq: toIdx,
+  toSeq: toIdx + 1,
+}))
+assert('R11 回程上车的段序号为 15→16→17',
+  segs[0].fromSeq === 15 && segs[0].toSeq === 16 && segs[1].fromSeq === 16 && segs[1].toSeq === 17,
+  `(${segs.map((s) => `${s.fromSeq}→${s.toSeq}`).join(' ')}，上车站索引 ${boardIdxR})`)
 
 console.log('\n══════════════════════════════')
 console.log(`断言结果: 通过 ${pass} / 失败 ${fail} ${fail === 0 ? '✅ 全部通过（测试的就是线上实现）' : '❌ 存在失败项'}`)

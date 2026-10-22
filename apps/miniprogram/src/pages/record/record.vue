@@ -4,6 +4,7 @@ import { useUploadStore } from '@/stores/upload'
 import { useScheduleStore } from '@/stores/schedule'
 import { useLocationStore } from '@/stores/location'
 import { findNearestStop } from '@/utils/geo'
+import { findStopIndexes, stopStateOf } from '@/utils/stop_seq'
 import { isDevUnlocked } from '@/utils/dev'
 import { onShow, onLoad } from '@dcloudio/uni-app'
 
@@ -42,11 +43,18 @@ const nearestRouteStop = computed(() => {
   const result = findNearestStop(locationStore.userLat, locationStore.userLng, routeStations)
   const name = result?.station.name
   if (!name) return null
-  // 接驳环线同一站名会出现两次（去程/回程），一键上车取第一次经过的位置——
-  // 那是先到的那一趟。第二次经过需要用户自己点对应行，不能混为一谈。
-  const idx = routeStops.value.indexOf(name)
-  if (idx < 0 || idx >= routeStops.value.length - 1) return null
-  return { name, idx }
+  /**
+   * 该站名在本圈内的**全部**经过位置（按站序升序），而不是只取第一次。
+   *
+   * 接驳1路/2路是环线，军体活动中心东、网球场、激光所在同一圈里经过两次
+   * （去程一次、绕回来再停一次）。以前这里用 `indexOf(站名)` 静默取第一次，
+   * 结果用户在回程那趟车前点「一键上车」，页面却把上车站设成去程的站序，
+   * 之后每一段计时都会记到错误的路段上。
+   * 站名相同、物理位置也相同，靠代码猜不出用户要上哪一趟 —— 必须让用户选。
+   */
+  const idxs = findStopIndexes(routeStops.value, name)
+  if (idxs.length === 0) return null
+  return { name, idxs }
 })
 
 const boardIdx = ref(-1)
@@ -65,14 +73,15 @@ function saveNick() { uploadStore.saveNickname(nickInput.value) }
  *
  * 接驳1路的激光所是第 9、13 站，接驳2路是第 6、10 站，就餐专线的理学院是第 2、8 站：
  * 用 indexOf(站名) 永远只会拿到第一次经过的位置，从第二次上车时整条计时链都会错位，
- * 采出来的段耗时也就没法用于校准。这里一律用 v-for 的 idx。
+ * 采出来的段耗时也就没法用于校准。这里一律用 v-for 的 idx（与 stopSeq 严格一一对应）。
  */
 function boardAt(idx: number) {
   const stopName = routeStops.value[idx]
   if (!stopName || idx >= routeStops.value.length - 1) return
   boardIdx.value = idx
   uploadStore.startRecordingAt(stopName, idx + 1)
-  uni.showToast({ title: `已上车：${stopName}`, icon: 'none' })
+  // 同名站在一圈内出现两次时，站名不足以让用户确认自己选对了哪一趟
+  uni.showToast({ title: `已上车：${stopName}（第 ${idx + 1} 站）`, icon: 'none' })
 }
 
 function tapStop(idx: number) {
@@ -85,14 +94,43 @@ function tapStop(idx: number) {
 }
 
 function stopState(idx: number): number {
-  if (!timingActive.value) return -1
-  if (idx === boardIdx.value) return 0
-  if (idx < boardIdx.value) return -1
-  const segIdx = idx - boardIdx.value - 1
-  if (segIdx < recordedCount.value) return 2
-  if (segIdx === recordedCount.value) return 1
-  return -1
+  return stopStateOf(idx, boardIdx.value, recordedCount.value)
 }
+
+/**
+ * 每行的状态缓存
+ *
+ * 模板里每个 stop-row 原来要算 4~6 次 stopState，18 行就是上百次；
+ * 缓存成数组后模板只做取值，也便于给整行加高亮，让「到底选了哪一站」一眼可见。
+ */
+const stopStates = computed(() => routeStops.value.map((_, idx) => stopState(idx)))
+
+/**
+ * 出现多次的站名的行索引
+ *
+ * 用来给「上车」按钮补上站序：一圈过两次的站（军体东/网球场/激光所）
+ * 光看名字满屏都一样，点之前必须能看出自己点的是第几站。
+ */
+const duplicatedIdxs = computed(() => {
+  const seen = new Map<string, number[]>()
+  routeStops.value.forEach((s, i) => {
+    const list = seen.get(s)
+    if (list) list.push(i)
+    else seen.set(s, [i])
+  })
+  const out = new Set<number>()
+  for (const list of seen.values()) if (list.length > 1) list.forEach(i => out.add(i))
+  return out
+})
+
+function boardLabel(idx: number): string {
+  return duplicatedIdxs.value.has(idx) ? `上车 · 第${idx + 1}站` : '上车'
+}
+
+/** store 被重置（切线路、提交完成）时，页面高亮必须跟着清掉，否则会停在旧的站序上 */
+watch(() => uploadStore.timingActive, (active) => {
+  if (!active) boardIdx.value = -1
+})
 
 function getSegmentSeconds(idx: number): string {
   const segIdx = idx - boardIdx.value - 1
@@ -202,23 +240,47 @@ function formatTime(ts: number) {
       </view>
 
       <view v-if="routeStops.length">
-        <view v-if="nearestRouteStop && !timingActive" class="nearest-card" @tap="boardAt(nearestRouteStop.idx)">
-          <image class="nearest-icon" src="/static/icons/ui/locate.png" mode="aspectFit" />
-          <text>距你最近「{{ nearestRouteStop.name }}」，点此一键上车</text>
+        <!-- 最近站卡片：站名只经过一次时一键上车；经过多次时必须让用户选，
+             否则会默认选中去程那一次，把回程上车的计时记到错误路段上 -->
+        <view v-if="nearestRouteStop && !timingActive" class="nearest-card">
+          <view class="nearest-main">
+            <image class="nearest-icon" src="/static/icons/ui/locate.png" mode="aspectFit" />
+            <text>距你最近「{{ nearestRouteStop.name }}」</text>
+          </view>
+          <template v-if="nearestRouteStop.idxs.length === 1">
+            <view class="nearest-btns">
+              <view class="nearest-btn" @tap="boardAt(nearestRouteStop.idxs[0])">点此上车</view>
+            </view>
+          </template>
+          <template v-else>
+            <text class="nearest-hint">
+              这一站在一圈里经过 {{ nearestRouteStop.idxs.length }} 次，请按你上的那趟车选站序
+            </text>
+            <view class="nearest-btns">
+              <view
+                v-for="i in nearestRouteStop.idxs" :key="i"
+                class="nearest-btn" @tap="boardAt(i)"
+              >第 {{ i + 1 }} 站</view>
+            </view>
+          </template>
         </view>
         <view class="stops-title">{{ timingActive ? '到站请点「计时」' : '选择上车站点' }}</view>
 
-        <view v-for="(stop, idx) in routeStops" :key="idx" class="stop-row">
-          <view class="stop-dot" :class="{ boarding: stopState(idx) === 0, current: stopState(idx) === 1, done: stopState(idx) === 2 }">
-            <text v-if="stopState(idx) === 0">上</text>
-            <image v-else-if="stopState(idx) === 2" class="stop-dot-check" src="/static/icons/ui/check-white.png" mode="aspectFit" />
+        <view
+          v-for="(stop, idx) in routeStops" :key="idx"
+          class="stop-row"
+          :class="{ boarding: stopStates[idx] === 0, current: stopStates[idx] === 1, done: stopStates[idx] === 2 }"
+        >
+          <view class="stop-dot" :class="{ boarding: stopStates[idx] === 0, current: stopStates[idx] === 1, done: stopStates[idx] === 2 }">
+            <text v-if="stopStates[idx] === 0">上</text>
+            <image v-else-if="stopStates[idx] === 2" class="stop-dot-check" src="/static/icons/ui/check-white.png" mode="aspectFit" />
             <text v-else>{{ idx + 1 }}</text>
           </view>
-          <text class="stop-name" :class="{ bold: stopState(idx) === 0 }">{{ stop }}</text>
-          <text v-if="stopState(idx) === 2" class="seg-secs">{{ getSegmentSeconds(idx) }}</text>
-          <view v-if="stopState(idx) === 2 && idx === boardIdx + recordedCount" class="undo-btn" @tap="handleUndo">回退</view>
-          <view v-if="!timingActive && idx < routeStops.length - 1" class="board-btn" @tap="boardAt(idx)">上车</view>
-          <view v-if="stopState(idx) === 1" class="timing-btn" @tap="tapStop(idx)">计时</view>
+          <text class="stop-name" :class="{ bold: stopStates[idx] === 0 }">{{ stop }}</text>
+          <text v-if="stopStates[idx] === 2" class="seg-secs">{{ getSegmentSeconds(idx) }}</text>
+          <view v-if="stopStates[idx] === 2 && idx === boardIdx + recordedCount" class="undo-btn" @tap="handleUndo">回退</view>
+          <view v-if="!timingActive && idx < routeStops.length - 1" class="board-btn" @tap="boardAt(idx)">{{ boardLabel(idx) }}</view>
+          <view v-if="stopStates[idx] === 1" class="timing-btn" @tap="tapStop(idx)">计时</view>
         </view>
 
         <view v-if="timingActive && recordedCount > 0" class="submit-area">
@@ -267,14 +329,24 @@ function formatTime(ts: number) {
 .route-opt.active { background: var(--color-primary-soft); color: var(--color-primary); border-color: var(--color-primary); font-weight: 600; }
 
 .nearest-card {
-  display: flex; align-items: center; gap: 10rpx;
+  display: flex; flex-direction: column; gap: 12rpx;
   background: var(--color-primary-soft); border: 1rpx solid var(--color-primary); border-radius: 12rpx;
   padding: 18rpx 20rpx; font-size: 26rpx; color: var(--color-primary); margin-bottom: 16rpx;
 }
+.nearest-main { display: flex; align-items: center; gap: 10rpx; }
 .nearest-icon { width: 30rpx; height: 30rpx; flex-shrink: 0; }
+.nearest-hint { font-size: 22rpx; line-height: 1.5; opacity: 0.85; }
+.nearest-btns { display: flex; flex-wrap: wrap; gap: 12rpx; }
+.nearest-btn {
+  background: var(--color-primary); color: #fff; font-size: 24rpx;
+  padding: 10rpx 26rpx; border-radius: 999rpx;
+}
 .stops-title { font-size: 28rpx; font-weight: 600; margin-bottom: 10rpx; }
 
 .stop-row { display: flex; align-items: center; gap: 16rpx; padding: 14rpx 0; border-bottom: 1rpx solid var(--color-divider); }
+/* 整行高亮：重复站名（军体东/网球场/激光所一圈过两次）时，只靠小圆点看不出选中了哪一趟 */
+.stop-row.boarding { background: var(--color-primary-soft); border-radius: 10rpx; }
+.stop-row.current { background: var(--color-warning-soft); border-radius: 10rpx; }
 .stop-dot { width: 40rpx; height: 40rpx; border-radius: 50%; background: var(--color-border); color: var(--color-text-secondary); display: flex; align-items: center; justify-content: center; font-size: 20rpx; flex-shrink: 0; }
 .stop-dot.boarding { background: var(--color-primary); color: #fff; }
 .stop-dot.current { background: var(--color-warning); color: #fff; font-weight: 600; }

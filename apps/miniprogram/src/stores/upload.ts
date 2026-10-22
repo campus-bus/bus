@@ -99,6 +99,9 @@ export const useUploadStore = defineStore('upload', () => {
     const last = recordedSegments.value.pop()!
     segmentSeconds.value.pop()
     currentFromStop.value = last.from
+    // 站序必须一起回退：只还原站名会让下一段带上被撤销那段的终点站序，
+    // 同名站（军体东/网球场/激光所）一圈过两次时，记录的 fromSeq 会指向错误位置
+    currentFromSeq.value = last.fromSeq ?? 0
     const prevTotal = recordedSegments.value.reduce((sum, s) => sum + s.seconds, 0)
     startTime.value = boardingTime.value + prevTotal * 1000
   }
@@ -190,7 +193,7 @@ export const useUploadStore = defineStore('upload', () => {
   return {
     nickname, saveNickname,
     uploading, history, loadingHistory,
-    startTime, boardingTime, recordedSegments, currentFromStop, segmentSeconds, timingActive,
+    startTime, boardingTime, recordedSegments, currentFromStop, currentFromSeq, segmentSeconds, timingActive,
     startRecordingAt, recordSegment, undoLastSegment, resetRecording,
     submit, loadHistory, deleteRecord,
     buildCalibrationText, copyCalibrationText,
