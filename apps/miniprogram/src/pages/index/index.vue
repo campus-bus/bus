@@ -23,6 +23,15 @@ const WALK_SPEED = 1.3
 /** 附近站搜索半径（米）与最多展示站数 */
 const NEARBY_RADIUS_M = 200
 const NEARBY_LIMIT = 3
+/**
+ * 校园服务半径（米）
+ *
+ * 200m 内没有站时，旧逻辑会退到「全站最近的一个」且不设上限——
+ * 人在外地打开首页，会看到「步行约 68 小时去赶车」这种建议。
+ * 超出这个范围就不做乘车规划，只显示该站时刻（用户可能正在返校路上）。
+ * 校园东西约 2km，取 3km 留出余量。
+ */
+const CAMPUS_SERVICE_RADIUS_M = 3000
 /** 列表时间窗：已过站保留 5 分钟，最多看到 60 分钟后 */
 const KEEP_PASSED_SEC = -300
 const LOOKAHEAD_SEC = 3600
@@ -52,6 +61,11 @@ interface ArrivalItem {
   destTime?: string
   destMinutes?: number
   destSeq?: number
+  /**
+   * 上车可行性档位（仅多起点场景使用，排序用，不显示）：
+   * 0 = 走得到且车还没来；1 = 车还没来但走过去来不及；2 = 车已过站
+   */
+  boardTier?: number
 }
 
 const scheduleStore = useScheduleStore()
@@ -65,6 +79,7 @@ useShare()
 const {
   ready: locReady, loading: locLoading, error: locError, authorized: locAuthorized,
   init: initLocation, requestLocation, openSetting, openPrivacyContract,
+  acquireWatch, releaseWatch,
 } = useGeolocation()
 
 // ─── 天气（腾讯位置服务，未配置 Key 时静默不展示） ───
@@ -72,6 +87,17 @@ const { weather, initWeather } = useWeather()
 
 /** 是否已经拿到有效位置 */
 const hasLocation = computed(() => locationStore.userLat !== null && locationStore.userLng !== null)
+/**
+ * 当前位置是否已经离开校园服务范围
+ *
+ * 用途：超出范围时不做「走过去赶这班车」的建议（详见 CAMPUS_SERVICE_RADIUS_M），
+ * 但目的地时刻照常展示，用户仍能查车。
+ */
+const outOfCampus = computed(() => {
+  if (locationStore.userLat === null || locationStore.userLng === null) return false
+  const nearest = findNearestStop(locationStore.userLat, locationStore.userLng, scheduleStore.stations)
+  return !!nearest && nearest.distance > CAMPUS_SERVICE_RADIUS_M
+})
 /**
  * 未定位功能区块的说明文案（讲清"点了能得到什么"）
  *
@@ -106,9 +132,21 @@ const todayDate = computed(() => { void nowTick.value; return formatDate(getNow(
 let timer: ReturnType<typeof setInterval> | null = null
 function startTimer() { if (!timer) timer = setInterval(() => { nowTick.value++ }, 1000) }
 function stopTimer() { if (timer) { clearInterval(timer); timer = null } }
-onShow(() => { startTimer(); initLocation(); initWeather() })
-onHide(stopTimer)
-onUnmounted(stopTimer)
+onShow(() => {
+  startTimer()
+  initLocation()
+  // 附近站点与步行时间随走动实时变化：停留首页期间保持定位，离开即停
+  acquireWatch('index')
+  initWeather()
+})
+onHide(() => {
+  stopTimer()
+  releaseWatch('index')
+})
+onUnmounted(() => {
+  stopTimer()
+  releaseWatch('index')
+})
 
 /** 打开关于页（维护者工具入口也在这里） */
 function goAbout() {
@@ -126,8 +164,11 @@ const sortedStops = computed(() => {
   const order = preferenceStore.stopOrder
   return [...groups].sort((a, b) => (order[b] || 0) - (order[a] || 0))
 })
-/** 频次最高的 3 个站点，展示「常去」标记 */
-const freqTop3 = computed(() => sortedStops.value.slice(0, 3))
+/** 频次最高的 3 个站点，展示「常去」标记（首次使用无点击记录时一个都不标） */
+const freqTop3 = computed(() => {
+  const order = preferenceStore.stopOrder
+  return sortedStops.value.filter(s => (order[s] || 0) > 0).slice(0, 3)
+})
 const displayStops = computed(() => {
   if (stopSearch.value) return sortedStops.value.filter(s => s.includes(stopSearch.value))
   return stopExpanded.value ? sortedStops.value : sortedStops.value.slice(0, 5)
@@ -192,7 +233,7 @@ const destArrivals = computed<ArrivalItem[]>(() => {
   const results: ArrivalItem[] = []
   const hasGps = locationStore.userLat !== null && locationStore.userLng !== null
 
-  if (hasGps) {
+  if (hasGps && !outOfCampus.value) {
     const nearStops = findNearestStops(
       locationStore.userLat!, locationStore.userLng!,
       scheduleStore.stations, NEARBY_LIMIT, NEARBY_RADIUS_M,
@@ -220,45 +261,59 @@ const destArrivals = computed<ArrivalItem[]>(() => {
       return results
     }
 
-    // 多起点搜索：附近 3 个站各尝试一次，同一班次只保留最优方案
+    // 多起点搜索：附近 3 个站各自枚举，同一班次保留「最能上车」的那个上车站。
+    //
+    // 不能按邻近顺序「先到先得、命中就 seen 掉同班次」：最近的站这班车可能刚过。
+    // 实测 11:25 站在二食堂、去高超楼：S0008 到二食堂 11:24:37（已过 23 秒）、
+    // 到二食堂北 11:32:12（还来得及）。旧逻辑先遍历二食堂就把它判给二食堂，
+    // 二食堂北这个唯一能赶上的上车站反而被丢掉，用户看到的是「已过站」。
     let candidates = nearStops
     if (candidates.length === 0) {
       const fb = findNearestStop(locationStore.userLat!, locationStore.userLng!, scheduleStore.stations)
       if (fb) candidates = [fb]
     }
-    const seen = new Set<string>()
+    /** 同一班次去同一目的地，到站时刻相同 → 只比「上不上得去」和「走多远」 */
+    const bestByDep = new Map<string, { item: ArrivalItem; tier: number; walkSeconds: number }>()
     for (const c of candidates) {
       const candidateStop = c.station.name
       if (destMembers.includes(candidateStop)) continue
       const walkSeconds = c.distance / WALK_SPEED
       for (const dep of scheduleStore.departures) {
         if (dep.dateType !== dateType.value) continue
-        if (seen.has(dep.recordId)) continue
         const best = findBestRide(predsOf(dep.recordId), [candidateStop], destMembers)
         if (!best) continue
         const secBoard = Math.round(best.origin.arrivalMinutes * 60 - base)
         const secDest = Math.round(best.dest.arrivalMinutes * 60 - base)
         if (secDest > LOOKAHEAD_SEC || secBoard < KEEP_PASSED_SEC) continue
         const isOriginDeparture = best.origin.isDepartureStop ?? false
-        results.push({
-          departure: dep,
-          candidateStop,
-          walkLabel: formatWalkTime(walkSeconds),
-          walkWarning: secBoard > 0 && walkSeconds > secBoard,
-          isOriginDeparture,
-          boardTime: best.origin.arrivalTime,
-          boardMinutes: best.origin.arrivalMinutes,
-          boardSeq: best.origin.stopSeq,
-          destStop: best.dest.stopName,
-          destTime: best.dest.arrivalTime,
-          destMinutes: best.dest.arrivalMinutes,
-          destSeq: best.dest.stopSeq,
+        // 档位：0 走得到且车还没来 / 1 车还没来但走过去来不及 / 2 车已过站
+        const tier = secBoard <= 0 ? 2 : (walkSeconds > secBoard ? 1 : 0)
+        const prev = bestByDep.get(dep.recordId)
+        if (prev && (prev.tier < tier || (prev.tier === tier && prev.walkSeconds <= walkSeconds))) continue
+        bestByDep.set(dep.recordId, {
+          tier,
+          walkSeconds,
+          item: {
+            departure: dep,
+            candidateStop,
+            walkLabel: formatWalkTime(walkSeconds),
+            walkWarning: tier === 1,
+            isOriginDeparture,
+            boardTime: best.origin.arrivalTime,
+            boardMinutes: best.origin.arrivalMinutes,
+            boardSeq: best.origin.stopSeq,
+            destStop: best.dest.stopName,
+            destTime: best.dest.arrivalTime,
+            destMinutes: best.dest.arrivalMinutes,
+            destSeq: best.dest.stopSeq,
+            boardTier: tier,
+          },
         })
-        seen.add(dep.recordId)
       }
     }
+    results.push(...[...bestByDep.values()].map(x => x.item))
   } else {
-    // 未定位：只报目的地站的到站时间
+    // 未定位，或定位显示已离开校园：只报目的地站的到站时间，不做「走过去赶车」规划
     for (const dep of scheduleStore.departures) {
       if (dep.dateType !== dateType.value) continue
       for (const p of predsOf(dep.recordId)) {
@@ -276,7 +331,13 @@ const destArrivals = computed<ArrivalItem[]>(() => {
       }
     }
   }
-  results.sort((a, b) => (a.destMinutes ?? a.arrivalMinutes ?? 0) - (b.destMinutes ?? b.arrivalMinutes ?? 0))
+  // 先按「能不能上车」分档，同档内按到目的地时间
+  results.sort((a, b) => {
+    const ta = a.boardTier ?? 0
+    const tb = b.boardTier ?? 0
+    if (ta !== tb) return ta - tb
+    return (a.destMinutes ?? a.arrivalMinutes ?? 0) - (b.destMinutes ?? b.arrivalMinutes ?? 0)
+  })
   return results
 })
 
@@ -378,10 +439,10 @@ function departingCardKey(recordId: string) { return `dep-${recordId}` }
       <view class="date-tag" :class="dateType === 'weekday' ? 'wd' : 'we'">{{ dateTypeLabel }}</view>
     </view>
 
-    <!-- 全天无车：说清原因，不要用「当前时段暂无」误导 -->
+    <!-- 全天无车：说清是「没收录」还是「确认停运」，不要把两者混为一谈 -->
     <view v-if="noServiceToday" class="notice-card">
-      <text class="notice-title">今天没有班车运行</text>
-      <text class="notice-text">周末 / 节假日时刻表尚未公布，全部线路目前仅工作日运行。</text>
+      <text class="notice-title">今天暂无可查询的班车</text>
+      <text class="notice-text">周末 / 节假日时刻表尚未收录，目前仅有工作日时刻表；如学校安排有车，请以现场通知为准。</text>
     </view>
 
     <!-- 附近站点：未定位时作为首屏功能区块展示。
@@ -452,7 +513,10 @@ function departingCardKey(recordId: string) { return `dep-${recordId}` }
         </view>
       </view>
 
-      <view v-if="hasLocation && !noServiceToday && nearbySections.length === 0" class="hint-card">
+      <view v-if="outOfCampus" class="hint-card">
+        <text>你当前不在校园附近，已隐藏步行赶车建议；下面是「{{ selectedStop }}」的到站时刻</text>
+      </view>
+      <view v-else-if="hasLocation && !noServiceToday && nearbySections.length === 0" class="hint-card">
         <text>当前时段附近暂无到站车次，可从上方列表手动选择站点</text>
       </view>
     </template>

@@ -40,7 +40,13 @@ const nearestRouteStop = computed(() => {
   const names = new Set(routeStops.value.slice(0, -1))
   const routeStations = scheduleStore.stations.filter(s => names.has(s.name))
   const result = findNearestStop(locationStore.userLat, locationStore.userLng, routeStations)
-  return result?.station.name ?? null
+  const name = result?.station.name
+  if (!name) return null
+  // 接驳环线同一站名会出现两次（去程/回程），一键上车取第一次经过的位置——
+  // 那是先到的那一趟。第二次经过需要用户自己点对应行，不能混为一谈。
+  const idx = routeStops.value.indexOf(name)
+  if (idx < 0 || idx >= routeStops.value.length - 1) return null
+  return { name, idx }
 })
 
 const boardIdx = ref(-1)
@@ -54,11 +60,18 @@ const canSubmit = computed(() => !!uploadStore.nickname && recordedCount.value >
 
 function saveNick() { uploadStore.saveNickname(nickInput.value) }
 
-function boardAt(stopName: string) {
-  const idx = routeStops.value.indexOf(stopName)
-  if (idx < 0 || idx >= routeStops.value.length - 1) return
+/**
+ * 按「站序」而不是「站名」定位上车站
+ *
+ * 接驳1路的激光所是第 9、13 站，接驳2路是第 6、10 站，就餐专线的理学院是第 2、8 站：
+ * 用 indexOf(站名) 永远只会拿到第一次经过的位置，从第二次上车时整条计时链都会错位，
+ * 采出来的段耗时也就没法用于校准。这里一律用 v-for 的 idx。
+ */
+function boardAt(idx: number) {
+  const stopName = routeStops.value[idx]
+  if (!stopName || idx >= routeStops.value.length - 1) return
   boardIdx.value = idx
-  uploadStore.startRecordingAt(stopName)
+  uploadStore.startRecordingAt(stopName, idx + 1)
   uni.showToast({ title: `已上车：${stopName}`, icon: 'none' })
 }
 
@@ -68,7 +81,7 @@ function tapStop(idx: number) {
     uni.showToast({ title: '请按站点顺序依次记录', icon: 'none' })
     return
   }
-  uploadStore.recordSegment(routeStops.value[idx])
+  uploadStore.recordSegment(routeStops.value[idx], idx + 1)
 }
 
 function stopState(idx: number): number {
@@ -102,7 +115,13 @@ function handleSubmit() {
     content: `提交 ${recordedCount.value} 段行程记录？`,
     success: async (res) => {
       if (!res.confirm) return
-      const ok = await uploadStore.submit(selectedRoute.value)
+      // 带上路线 key 与上车时刻：同一路线一天几十班，只存线路名无法回溯测的是哪一趟
+      const ok = await uploadStore.submit(
+        selectedRoute.value,
+        '',
+        formatTime(uploadStore.boardingTime),
+        routeToKey[selectedRoute.value] || '',
+      )
       if (ok) {
         uni.showToast({ title: '提交成功！', icon: 'success' })
         boardIdx.value = -1
@@ -122,12 +141,34 @@ function handleDelete(id: string) {
   })
 }
 
-watch(selectedRoute, () => {
-  boardIdx.value = -1
-  uploadStore.resetRecording()
-})
 watch(tabActive, (v) => { if (v === 1) uploadStore.loadHistory() })
 onShow(() => { if (tabActive.value === 1) uploadStore.loadHistory() })
+
+/**
+ * 切换线路
+ *
+ * 旧逻辑一点别的线路就 resetRecording()：真实采样要十几分钟，
+ * 误触一下整趟白测。有已记录段时先确认，取消则保持原线路不变。
+ */
+function pickRoute(r: string) {
+  if (r === selectedRoute.value) return
+  if (timingActive.value && recordedCount.value > 0) {
+    uni.showModal({
+      title: '切换线路会清空本次计时',
+      content: `已记录 ${recordedCount.value} 段，确定放弃并切换到「${routeShort(r)}」？`,
+      confirmText: '放弃并切换',
+      confirmColor: '#DC2626',
+      success: (res) => { if (res.confirm) applyRoute(r) },
+    })
+    return
+  }
+  applyRoute(r)
+}
+function applyRoute(r: string) {
+  selectedRoute.value = r
+  boardIdx.value = -1
+  uploadStore.resetRecording()
+}
 
 function formatSegs(segs: Array<{ from: string; to: string; seconds: number }>) {
   return segs.map(s => `${s.from}→${s.seconds}s→${s.to}`).join(' ')
@@ -156,14 +197,14 @@ function formatTime(ts: number) {
         <view
           v-for="r in routeOptions" :key="r"
           class="route-opt" :class="{ active: selectedRoute === r }"
-          @tap="selectedRoute = r"
+          @tap="pickRoute(r)"
         >{{ routeShort(r) }}</view>
       </view>
 
       <view v-if="routeStops.length">
-        <view v-if="nearestRouteStop && !timingActive" class="nearest-card" @tap="boardAt(nearestRouteStop)">
+        <view v-if="nearestRouteStop && !timingActive" class="nearest-card" @tap="boardAt(nearestRouteStop.idx)">
           <image class="nearest-icon" src="/static/icons/ui/locate.png" mode="aspectFit" />
-          <text>距你最近「{{ nearestRouteStop }}」，点此一键上车</text>
+          <text>距你最近「{{ nearestRouteStop.name }}」，点此一键上车</text>
         </view>
         <view class="stops-title">{{ timingActive ? '到站请点「计时」' : '选择上车站点' }}</view>
 
@@ -176,7 +217,7 @@ function formatTime(ts: number) {
           <text class="stop-name" :class="{ bold: stopState(idx) === 0 }">{{ stop }}</text>
           <text v-if="stopState(idx) === 2" class="seg-secs">{{ getSegmentSeconds(idx) }}</text>
           <view v-if="stopState(idx) === 2 && idx === boardIdx + recordedCount" class="undo-btn" @tap="handleUndo">回退</view>
-          <view v-if="!timingActive && idx < routeStops.length - 1" class="board-btn" @tap="boardAt(stop)">上车</view>
+          <view v-if="!timingActive && idx < routeStops.length - 1" class="board-btn" @tap="boardAt(idx)">上车</view>
           <view v-if="stopState(idx) === 1" class="timing-btn" @tap="tapStop(idx)">计时</view>
         </view>
 

@@ -27,8 +27,21 @@ export interface WeatherInfo {
   tempNow: number
 }
 
-const CACHE_KEY = 'weather_cache_v2'
+/**
+ * 缓存 key 带版本号
+ *
+ * v2 时期请求里带的是用户实时坐标（2026-10-19 之前），Key 与当前固定坐标逻辑不同；
+ * 升到 v3 让旧缓存自然失效，避免「修了坐标却还在用旧数据」这种假象。
+ */
+const CACHE_KEY = 'weather_cache_v3'
 const CACHE_MS = 60 * 60 * 1000 // 本地缓存 60 分钟
+/**
+ * 过期缓存的最长可用时间
+ *
+ * 超过这个时长（比如三天前拉到的天气）就不再展示：网络一直失败时，
+ * 显示「8 月 3 日 晴 32°」比不显示更误导，用户会以为是此刻的天气。
+ */
+const MAX_STALE_MS = 6 * 60 * 60 * 1000
 /** 校园中心点（研究生宿舍楼，GCJ-02，与腾讯接口一致）。固定值，与用户位置无关。 */
 const CAMPUS_LNG = 113.051463
 const CAMPUS_LAT = 28.254769
@@ -52,14 +65,16 @@ let lastAttemptAt = 0
 /** 同一进程内切 tab 的最小请求间隔 */
 const RETRY_MS = 10 * 60 * 1000
 
-/** 读本地缓存（过期数据也先拿来垫上，避免首屏空着） */
+/** 读本地缓存；超过 MAX_STALE_MS 的视为不可用（宁可不显示，也不冒充实时天气） */
 function readCache(): { info: WeatherInfo; fresh: boolean } | null {
   try {
     const raw = uni.getStorageSync(CACHE_KEY)
     if (!raw) return null
     const cache = JSON.parse(raw as string)
     if (!cache || !cache.info) return null
-    return { info: cache.info as WeatherInfo, fresh: Date.now() - cache.updatedAt < CACHE_MS }
+    const age = Date.now() - cache.updatedAt
+    if (!(age >= 0) || age > MAX_STALE_MS) return null
+    return { info: cache.info as WeatherInfo, fresh: age < CACHE_MS }
   } catch {
     return null
   }

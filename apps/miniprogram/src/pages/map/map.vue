@@ -20,7 +20,7 @@ const locationStore = useLocationStore()
 useShare()
 // 地图页不自动申请授权：进入时只检查授权状态（已授权则静默定位），
 // 未授权时由用户点右下角定位按钮主动触发（与首页门禁保持一致，符合平台规范）
-const { init: initLocation, requestLocation, openSetting } = useGeolocation()
+const { init: initLocation, requestLocation, openSetting, acquireWatch, releaseWatch } = useGeolocation()
 
 // ─── 默认视野：把整张校园路线图完整框进屏幕并居中 ───
 // 之前固定在研究生宿舍楼（校园东南角），进页面只能看到局部；
@@ -285,14 +285,15 @@ function applyPendingFocus() {
   }
 
   // 不在路上（还没发车 / 已到终点）：computeActiveBusPositions 只返回运行中的车，
-  // 此时定位到该班次的起点站或终点站——也就是车此刻实际停放的位置
+  // 此时只能定位到该班次线路的起点站或终点站——**这不是车辆 GPS 位置**，
+  // 车实际停在哪里我们并不知道，所以提示文案必须说清是「线路起点/终点」。
   const fallback = resolveEndPoint(target)
   if (fallback) {
     latitude.value = fallback.lat
     longitude.value = fallback.lng
     scale.value = 16
     uni.showToast({
-      title: fallback.before ? '该车次尚未发车，已定位到起点站' : '该车次已到终点，已定位到终点站',
+      title: fallback.before ? '该车次尚未发车，已显示线路起点站' : '该车次已到终点，已显示线路终点站',
       icon: 'none',
     })
     return
@@ -327,10 +328,18 @@ function resolveEndPoint(target: { departureId: string; routeKey: string }) {
 onShow(() => {
   startTimer()
   initLocation()
+  // 地图是位置功能页：停留期间保持持续定位，离开本页立即停止（见 useGeolocation 的 acquire/release）
+  acquireWatch('map')
   applyPendingFocus()
 })
-onHide(stopTimer)
-onUnmounted(stopTimer)
+onHide(() => {
+  stopTimer()
+  releaseWatch('map')
+})
+onUnmounted(() => {
+  stopTimer()
+  releaseWatch('map')
+})
 
 // ─── 点站面板 ───
 const selectedStop = ref<string | null>(null)
@@ -341,9 +350,14 @@ const minuteBaseSec = computed(() => Math.floor(secondsNow.value / 60) * 60)
 
 function onMarkerTap(e: { detail: { markerId: number } }) {
   const id = e.detail.markerId
-  // 站点 marker 从 stationMarkers 反查；公交 marker 不在此列，find 返回 undefined 自然忽略
   const m = stationMarkers.value.find(x => x.id === id)
-  if (m) selectedStop.value = m.title
+  if (m) { selectedStop.value = m.title; return }
+  // 公交图标的 id 从 50000 起（见 busMarkerId 注释），反查一次给出反馈：
+  // 用户看到车图标会下意识点一下，点了没反应像卡死
+  const bus = busPositions.value.find(b => busMarkerId(b.departureId) === id)
+  if (bus) {
+    uni.showToast({ title: `${bus.route} ${bus.shiftName} · 位置为时刻表推算`, icon: 'none' })
+  }
 }
 function closePanel() { selectedStop.value = null }
 
@@ -419,10 +433,17 @@ function recenterAll() {
 // ─── 视野回写：用户手势拖动/缩放后同步 refs ───
 // map 的 latitude/longitude/scale 是单向绑定：不把实际视野写回来，
 // 就会出现「拖走以后点回中没反应」——因为 refs 还是旧值，赋值等于没变。
-// 只跟随 causedBy === 'gesture' 的事件：程序化设置（定位/回中）与初始渲染
-// 也会触发 regionchange，若一起回写会把尚未生效的中间状态存进 refs。
+//
+// 触发原因（causedBy）在不同基础库里的取值和挂载位置并不统一：
+//   - 手势拖动结束是 'drag'、双指缩放结束是 'scale'，不是 'gesture'
+//     （'gesture' 用于旋转/倾斜手势，而本项目 enable-rotate / enable-overlooking 都关了）；
+//   - 程序化设置（回中、定位、初始渲染）是 'update'；
+//   - 个别版本把 causedBy 放在事件顶层而不是 detail 里。
+// 所以这里只排除 'update'，其余一律回写，且顶层与 detail 都读，避免再次踩到
+// 「用户拖完点回中没有反应」这个已经出现过的问题。
 function onRegionChange(e: {
   type?: string
+  causedBy?: string
   detail?: {
     type?: string
     causedBy?: string
@@ -433,7 +454,8 @@ function onRegionChange(e: {
   const d = e?.detail
   if (!d) return
   if ((d.type || e.type) !== 'end') return
-  if (d.causedBy !== 'gesture') return
+  const causedBy = d.causedBy || e.causedBy
+  if (causedBy === 'update') return
   if (typeof d.scale === 'number') scale.value = d.scale
   if (d.centerLocation) {
     latitude.value = d.centerLocation.latitude

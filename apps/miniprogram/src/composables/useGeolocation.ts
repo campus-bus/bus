@@ -109,22 +109,7 @@ function startWatch(): Promise<void> {
         authorized.value = true
         handleWechatLocation(res)
         resolve()
-        if (watching) return
-        // 开启前台持续监听
-        // 注意：onLocationChange 回调固定是 gcj02，type 只写在这里表明预期，不要改成 wgs84
-        wx.startLocationUpdate({
-          type: 'gcj02',
-          success: () => {
-            if (watching) return
-            watching = true
-            wx.onLocationChange(handleWechatLocation)
-          },
-          fail: (err) => {
-            // 常见原因：后台未开通「位置信息（持续监听）」接口权限（需类目审核）
-            // 此时不影响单次定位，只是走动时位置不刷新
-            console.warn('[location] startLocationUpdate 失败:', err?.errMsg || err)
-          },
-        })
+        resumeWatch()
       },
       fail: (err) => {
         loading.value = false
@@ -162,6 +147,63 @@ function ensureStarted(): Promise<void> {
   return startWatch()
 }
 
+/**
+ * 开启前台持续定位（不重新取单点）
+ *
+ * 与 startWatch 的区别：这里只挂 onLocationChange，不再调 getLocation。
+ * 页面每次 onShow 都调 getLocation 会触发频率限制，也没必要——
+ * 监听一接上，微信会立刻推一个当前位置过来。
+ */
+function resumeWatch() {
+  if (watching || starting || denied) return
+  // 注意：onLocationChange 回调固定是 gcj02，type 只写在这里表明预期，不要改成 wgs84
+  wx.startLocationUpdate({
+    type: 'gcj02',
+    success: () => {
+      if (watching) return
+      watching = true
+      wx.onLocationChange(handleWechatLocation)
+    },
+    fail: (err) => {
+      // 常见原因：后台未开通「位置信息（持续监听）」接口权限（需类目审核）
+      // 此时不影响单次定位，只是走动时位置不刷新
+      console.warn('[location] startLocationUpdate 失败:', err?.errMsg || err)
+    },
+  })
+}
+
+function pauseWatch() {
+  if (!watching) return
+  wx.offLocationChange(handleWechatLocation)
+  wx.stopLocationUpdate({})
+  watching = false
+}
+
+/**
+ * 持续定位「所有权」：谁在用，就由谁负责开关
+ *
+ * 目的：离开用到位置的页面就停止监听（申请材料与合规声明都这么写）。
+ * 直接用各页面自己的 onHide 去 stop 不可行——tabBar 切换时新页 onShow 与旧页 onHide
+ * 的先后顺序并不保证，旧页后到就会把新页刚开的监听关掉。
+ * 所以记一个当前持有者：新页 onShow 抢走所有权，旧页 onHide 发现所有权已不是自己
+ * 就什么都不做。这样两种顺序都正确。
+ */
+let watchOwner: string | null = null
+
+/** 页面开始使用位置（onShow）。owner 用页面名，便于排查 */
+function acquireWatch(owner: string) {
+  watchOwner = owner
+  // 用户还没同意过定位时什么都不做：授权必须由点击触发
+  if (authorized.value && wantWatch) resumeWatch()
+}
+
+/** 页面离开（onHide）：只有所有权还在自己手上时才停 */
+function releaseWatch(owner: string) {
+  if (watchOwner !== owner) return
+  watchOwner = null
+  pauseWatch()
+}
+
 /** 用户主动点击定位入口时调用：先过隐私协议，再取位置。返回是否成功拿到坐标 */
 async function requestLocation(): Promise<boolean> {
   if (loading.value || starting) return false
@@ -190,8 +232,12 @@ function init(autoRequest = false) {
       if (auth === true) {
         authorized.value = true
         denied = false
-        // 已授权：静默定位（已经在监听时不再重复请求，避免 getLocation 频率限制）
-        ensureStarted()
+        wantWatch = true
+        // 已有坐标时只恢复监听，不再重复取单点：切 tab 回来每次都 getLocation
+        // 既没必要，也容易撞上调用频率限制
+        const store = useLocationStore()
+        if (store.userLat !== null && store.userLng !== null) resumeWatch()
+        else ensureStarted()
         return
       }
       authorized.value = false
@@ -212,30 +258,26 @@ function init(autoRequest = false) {
 
 function stopWatch() {
   wantWatch = false
-  if (watching) {
-    wx.offLocationChange(handleWechatLocation)
-    wx.stopLocationUpdate({})
-    watching = false
-  }
+  watchOwner = null
+  pauseWatch()
 }
 
 /**
  * 注册前后台钩子：切后台立即停止持续定位，回前台自动恢复
  *
  * 合规要点：位置接口仅在前台使用（未申请后台定位能力），
- * 这条策略让「只在用户看地图时持续定位」在代码层面真正成立。
+ * 配合 acquireWatch/releaseWatch（离开页面即停），
+ * 代码层面真正做到了「只在停留于用到位置的页面、且小程序在前台时定位」。
  */
 function installAppHooks() {
   if (appHooksInstalled) return
   appHooksInstalled = true
   wx.onAppHide?.(() => {
-    if (!watching) return
-    wx.offLocationChange(handleWechatLocation)
-    wx.stopLocationUpdate({})
-    watching = false
+    pauseWatch()
   })
   wx.onAppShow?.(() => {
-    if (wantWatch && !watching) startWatch()
+    // 回前台：只恢复监听，不重新取单点（避免频繁 getLocation）
+    if (watchOwner && wantWatch) resumeWatch()
   })
 }
 
@@ -275,5 +317,6 @@ export function useGeolocation(options: { autoStart?: boolean } = {}) {
   return {
     ready, error, loading, authorized,
     init, requestLocation, startWatch, stopWatch, openSetting, openPrivacyContract,
+    acquireWatch, releaseWatch,
   }
 }

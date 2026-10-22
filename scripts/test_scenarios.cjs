@@ -150,6 +150,45 @@ assert('R2 JB2 18站 军体东×2激光所×2网球场×2',
   jb2Stops.filter(s => s.currentStop === '网球场').length === 2)
 assert('R2 JB1=JB2反转', JSON.stringify(rp.find(x => x.routeKey === 'JB1_NORMAL').stops.map(s => s.currentStop)) === JSON.stringify([...jb2Stops.map(s => s.currentStop)].reverse()))
 
+// ═══ P. 上车站可行性优先（首页多起点推荐） ═══
+// 复现 2026-10-22 修复前的真实缺陷：11:25 站在二食堂、去高超楼，
+// 最近站「二食堂」这班车 11:24:37 已经过了（-23s，仍在 5 分钟保留窗内），
+// 旧逻辑先遍历到二食堂就 seen 掉同班次，把「二食堂北 11:32:12」这个唯一能赶上的
+// 上车站丢掉了。修复后按档位（可上车 > 走不到 > 已过站）选上车站。
+console.log('\n【P. 上车站可行性优先】')
+const now1125 = 11 * 3600 + 25 * 60
+const near1125 = [{ name: '二食堂', dist: 20 }, { name: '二食堂北', dist: 45 }]
+const destMembers1125 = ['高超楼']
+const tierOf = (secBoard, walkSeconds) => (secBoard <= 0 ? 2 : (walkSeconds > secBoard ? 1 : 0))
+const bestByDep1125 = new Map()
+const rawCandidates = []
+for (const c of near1125) {
+  const walkSeconds = c.dist / 1.3
+  for (const d of deps.filter(x => x.dateType === 'weekday')) {
+    const rr = findBestRide(getPreds(d.recordId), [c.name], destMembers1125)
+    if (!rr) continue
+    const secBoard = Math.round(rr.origin.arrivalMinutes * 60 - now1125)
+    const secDest = Math.round(rr.dest.arrivalMinutes * 60 - now1125)
+    if (secDest > 3600 || secBoard < -300) continue
+    const tier = tierOf(secBoard, walkSeconds)
+    rawCandidates.push({ dep: d.recordId, stop: c.name, secBoard, tier })
+    const prev = bestByDep1125.get(d.recordId)
+    if (prev && (prev.tier < tier || (prev.tier === tier && prev.walk <= walkSeconds))) continue
+    bestByDep1125.set(d.recordId, { tier, walk: walkSeconds, stop: c.name, board: rr.origin.arrivalTime })
+  }
+}
+const s8pick = bestByDep1125.get('S0008')
+const s8old = rawCandidates.find(x => x.dep === 'S0008' && x.stop === '二食堂')
+assert('P1 S0008 在二食堂已过站(-23s)、二食堂北还有 432s',
+  !!s8old && s8old.secBoard === -23, `(二食堂 ${s8old?.secBoard}s)`)
+assert('P1 修复后选二食堂北（可上车），不再推荐已过站的二食堂',
+  !!s8pick && s8pick.stop === '二食堂北' && s8pick.tier === 0 && s8pick.board === '11:32:12', `(${s8pick?.stop} ${s8pick?.board})`)
+assert('P2 不存在「有可上车方案却选了已过站方案」的班次',
+  [...bestByDep1125.entries()].every(([id, v]) => {
+    if (v.tier < 2) return true
+    return !rawCandidates.some(x => x.dep === id && x.tier < 2)
+  }))
+
 // ═══ D. 日期类型（节假日表） ═══
 // 依据国办发明电〔2025〕7 号逐日核对 2026 年。曾出现 7 天误判
 // （元旦未补 1/4 上班、春节漏 2/15-2/16、清明整体偏移一天、劳动节漏 5/9 上班），

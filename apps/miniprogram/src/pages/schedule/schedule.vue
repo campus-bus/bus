@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
 import { useScheduleStore } from '@/stores/schedule'
 import { usePreferenceStore } from '@/stores/preference'
 import { getDateType, localDateStr, parseDateStr } from '@/utils/datetime'
@@ -10,7 +11,6 @@ import { routeColorOf, routeLabelOf } from '@/constants/routes'
 import { useShare } from '@/utils/share'
 import BusStopTimeline from '@/components/BusStopTimeline.vue'
 import type { Departure, RouteName, DateType } from '@/types'
-
 const scheduleStore = useScheduleStore()
 const preferenceStore = usePreferenceStore()
 
@@ -35,6 +35,9 @@ const planDate = ref(localDateStr())
 const planOrigin = ref('研究生宿舍楼')
 const planDest = ref('高超楼')
 const planDeadline = ref('20:00')
+/** 用户是否手动改过日期 / 日期类型：跨零点刷新默认值时不能覆盖用户的主动选择 */
+const userPickedDate = ref(false)
+const userPickedDateType = ref(false)
 
 interface PlanResult {
   departure: Departure
@@ -70,6 +73,13 @@ const planDateLabel = computed(() => getDateLabel(parseDateStr(planDate.value)))
 const routes: RouteName[] = ['环线1路', '接驳1路', '接驳2路']
 
 function doSearch() {
+  // 环线首尾同站：起终点选同一个站时，findBestRide 会把「回到起点」当成到达，
+  // 输出「07:30 发车、07:43 回到研究生宿舍楼」这种绕一圈的无效行程。
+  // 分组后比较，避免「军体活动中心」与「军体活动中心东」这类同组站漏判。
+  if (toGroup(planOrigin.value) === toGroup(planDest.value)) {
+    uni.showToast({ title: '出发站和到达站不能是同一个站', icon: 'none' })
+    return
+  }
   const [dh, dm] = planDeadline.value.split(':').map(Number)
   const deadlineMin = dh * 60 + dm
   const dt = planDateType.value
@@ -106,8 +116,23 @@ const expandedId = ref<string | null>(null)
 /** 行程规划结果卡片：展开显示完整站点时间线 */
 const planExpandedId = ref<string | null>(null)
 function togglePlanExpand(id: string) { planExpandedId.value = planExpandedId.value === id ? null : id }
-/** 查询日期是今天才显示车辆运行进度（历史/未来日期用当前时间判断会误导） */
-const isPlanToday = computed(() => planDate.value === localDateStr())
+/**
+ * 「查询日期是不是今天」
+ *
+ * 必须依赖 todayTick：这是 tabBar 页，实例常驻不销毁，
+ * 不显式依赖的话跨零点后会一直用创建时的日期做比较，历史日期被当成今天，
+ * 从而错误地显示车辆运行进度。
+ */
+const todayTick = ref(0)
+const todayStr = computed(() => { void todayTick.value; return localDateStr() })
+const isPlanToday = computed(() => planDate.value === todayStr.value)
+
+onShow(() => {
+  todayTick.value++
+  // 页面常驻：跨零点后把「没被用户手动改过」的默认值同步到新的一天
+  if (!userPickedDate.value) planDate.value = localDateStr()
+  if (!userPickedDateType.value) selectedDateType.value = getDateType(getNow())
+})
 
 const departures = computed(() => scheduleStore.getDepartures(selectedDateType.value, selectedRoute.value))
 const timeSorted = computed(() => [...departures.value].sort((a, b) => a.departureMinutes - b.departureMinutes))
@@ -128,9 +153,23 @@ const grouped = computed(() => {
 
 function toggleExpand(id: string) { expandedId.value = expandedId.value === id ? null : id }
 
+/**
+ * 切换线路：不改动日期类型过滤器
+ *
+ * 旧逻辑在切到环线1路时会把「周末/节假日」偷偷改成「工作日」——
+ * 切换内容过滤器却暗改另一个过滤器，用户会以为自己看的是周末时刻表。
+ * 现在只切线路，没有数据时由下方的提示条说明原因。
+ */
 function switchRoute(r: RouteName) {
   selectedRoute.value = r
-  if (r === '环线1路' && selectedDateType.value === 'weekend_holiday') selectedDateType.value = 'weekday'
+}
+function pickDateType(dt: DateType) {
+  userPickedDateType.value = true
+  selectedDateType.value = dt
+}
+function pickPlanDate(v: string) {
+  userPickedDate.value = true
+  planDate.value = v
 }
 </script>
 
@@ -146,7 +185,7 @@ function switchRoute(r: RouteName) {
     <view v-if="activeTab === 0" class="planner">
       <view class="row">
         <text class="label">日期</text>
-        <picker class="picker" mode="date" :value="planDate" @change="(e: any) => planDate = e.detail.value">
+        <picker class="picker" mode="date" :value="planDate" @change="(e: any) => pickPlanDate(e.detail.value)">
           <view class="input">
             <text class="input-text">{{ planDate }}</text>
             <text class="date-tag" :class="planDateType === 'weekday' ? 'wd' : 'we'">{{ planDateLabel }}</text>
@@ -223,8 +262,8 @@ function switchRoute(r: RouteName) {
       </view>
       <view class="date-toggle">
         <view class="dt-left">
-          <view class="dt-btn" :class="{ active: selectedDateType === 'weekday' }" @tap="selectedDateType = 'weekday'">工作日</view>
-          <view class="dt-btn" :class="{ active: selectedDateType === 'weekend_holiday' }" @tap="selectedDateType = 'weekend_holiday'">周末/节假日</view>
+          <view class="dt-btn" :class="{ active: selectedDateType === 'weekday' }" @tap="pickDateType('weekday')">工作日</view>
+          <view class="dt-btn" :class="{ active: selectedDateType === 'weekend_holiday' }" @tap="pickDateType('weekend_holiday')">周末/节假日</view>
         </view>
         <view class="sort-toggle" @tap="sortByTime = !sortByTime">{{ sortByTime ? '按时间' : '按班次' }}</view>
       </view>
