@@ -283,10 +283,7 @@ function pickPlanDate(v: string) {
       </view>
 
       <view v-if="selectedRoute === '环线1路' && selectedDateType === 'weekend_holiday'" class="notice">
-        环线1路仅在工作日运行，周末/节假日无环线1路车次。
-      </view>
-      <view v-if="selectedRoute !== '环线1路' && selectedDateType === 'weekend_holiday'" class="notice">
-        周末/节假日时刻表暂未公布。
+        环线1路和就餐专线只在工作日运行。周末和节假日请查接驳1路、接驳2路。
       </view>
 
       <view v-if="departures.length > 0" class="dep-list">

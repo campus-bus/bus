@@ -352,7 +352,7 @@ const departingSoon = computed(() => {
   return list
 })
 
-/** 当天全天无车（2026-10-18 起周末/节假日时刻表尚未公布） */
+/** 当天该日期类型下一条班次都没有 */
 const noServiceToday = computed(() => scheduleStore.getDepartures(dateType.value).length === 0)
 
 // ─── 倒计时（逐秒派生，不改动列表结构） ───
@@ -440,7 +440,7 @@ function departingCardKey(recordId: string) { return `dep-${recordId}` }
     <!-- 全天无车：说清是「没收录」还是「确认停运」，不要把两者混为一谈 -->
     <view v-if="noServiceToday" class="notice-card">
       <text class="notice-title">今天暂无可查询的班车</text>
-      <text class="notice-text">周末 / 节假日时刻表尚未收录，目前仅有工作日时刻表；如学校安排有车，请以现场通知为准。</text>
+      <text class="notice-text">今天没有收录的班次。如学校临时安排车辆，请以现场通知为准。</text>
     </view>
 
     <!-- 附近站点：未定位时作为首屏功能区块展示。

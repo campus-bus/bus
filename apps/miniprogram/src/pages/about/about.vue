@@ -68,7 +68,7 @@ function exitDev() {
 
     <view class="section">
       <view class="section-title">注意</view>
-      <view class="text">· 全部线路目前仅工作日运行，周末/节假日时刻表待公布</view>
+      <view class="text">· 环线1路和就餐专线只在工作日运行。接驳1路、接驳2路在周末和法定节假日按周末时刻表运行</view>
       <view class="text">· 标有"就餐"的车次走就餐专线，站点与普通环线1路不同</view>
       <view class="text">· 高超楼是系统工程学院所在地，就餐专线在此发车，接驳1路/2路均经过</view>
     </view>

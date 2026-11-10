@@ -96,11 +96,11 @@ assert('B4 军体东→军体南 seq12→seq13', r !== null && r.origin.stopSeq 
 console.log('\n【S. 行程规划】')
 // S1: 全班次最优组合抽查
 let allOk = true
-for (const d of deps.filter(x => x.routeKey === 'JB2_NORMAL').slice(0, 25)) {
+for (const d of deps.filter(x => x.routeKey === 'JB2_NORMAL' && x.dateType === 'weekday')) {
   const rr = findBestRide(getPreds(d.recordId), ['军体活动中心东'], ['二食堂'])
   if (rr && rr.origin.stopSeq !== 12) { allOk = false; console.log('    班次', d.departureTime, '误选 seq' + rr.origin.stopSeq) }
 }
-assert('S1 JB2 全部25班 军体东→二食堂 均选seq12', allOk)
+assert('S1 JB2 工作日25班 军体东→二食堂 均选seq12', allOk)
 
 // S2: deadline 过滤
 const deadline = 17 * 60 // 17:00
@@ -140,8 +140,13 @@ assert('H8 预测序列seq严格递增', p1645.every((p, i) => i === 0 || p.stop
 // ═══ T. 时间逻辑 ═══
 console.log('\n【T. 时间逻辑】')
 assert('T2 过站-300s移除阈值正确', withSec.every(x => x.sec >= -300))
-// T3: 周末无车次
-assert('T3 周末departures为0', deps.filter(d => d.dateType === 'weekend_holiday').length === 0)
+// T3: 周末只有接驳，时刻与 2026-11 公示表一致；环线1路、就餐专线周末不跑
+const weekend = deps.filter(d => d.dateType === 'weekend_holiday')
+const weekendTimes = (key) => weekend.filter(d => d.routeKey === key).map(d => d.departureTime).join(',')
+assert('T3 周末接驳1路 25 趟', weekendTimes('JB1_NORMAL') === '7:50,8:30,9:10,9:50,10:30,11:10,11:50,12:30,14:40,15:20,16:00,16:40,17:25,17:50,18:15,18:40,19:05,19:30,19:55,20:20,20:45,21:10,21:35,22:00,22:25')
+assert('T3 周末接驳2路 12 趟', weekendTimes('JB2_NORMAL') === '8:10,8:50,9:30,10:10,10:50,11:30,12:10,14:20,15:00,15:40,16:20,17:00')
+assert('T3 周末无环线1路和就餐专线', weekend.every(d => d.routeKey === 'JB1_NORMAL' || d.routeKey === 'JB2_NORMAL'))
+assert('T3 周末每班都有 18 站预测', weekend.every(d => getPreds(d.recordId).length === 18))
 // T4: 末班后无车次（23:00）
 const now2300 = 23 * 3600
 const remain = pred.filter(p => p.dateType === 'weekday' && p.arrivalMinutes * 60 - now2300 > -300)
@@ -251,7 +256,28 @@ for (let t = new Date(2026, 0, 1); t.getFullYear() === 2026; t = new Date(t.getF
 }
 assert('D1 2026 全年 365 天日期类型与国办发明电〔2025〕7 号一致', wrongDays.length === 0,
   wrongDays.length ? '　不符：' + wrongDays.join(', ') : '')
-assert('D2 节假日表覆盖 2026 年（明年需补 2027）', Object.keys(holMap).length > 0 && Object.keys(holMap).every(k => k.startsWith('2026')))
+
+// 2027：国办发明电〔2026〕10 号。端午、中秋各只放 1 天
+const officialOff27 = new Set(), officialWork27 = new Set()
+const addRange27 = (a, b) => {
+  const [y1, m1, d1] = a.split('-').map(Number)
+  const [y2, m2, d2] = b.split('-').map(Number)
+  for (let t = new Date(y1, m1 - 1, d1), e = new Date(y2, m2 - 1, d2); t <= e; t = new Date(t.getFullYear(), t.getMonth(), t.getDate() + 1)) officialOff27.add(keyOf(t))
+}
+addRange27('2027-01-01', '2027-01-03'); addRange27('2027-02-05', '2027-02-13'); addRange27('2027-04-03', '2027-04-05')
+addRange27('2027-05-01', '2027-05-05'); addRange27('2027-06-09', '2027-06-09'); addRange27('2027-09-15', '2027-09-15'); addRange27('2027-10-01', '2027-10-07')
+;['2027-01-31', '2027-02-14', '2027-05-08', '2027-09-26', '2027-10-09'].forEach(x => officialWork27.add(x))
+const wrong27 = []
+for (let t = new Date(2027, 0, 1); t.getFullYear() === 2027; t = new Date(t.getFullYear(), t.getMonth(), t.getDate() + 1)) {
+  const s = keyOf(t), g = t.getDay()
+  const shouldWork = officialWork27.has(s) || (!officialOff27.has(s) && !officialWork27.has(s) && g !== 0 && g !== 6)
+  if ((dateKind(s) === 'workday') !== shouldWork) wrong27.push(s)
+}
+assert('D2 2027 全年 365 天日期类型与国办发明电〔2026〕10 号一致', wrong27.length === 0,
+  wrong27.length ? '　不符：' + wrong27.join(', ') : '')
+assert('D3 节假日表同时覆盖 2026 与 2027',
+  Object.keys(holMap).some(k => k.startsWith('2026')) && Object.keys(holMap).some(k => k.startsWith('2027'))
+  && Object.keys(holMap).every(k => k.startsWith('2026') || k.startsWith('2027')))
 
 console.log('\n══════════════════════════════')
 console.log('断言结果: 通过', pass, '/ 失败', fail, fail === 0 ? '✅ 全部通过' : '❌ 存在失败项')

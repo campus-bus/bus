@@ -80,7 +80,7 @@ function stopClock() { if (clockTimer) { clearInterval(clockTimer); clockTimer =
 /**
  * 该站名各次经过的「下一次到站」
  *
- * 只取当天日期类型的班次（周末/节假日目前无车，结果为空 → 界面不猜，让用户选）。
+ * 只取当天日期类型的班次。周末和节假日只有接驳，选环线1路或就餐专线时列表为空，由用户自己选站。
  */
 const nearestPasses = computed(() => {
   const near = nearestRouteStop.value
