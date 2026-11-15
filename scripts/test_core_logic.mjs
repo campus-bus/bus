@@ -70,23 +70,23 @@ console.log('\n【A. 同名站多次经过（真实 findBestRide）】')
 const jb2_1645 = depOf('JB2_NORMAL', '16:45')
 const p1645 = predsOf(jb2_1645.recordId)
 
-let r = findBestRide(p1645, ['军体活动中心东'], ['二食堂'])
-assert('A1 军体东→二食堂 选返程 seq12→15', r && r.origin.stopSeq === 12 && r.dest.stopSeq === 15,
+let r = findBestRide(p1645, ['高培楼'], ['二食堂'])
+assert('A1 高培楼→二食堂 选回程 seq12→14', r && r.origin.stopSeq === 12 && r.dest.stopSeq === 14,
   `(seq${r?.origin.stopSeq} ${r?.origin.arrivalTime} → ${r?.dest.arrivalTime})`)
 
-r = findBestRide(p1645, ['军体活动中心东', '军体活动中心南'], ['二食堂'])
-assert('A3 军体(组)→二食堂 选军体南 seq13', r && r.origin.stopName === '军体活动中心南' && r.origin.stopSeq === 13,
+r = findBestRide(p1645, ['高培楼'], ['二食堂'])
+assert('A3 两处高培楼→二食堂 选回程 seq12', r && r.origin.stopSeq === 12,
   `(seq${r?.origin.stopSeq} 乘坐${Math.round((r?.rideMinutes ?? 0) * 60)}s)`)
 
-r = findBestRide(p1645, ['军体活动中心东', '军体活动中心南'], ['激光所'])
-assert('A4 军体(组)→激光所 选军体东 seq4', r && r.origin.stopName === '军体活动中心东' && r.origin.stopSeq === 4)
+r = findBestRide(p1645, ['高培楼'], ['激光所'])
+assert('A4 高培楼→激光所 选去程 seq4→6', r && r.origin.stopSeq === 4 && r.dest.stopSeq === 6)
 
 r = findBestRide(p1645, ['理学院'], ['网球场'])
 assert('A5 理学院→网球场 seq9→11', r && r.origin.stopSeq === 9 && r.dest.stopSeq === 11)
 
 const jb1First = departures.find((d) => d.routeKey === 'JB1_NORMAL')
-r = findBestRide(predsOf(jb1First.recordId), ['激光所'], ['军体活动中心东'])
-assert('A6 JB1 激光所→军体东 只坐 2 站', r && r.dest.stopSeq - r.origin.stopSeq === 2,
+r = findBestRide(predsOf(jb1First.recordId), ['激光所'], ['高培楼'])
+assert('A6 JB1 激光所→高培楼 只坐 2 站', r && r.dest.stopSeq - r.origin.stopSeq === 2,
   `(seq${r?.origin.stopSeq}→seq${r?.dest.stopSeq})`)
 
 console.log('\n【B. 站点分组（真实 toGroup / groupMembers）】')
@@ -191,14 +191,14 @@ const stopsOf = (key) => {
 const jb1Stops = stopsOf('JB1_NORMAL')
 const jb2Stops = stopsOf('JB2_NORMAL')
 
-assert('R1 JB1 军体活动中心东 出现在第 7、15 站',
-  JSON.stringify(findStopIndexes(jb1Stops, '军体活动中心东')) === JSON.stringify([6, 14]),
-  `(${findStopIndexes(jb1Stops, '军体活动中心东').map((i) => i + 1).join(', ')})`)
-assert('R2 JB2 军体活动中心东 出现在第 4、12 站',
-  JSON.stringify(findStopIndexes(jb2Stops, '军体活动中心东')) === JSON.stringify([3, 11]),
-  `(${findStopIndexes(jb2Stops, '军体活动中心东').map((i) => i + 1).join(', ')})`)
-assert('R3 JB1 激光所 出现在第 9、13 站（一圈两次）',
-  JSON.stringify(findStopIndexes(jb1Stops, '激光所')) === JSON.stringify([8, 12]))
+assert('R1 JB1 高培楼 出现在第 6、14 站',
+  JSON.stringify(findStopIndexes(jb1Stops, '高培楼')) === JSON.stringify([5, 13]),
+  `(${findStopIndexes(jb1Stops, '高培楼').map((i) => i + 1).join(', ')})`)
+assert('R2 JB2 高培楼 出现在第 4、12 站',
+  JSON.stringify(findStopIndexes(jb2Stops, '高培楼')) === JSON.stringify([3, 11]),
+  `(${findStopIndexes(jb2Stops, '高培楼').map((i) => i + 1).join(', ')})`)
+assert('R3 JB1 激光所 出现在第 8、12 站（一圈两次）',
+  JSON.stringify(findStopIndexes(jb1Stops, '激光所')) === JSON.stringify([7, 11]))
 assert('R4 JB2 网球场 出现在第 5、11 站（一圈两次）',
   JSON.stringify(findStopIndexes(jb2Stops, '网球场')) === JSON.stringify([4, 10]))
 assert('R5 起终点同名站只保留起点，终点不作上车站',
@@ -208,26 +208,25 @@ assert('R6 不在该路线上的站返回空数组',
   findStopIndexes(jb1Stops, '二食堂北').length === 0)
 
 // 这条就是用户报的 bug：在回程那趟车前点「一键上车」，不能把上车站落成去程站序
-assert('R7 选回程军体东(第15站)后，去程第7站不会被点亮',
-  stopStateOf(14, 14, 0) === 0 && stopStateOf(6, 14, 0) === -1,
-  `(第15站=${stopStateOf(14, 14, 0)}, 第7站=${stopStateOf(6, 14, 0)})`)
+assert('R7 选回程高培楼(第14站)后，去程第6站不会被点亮',
+  stopStateOf(13, 13, 0) === 0 && stopStateOf(5, 13, 0) === -1,
+  `(第14站=${stopStateOf(13, 13, 0)}, 第6站=${stopStateOf(5, 13, 0)})`)
 assert('R8 上车后只有下一站可计时，再往后都不亮',
-  stopStateOf(15, 14, 0) === 1 && stopStateOf(16, 14, 0) === -1 && stopStateOf(17, 14, 0) === -1)
+  stopStateOf(14, 13, 0) === 1 && stopStateOf(15, 13, 0) === -1 && stopStateOf(16, 13, 0) === -1)
 assert('R9 记录一段后该站转为已记录，下一站接过计时位',
-  stopStateOf(15, 14, 1) === 2 && stopStateOf(16, 14, 1) === 1)
+  stopStateOf(14, 13, 1) === 2 && stopStateOf(15, 13, 1) === 1)
 assert('R10 未上车时所有行都不亮',
-  [0, 6, 14, 17].every((i) => stopStateOf(i, -1, 0) === -1))
+  [0, 5, 13, 16].every((i) => stopStateOf(i, -1, 0) === -1))
 
-// 端到端：从回程军体东上车，沿第 15→16→17 站记两段，段序号必须是 15/16/17 而不是 7/8/9
-const boardIdxR = 14
-const segs = [15, 16].map((toIdx) => ({
+const boardIdxR = 13
+const segs = [14, 15].map((toIdx) => ({
   from: jb1Stops[toIdx - 1],
   to: jb1Stops[toIdx],
   fromSeq: toIdx,
   toSeq: toIdx + 1,
 }))
-assert('R11 回程上车的段序号为 15→16→17',
-  segs[0].fromSeq === 15 && segs[0].toSeq === 16 && segs[1].fromSeq === 16 && segs[1].toSeq === 17,
+assert('R11 回程上车的段序号为 14→15→16',
+  segs[0].fromSeq === 14 && segs[0].toSeq === 15 && segs[1].fromSeq === 15 && segs[1].toSeq === 16,
   `(${segs.map((s) => `${s.fromSeq}→${s.toSeq}`).join(' ')}，上车站索引 ${boardIdxR})`)
 
 console.log('\n【T. 一键上车「下一班是哪一趟」（真实 nextArrivalsBySeq / recommendedPass）】')
@@ -247,39 +246,38 @@ const passesAt = (routeKey, name, hh, mm) => {
   return { ps, rec: recommendedPass(ps) }
 }
 
-// JB2 军体活动中心东：seq4（去程）、seq12（回程）
-let t = passesAt('JB2_NORMAL', '军体活动中心东', 16, 30)
-assert('T1 16:30 时下一班走回程 seq12（16:35），而不是去程 seq4（16:48）',
+// JB2 高培楼：seq4（去程）、seq12（回程）
+let t = passesAt('JB2_NORMAL', '高培楼', 16, 30)
+assert('T1 16:30 时下一班走回程 seq12（16:35:54），而不是去程 seq4（16:48:07）',
   t.rec === 11 && t.ps.find((p) => p.seq === 12).etaSeconds < t.ps.find((p) => p.seq === 4).etaSeconds,
   `(回程 ${t.ps.find((p) => p.seq === 12).etaTime} / 去程 ${t.ps.find((p) => p.seq === 4).etaTime} → 推荐 seq${t.rec + 1})`)
 
-t = passesAt('JB2_NORMAL', '军体活动中心东', 16, 0)
-assert('T2 16:00 时下一班走去程 seq4（16:08），而不是回程 seq12（16:15）',
+t = passesAt('JB2_NORMAL', '高培楼', 16, 0)
+assert('T2 16:00 时下一班走去程 seq4（16:08:07），而不是回程 seq12（16:15:54）',
   t.rec === 3, `(推荐 seq${t.rec + 1}，去程 ${t.ps.find((p) => p.seq === 4).etaTime})`)
 
-t = passesAt('JB2_NORMAL', '军体活动中心东', 17, 0)
-assert('T3 17:00 时又轮到去程 seq4（17:08）',
+t = passesAt('JB2_NORMAL', '高培楼', 17, 0)
+assert('T3 17:00 时又轮到去程 seq4（17:08:07）',
   t.rec === 3, `(推荐 seq${t.rec + 1})`)
 
 assert('T4 推荐结果始终是「预计到站最近且未过站」的那一次',
   [0, 15, 30, 45].every((mm) => {
-    const r = passesAt('JB2_NORMAL', '军体活动中心东', 16, mm)
+    const r = passesAt('JB2_NORMAL', '高培楼', 16, mm)
     if (r.rec === null) return true
     const rec = r.ps.find((p) => p.idx === r.rec)
     return r.ps.every((p) => p.etaSeconds === null || p.etaSeconds < 0 || p.etaSeconds >= rec.etaSeconds)
   }))
 
-// JB1 军体东：seq7（去程）、seq15（回程）
-t = passesAt('JB1_NORMAL', '军体活动中心东', 16, 30)
-assert('T5 JB1 16:30 下一班走去程 seq7', t.rec === 6, `(推荐 seq${t.rec + 1}，${t.ps.find((p) => p.seq === 7).etaTime})`)
+t = passesAt('JB1_NORMAL', '高培楼', 16, 30)
+assert('T5 JB1 16:30 下一班走去程 seq6', t.rec === 5, `(推荐 seq${t.rec + 1}，${t.ps.find((p) => p.seq === 6).etaTime})`)
 
-const both = passesAt('JB2_NORMAL', '军体活动中心东', 16, 30).ps
+const both = passesAt('JB2_NORMAL', '高培楼', 16, 30).ps
 assert('T6 两个候选都给出了到站时刻（界面可显示「第4站 16:48」这种）',
   both.length === 2 && both.every((p) => typeof p.etaTime === 'string' && p.etaSeconds !== null))
 assert('T7 深夜无车时返回 null（不替用户猜，界面并列展示）',
-  recommendedPass(nextArrivalsBySeq([3, 11], arrivalsOf('JB2_NORMAL', '军体活动中心东'), 23 * 3600 + 50 * 60)) === null)
+  recommendedPass(nextArrivalsBySeq([3, 11], arrivalsOf('JB2_NORMAL', '高培楼'), 23 * 3600 + 50 * 60)) === null)
 assert('T8 刚过站的班次标为 passed（用于「刚过站」提示）',
-  nextArrivalsBySeq([3], arrivalsOf('JB2_NORMAL', '军体活动中心东'), 16 * 3600 + 30 * 60 + 0)
+  nextArrivalsBySeq([3], arrivalsOf('JB2_NORMAL', '高培楼'), 16 * 3600 + 30 * 60 + 0)
     .every((p) => typeof p.passed === 'boolean'))
 
 // ── W. 行程规划：今天已错过的班次不得推荐（真实 isCatchable） ──
@@ -299,31 +297,30 @@ assert('W6 凌晨 00:00 查今天：当天所有班次都还没开',
   isCatchable(7 * 60 + 30, 0, true) && isCatchable(22 * 60 + 30, 0, true))
 
 // ── X. 记录页「下一班」必须按线路过滤（真实 collectStopArrivals） ──
-// 场景来源：上线前验收发现「军体活动中心东」在环线1路与接驳2路都是第 4 站，
-// 不按 routeKey 过滤会拿环线1路 07:30 那班（07:33:27）判断接驳2路的方向，
-// 而接驳2路真正下一班是 07:48 —— 差 15 分钟，用户会按错方向上车。
+// 网球场在环线1路是第 5 站，在接驳2路也是第 5 站（另外回程还有第 11 站）。
+// 不按 routeKey 过滤会拿环线1路 07:30 那班（07:34:15）判断接驳2路的方向。
 console.log('\n【X. 记录页下一班按线路过滤（真实 collectStopArrivals）】')
-const jbdIdx = findStopIndexes(jb2Stops, '军体活动中心东')
 const at0700 = 7 * 3600
 const jb2Passes = nextArrivalsBySeq(
-  jbdIdx,
-  collectStopArrivals(departures, predsOf, 'JB2_NORMAL', 'weekday', '军体活动中心东'),
+  findStopIndexes(jb2Stops, '网球场'),
+  collectStopArrivals(departures, predsOf, 'JB2_NORMAL', 'weekday', '网球场'),
   at0700,
 )
+const hx1Stops = stopsOf('HX1_NORMAL')
 const hx1Passes = nextArrivalsBySeq(
-  jbdIdx,
-  collectStopArrivals(departures, predsOf, 'HX1_NORMAL', 'weekday', '军体活动中心东'),
+  findStopIndexes(hx1Stops, '网球场'),
+  collectStopArrivals(departures, predsOf, 'HX1_NORMAL', 'weekday', '网球场'),
   at0700,
 )
-const seq4 = (arr) => (arr.find((p) => p.seq === 4) || {}).etaTime
-assert('X1 接驳2路 07:00 时第 4 站下一班是 07:48:00（本线路）',
-  seq4(jb2Passes) === '07:48:00', `(实际 ${seq4(jb2Passes)})`)
-assert('X2 环线1路 07:00 时第 4 站下一班是 07:33:27（相邻线路的另一趟，证明站序会撞车）',
-  seq4(hx1Passes) === '07:33:27', `(实际 ${seq4(hx1Passes)})`)
+const seq5 = (arr) => (arr.find((p) => p.seq === 5) || {}).etaTime
+assert('X1 接驳2路 07:00 时第 5 站下一班是 07:48:47（本线路）',
+  seq5(jb2Passes) === '07:48:47', `(实际 ${seq5(jb2Passes)})`)
+assert('X2 环线1路 07:00 时第 5 站下一班是 07:34:15（相邻线路的另一趟，证明站序会撞车）',
+  seq5(hx1Passes) === '07:34:15', `(实际 ${seq5(hx1Passes)})`)
 assert('X3 两条线路的结果必须不同（若相同说明过滤失效）',
-  seq4(jb2Passes) !== seq4(hx1Passes))
+  seq5(jb2Passes) !== seq5(hx1Passes))
 assert('X4 站点序列只含本线路的班次（不混入环线1路/就餐专线）',
-  collectStopArrivals(departures, predsOf, 'JB2_NORMAL', 'weekday', '军体活动中心东')
+  collectStopArrivals(departures, predsOf, 'JB2_NORMAL', 'weekday', '网球场')
     .every((p) => {
       const dep = departures.find((d) => d.recordId === p.departureId)
       return dep && dep.routeKey === 'JB2_NORMAL'

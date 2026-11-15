@@ -54,30 +54,30 @@ console.log('\n【A. 同名站多次经过】')
 const jb2_1645 = getDep('JB2_NORMAL', '16:45')
 const p1645 = getPreds(jb2_1645.recordId)
 
-let r = findBestRide(p1645, ['军体活动中心东'], ['二食堂'])
-assert('A1 军体东→二食堂 选返程seq12', r.origin.stopSeq === 12 && r.dest.stopSeq === 15, `(seq${r.origin.stopSeq} ${r.origin.arrivalTime} → ${r.dest.arrivalTime})`)
+let r = findBestRide(p1645, ['高培楼'], ['二食堂'])
+assert('A1 高培楼→二食堂 选回程seq12', r && r.origin.stopSeq === 12 && r.dest.stopSeq === 14, `(seq${r?.origin.stopSeq} ${r?.origin.arrivalTime} → ${r?.dest.arrivalTime})`)
 
-// A2: 16:50 时 seq4(16:48) 已过，首页应给 seq12
+// A2: 16:50 时去程高培楼已过，应上车回程那一次
 const now1650 = 16 * 3600 + 50 * 60
 const boardSec = r.origin.arrivalMinutes * 60 - now1650
 assert('A2 16:50时seq12方案未过站', boardSec > 0, `(上车倒计时 ${Math.round(boardSec / 60)}分钟)`)
 
-r = findBestRide(p1645, ['军体活动中心东', '军体活动中心南'], ['二食堂'])
-assert('A3 军体(组)→二食堂 选军体南', r.origin.stopName === '军体活动中心南' && r.origin.stopSeq === 13, `(seq${r.origin.stopSeq} 乘坐${Math.round(r.rideMinutes * 60)}s)`)
+r = findBestRide(p1645, ['高培楼'], ['二食堂'])
+assert('A3 两处高培楼→二食堂 选回程seq12', r.origin.stopSeq === 12, `(seq${r.origin.stopSeq} 乘坐${Math.round(r.rideMinutes * 60)}s)`)
 
-r = findBestRide(p1645, ['军体活动中心东', '军体活动中心南'], ['激光所'])
-assert('A4 军体(组)→激光所 选军体东seq4', r.origin.stopName === '军体活动中心东' && r.origin.stopSeq === 4, `(乘坐${Math.round(r.rideMinutes * 60)}s)`)
+r = findBestRide(p1645, ['高培楼'], ['激光所'])
+assert('A4 高培楼→激光所 选去程seq4', r.origin.stopSeq === 4 && r.dest.stopSeq === 6, `(乘坐${Math.round(r.rideMinutes * 60)}s)`)
 
 r = findBestRide(p1645, ['理学院'], ['网球场'])
 assert('A5 理学院→网球场 seq9→seq11', r.origin.stopSeq === 9 && r.dest.stopSeq === 11, `(乘坐${Math.round(r.rideMinutes * 60)}s)`)
 
-// A6: 激光所→军体东：JB1 或 JB2 都应 2 站
+// A6: 激光所→高培楼：去程绕大圈，应选回程那一次，只隔 2 站
 const jb1First = deps.find(d => d.routeKey === 'JB1_NORMAL')
 const jb2First = deps.find(d => d.routeKey === 'JB2_NORMAL')
-const r1 = findBestRide(getPreds(jb1First.recordId), ['激光所'], ['军体活动中心东'])
-const r2 = findBestRide(getPreds(jb2First.recordId), ['激光所'], ['军体活动中心东'])
-assert('A6 JB1 激光所→军体东 2站', r1.dest.stopSeq - r1.origin.stopSeq === 2, `(seq${r1.origin.stopSeq}→seq${r1.dest.stopSeq})`)
-assert('A6 JB2 激光所→军体东 2站', r2.dest.stopSeq - r2.origin.stopSeq === 2, `(seq${r2.origin.stopSeq}→seq${r2.dest.stopSeq})`)
+const r1 = findBestRide(getPreds(jb1First.recordId), ['激光所'], ['高培楼'])
+const r2 = findBestRide(getPreds(jb2First.recordId), ['激光所'], ['高培楼'])
+assert('A6 JB1 激光所→高培楼 2站', r1.dest.stopSeq - r1.origin.stopSeq === 2, `(seq${r1.origin.stopSeq}→seq${r1.dest.stopSeq})`)
+assert('A6 JB2 激光所→高培楼 2站', r2.dest.stopSeq - r2.origin.stopSeq === 2, `(seq${r2.origin.stopSeq}→seq${r2.dest.stopSeq})`)
 
 // ═══ B. 站点分组 ═══
 console.log('\n【B. 站点分组】')
@@ -89,28 +89,28 @@ const dining = deps.find(d => d.routeKey === 'HX1_DINING')
 r = findBestRide(getPreds(dining.recordId), ['二食堂北'], ['理学院'])
 assert('B3 二食堂北→理学院 就餐专线可达', r !== null && r.origin.stopSeq === 7, `(seq${r?.origin.stopSeq}→seq${r?.dest.stopSeq})`)
 
-r = findBestRide(p1645, ['军体活动中心东'], ['军体活动中心南'])
-assert('B4 军体东→军体南 seq12→seq13', r !== null && r.origin.stopSeq === 12 && r.dest.stopSeq === 13, `(乘坐${Math.round(r.rideMinutes * 60)}s)`)
+r = findBestRide(p1645, ['网球场'], ['高培楼'])
+assert('B4 回程网球场→高培楼 seq11→seq12', r !== null && r.origin.stopSeq === 11 && r.dest.stopSeq === 12, `(乘坐${Math.round(r.rideMinutes * 60)}s)`)
 
 // ═══ S. 行程规划 ═══
 console.log('\n【S. 行程规划】')
 // S1: 全班次最优组合抽查
 let allOk = true
 for (const d of deps.filter(x => x.routeKey === 'JB2_NORMAL' && x.dateType === 'weekday')) {
-  const rr = findBestRide(getPreds(d.recordId), ['军体活动中心东'], ['二食堂'])
+  const rr = findBestRide(getPreds(d.recordId), ['高培楼'], ['二食堂'])
   if (rr && rr.origin.stopSeq !== 12) { allOk = false; console.log('    班次', d.departureTime, '误选 seq' + rr.origin.stopSeq) }
 }
-assert('S1 JB2 工作日25班 军体东→二食堂 均选seq12', allOk)
+assert('S1 JB2 工作日25班 高培楼→二食堂 均选seq12', allOk)
 
 // S2: deadline 过滤
 const deadline = 17 * 60 // 17:00
 const plans = []
 for (const d of deps.filter(x => x.dateType === 'weekday')) {
-  const rr = findBestRide(getPreds(d.recordId), ['军体活动中心东', '军体活动中心南'], ['二食堂'])
+  const rr = findBestRide(getPreds(d.recordId), ['高培楼'], ['二食堂'])
   if (rr && rr.dest.arrivalMinutes <= deadline) plans.push({ dep: d, rr })
 }
 assert('S2 deadline=17:00 过滤后无晚到方案', plans.every(p => p.rr.dest.arrivalMinutes <= deadline), `(${plans.length}个方案)`)
-assert('S2 16:45班次在17:00前到达(16:58:05)', plans.some(p => p.dep.recordId === jb2_1645.recordId))
+assert('S2 16:45班次在17:00前到达二食堂', plans.some(p => p.dep.recordId === jb2_1645.recordId))
 
 // S5: 11:20 两趟区分
 const d1120 = deps.filter(d => d.departureTime === '11:20')
@@ -120,19 +120,18 @@ assert('S5 11:20 第一班=就餐专线(高超楼)', dining1120 && dining1120.sh
 assert('S5 11:20 第三班=普通环1(研究生宿舍楼)', normal1120 && normal1120.shiftName === '第三班' && normal1120.departureStation === '研究生宿舍楼')
 
 // S6: 军体→二食堂 JB2 vs 环1
-const jb2r = findBestRide(p1645, ['军体活动中心东', '军体活动中心南'], ['二食堂'])
+const jb2r = findBestRide(p1645, ['高培楼'], ['二食堂'])
 const hx1_1640 = getDep('HX1_NORMAL', '16:40')
-const hx1r = findBestRide(getPreds(hx1_1640.recordId), ['军体活动中心东', '军体活动中心南'], ['二食堂'])
-assert('S6 JB2(157s)远优于环1(436s)', jb2r.rideMinutes < hx1r.rideMinutes && jb2r.rideMinutes < 3 && hx1r.rideMinutes > 7, `(JB2 ${Math.round(jb2r.rideMinutes * 60)}s vs 环1 ${Math.round(hx1r.rideMinutes * 60)}s)`)
+const hx1r = findBestRide(getPreds(hx1_1640.recordId), ['军体活动中心东'], ['二食堂'])
+assert('S6 JB2高培楼到二食堂远短于环1军体东', jb2r.rideMinutes < hx1r.rideMinutes && jb2r.rideMinutes < 3 && hx1r.rideMinutes > 7, `(JB2 ${Math.round(jb2r.rideMinutes * 60)}s vs 环1 ${Math.round(hx1r.rideMinutes * 60)}s)`)
 
 // ═══ H. 首页逻辑 ═══
 console.log('\n【H. 首页逻辑】')
 // H1: 军体东 16:50 到站列表应含 去程(已过) 和 返程(未到)
-const jtPreds = pred.filter(p => p.stopName === '军体活动中心东' && p.dateType === 'weekday' && !p.isDepartureStop && !p.isReturnStop)
-const withSec = jtPreds.map(p => ({ p, sec: p.arrivalMinutes * 60 - now1650 })).filter(x => x.sec > -300 && x.sec < 3600)
-const hasGoing = withSec.some(x => x.p.stopSeq === 4 && x.sec < 0)  // 去程已过(保留5分钟内)
-const hasReturn = withSec.some(x => x.p.stopSeq === 12 && x.sec > 0) // 返程未到
-assert('H1 军体东列表含返程(未到)方案', hasReturn, `(返程最早: ${withSec.filter(x => x.p.stopSeq === 12).sort((a, b) => a.sec - b.sec)[0]?.p.arrivalTime})`)
+const gpPreds = pred.filter(p => p.stopName === '高培楼' && p.dateType === 'weekday' && !p.isDepartureStop && !p.isReturnStop)
+const withSec = gpPreds.map(p => ({ p, sec: p.arrivalMinutes * 60 - now1650 })).filter(x => x.sec > -300 && x.sec < 3600)
+const hasReturn = withSec.some(x => x.p.stopSeq === 12 && x.sec > 0)
+assert('H1 高培楼列表含回程(未到)方案', hasReturn, `(回程最早: ${withSec.filter(x => x.p.stopSeq === 12).sort((a, b) => a.sec - b.sec)[0]?.p.arrivalTime})`)
 
 // H8: BusStopTimeline stops 排序（同班次 seq 严格递增含同名站）
 assert('H8 预测序列seq严格递增', p1645.every((p, i) => i === 0 || p.stopSeq === p1645[i - 1].stopSeq + 1))
@@ -146,7 +145,7 @@ const weekendTimes = (key) => weekend.filter(d => d.routeKey === key).map(d => d
 assert('T3 周末接驳1路 25 趟', weekendTimes('JB1_NORMAL') === '7:50,8:30,9:10,9:50,10:30,11:10,11:50,12:30,14:40,15:20,16:00,16:40,17:25,17:50,18:15,18:40,19:05,19:30,19:55,20:20,20:45,21:10,21:35,22:00,22:25')
 assert('T3 周末接驳2路 12 趟', weekendTimes('JB2_NORMAL') === '8:10,8:50,9:30,10:10,10:50,11:30,12:10,14:20,15:00,15:40,16:20,17:00')
 assert('T3 周末无环线1路和就餐专线', weekend.every(d => d.routeKey === 'JB1_NORMAL' || d.routeKey === 'JB2_NORMAL'))
-assert('T3 周末每班都有 18 站预测', weekend.every(d => getPreds(d.recordId).length === 18))
+assert('T3 周末每班都有 17 站预测', weekend.every(d => getPreds(d.recordId).length === 17))
 // T4: 末班后无车次（23:00）
 const now2300 = 23 * 3600
 const remain = pred.filter(p => p.dateType === 'weekday' && p.arrivalMinutes * 60 - now2300 > -300)
@@ -155,11 +154,12 @@ assert('T4 23:00后无有效车次', remain.length === 0)
 // ═══ R/M. 记录与地图数据 ═══
 console.log('\n【R/M. 记录与地图数据】')
 const jb2Stops = rp.find(x => x.routeKey === 'JB2_NORMAL').stops
-assert('R2 JB2 18站 军体东×2激光所×2网球场×2',
-  jb2Stops.length === 18 &&
-  jb2Stops.filter(s => s.currentStop === '军体活动中心东').length === 2 &&
+assert('R2 JB2 17站 高培楼×2激光所×2网球场×2',
+  jb2Stops.length === 17 &&
+  jb2Stops.filter(s => s.currentStop === '高培楼').length === 2 &&
   jb2Stops.filter(s => s.currentStop === '激光所').length === 2 &&
-  jb2Stops.filter(s => s.currentStop === '网球场').length === 2)
+  jb2Stops.filter(s => s.currentStop === '网球场').length === 2 &&
+  jb2Stops.filter(s => s.currentStop === '军体活动中心南').length === 0)
 assert('R2 JB1=JB2反转', JSON.stringify(rp.find(x => x.routeKey === 'JB1_NORMAL').stops.map(s => s.currentStop)) === JSON.stringify([...jb2Stops.map(s => s.currentStop)].reverse()))
 
 // ═══ P. 上车站可行性优先（首页多起点推荐） ═══

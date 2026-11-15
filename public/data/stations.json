@@ -21,7 +21,7 @@
     "name": "军体活动中心东",
     "lat": 28.264276,
     "lng": 113.042703,
-    "serviceRoutes": "HX1_NORMAL,JB2_NORMAL,JB1_NORMAL"
+    "serviceRoutes": "HX1_NORMAL"
   },
   {
     "name": "网球场",
@@ -90,15 +90,15 @@
     "serviceRoutes": "HX1_DINING"
   },
   {
-    "name": "空天楼",
-    "lat": 28.27085,
-    "lng": 113.037833,
+    "name": "高培楼",
+    "lat": 28.264278,
+    "lng": 113.041403,
     "serviceRoutes": "JB2_NORMAL,JB1_NORMAL"
   },
   {
-    "name": "军体活动中心南",
-    "lat": 28.263272,
-    "lng": 113.042008,
+    "name": "空天楼",
+    "lat": 28.27085,
+    "lng": 113.037833,
     "serviceRoutes": "JB2_NORMAL,JB1_NORMAL"
   },
   {

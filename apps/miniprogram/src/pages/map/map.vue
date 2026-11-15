@@ -8,9 +8,9 @@ import { useGeolocation } from '@/composables/useGeolocation'
 import { getDateType, getSecondsSinceMidnight } from '@/utils/datetime'
 import { getNow } from '@/utils/time'
 import { computeActiveBusPositions } from '@/utils/bus_position'
-import { STATION_MARKER_META } from '@/utils/station_marker_meta'
+import { STATION_DOT_MARKER, STATION_MARKER_META } from '@/utils/station_marker_meta'
 import { arrivalCountdown, etaClassOf } from '@/utils/countdown'
-import { findNearestStop, formatWalkTimePrecise, WALK_SPEED_MPS } from '@/utils/geo'
+import { findNearestStop, formatWalkTimePrecise, haversineDistance, WALK_SPEED_MPS } from '@/utils/geo'
 import { routeColorOf, routeLabelOf, busIconOf } from '@/constants/routes'
 import { SHARE_TITLE, SHARE_PATH } from '@/utils/share'
 import type { BusPosition } from '@/types'
@@ -131,15 +131,17 @@ const polyline = computed(() => {
 // 4. iconPath 是实测最稳的一层——公交车辆图标切换线路从未丢过。
 // 因此改为「一张图搞定」：位置由图片内部布局决定，绝对可控，也不依赖原生文字层。
 const STATION_DOT_ONLY = '/static/icons/stations/_dot-only.png'
+/** 同名站坐标差小于这个距离，视为同一个物理点，不另画圆点 */
+const SAME_STOP_M = 30
 
-// 站名 → marker id（稳定分配，只增不改）
+// 站名（或「站名@坐标」）→ marker id（稳定分配，只增不改）
 const stationMarkerIdMap = new Map<string, number>()
 let nextStationMarkerId = 1000
-function stationMarkerId(name: string): number {
-  let id = stationMarkerIdMap.get(name)
+function stationMarkerId(key: string): number {
+  let id = stationMarkerIdMap.get(key)
   if (id === undefined) {
     id = nextStationMarkerId++
-    stationMarkerIdMap.set(name, id)
+    stationMarkerIdMap.set(key, id)
   }
   return id
 }
@@ -150,33 +152,40 @@ const stationMarkers = computed(() => {
     width: number; height: number; title: string
     iconPath: string; anchor: { x: number; y: number }
   }> = []
-  const shown = new Map<string, { lat: number; lng: number }>()
-  // 汇总可见路线上的站点（按路线专属坐标）
+  // 同名站在不同路线上可能是两个物理位置（环线1路的激光所和接驳线的激光所）。
+  // 站名只留一份，避免气泡互相遮住；其余位置仍画圆点，让每条线的停靠点都看得见。
+  const spots: Array<{ name: string; lat: number; lng: number }> = []
   for (const rp of scheduleStore.routePatterns) {
     if (!visibleRoutes.value.has(rp.routeKey)) continue
     const stops = scheduleStore.routeStops[rp.routeKey]
     if (!stops) continue
     for (const s of stops) {
-      if (!shown.has(s.name)) shown.set(s.name, { lat: s.lat, lng: s.lng })
+      const same = spots.some(p => p.name === s.name && haversineDistance(p.lat, p.lng, s.lat, s.lng) < SAME_STOP_M)
+      if (!same) spots.push({ name: s.name, lat: s.lat, lng: s.lng })
     }
   }
+  const labeled = new Set<string>()
   const show = showLabels.value
-  for (const [name, info] of shown) {
-    const meta = STATION_MARKER_META[name]
-    // 数据里新增了站但没重新跑生成脚本时，退化为只显示圆点，避免整块 marker 消失
-    const iconPath = show && meta
-      ? `/static/icons/stations/${name}.png`
+  for (const info of spots) {
+    const withLabel = show && !labeled.has(info.name)
+    if (withLabel) labeled.add(info.name)
+    const meta = STATION_MARKER_META[info.name]
+    const iconPath = withLabel && meta
+      ? `/static/icons/stations/${info.name}.png`
       : STATION_DOT_ONLY
+    const idKey = withLabel
+      ? info.name
+      : `${info.name}@${info.lat.toFixed(5)},${info.lng.toFixed(5)}`
     markers.push({
-      id: stationMarkerId(name),
+      id: stationMarkerId(idKey),
       latitude: info.lat,
       longitude: info.lng,
       iconPath,
-      width: show && meta ? meta.width : 7,
-      height: show && meta ? meta.height : 7,
-      // anchorY 由生成脚本给出：让圆点圆心正好落在站点经纬度上
-      anchor: { x: 0.5, y: show && meta ? meta.anchorY : 0.5 },
-      title: name,
+      // 尺寸和锚点都来自生成脚本：站名图与纯圆点用同一画布高度、同一圆点半径
+      width: withLabel && meta ? meta.width : STATION_DOT_MARKER.width,
+      height: withLabel && meta ? meta.height : STATION_DOT_MARKER.height,
+      anchor: { x: 0.5, y: withLabel && meta ? meta.anchorY : STATION_DOT_MARKER.anchorY },
+      title: info.name,
     })
   }
   // 按 id 排序：保证数组顺序稳定，原生层对比新旧 markers 时不至于错乱

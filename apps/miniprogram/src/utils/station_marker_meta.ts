@@ -23,7 +23,10 @@ export const STATION_MARKER_META: Record<string, StationMarkerMeta> = {
   '305教学楼': { width: 62, height: 25, anchorY: 0.86 },
   '一食堂': { width: 43, height: 25, anchorY: 0.86 },
   '二食堂北': { width: 54, height: 25, anchorY: 0.86 },
+  '高培楼': { width: 43, height: 25, anchorY: 0.86 },
   '空天楼': { width: 43, height: 25, anchorY: 0.86 },
-  '军体活动中心南': { width: 87, height: 25, anchorY: 0.86 },
   '水上训练中心': { width: 76, height: 25, anchorY: 0.86 },
 }
+
+/** 不带站名的圆点。宽高必须相等，且高度与站名图相同，圆才不会被压扁。 */
+export const STATION_DOT_MARKER: StationMarkerMeta = { width: 25, height: 25, anchorY: 0.86 }

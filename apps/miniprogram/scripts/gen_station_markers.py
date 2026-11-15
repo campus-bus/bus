@@ -72,6 +72,16 @@ def draw_bubble(width, text, font):
     return im
 
 
+def paint_dot(draw, img_w, sample_h):
+    """在画布底部正中画圆点。半径用像素，宽高同一比例，缩放后才是正圆。"""
+    cx = img_w * SCALE / 2
+    cy = (sample_h + GAP) * SCALE + DOT_D * SCALE / 2
+    r = DOT_D * SCALE / 2
+    draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=DOT_RING)
+    r2 = r - 1 * SCALE
+    draw.ellipse([cx - r2, cy - r2, cx + r2, cy + r2], fill=DOT_FILL)
+
+
 def main():
     with open(DATA, 'r', encoding='utf-8') as f:
         stations = json.load(f)
@@ -96,14 +106,8 @@ def main():
         bubble = draw_bubble(bubble_w, name, font)
         im.paste(bubble, ((img_w - bubble_w) * SCALE // 2, 0), bubble)
 
-        d = ImageDraw.Draw(im)
-        cx = img_w * SCALE / 2
-        cy = (sample_h + GAP) * SCALE + DOT_D * SCALE / 2
-        r = DOT_D * SCALE / 2
         # 圆点：白色实心 + 蓝色描边（描边让它在浅色/深色底图上都看得见）
-        d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=DOT_RING)
-        r2 = r - 1 * SCALE
-        d.ellipse([cx - r2, cy - r2, cx + r2, cy + r2], fill=DOT_FILL)
+        paint_dot(ImageDraw.Draw(im), img_w, sample_h)
 
         path = os.path.join(OUT_DIR, name + '.png')
         im.save(path)
@@ -116,14 +120,15 @@ def main():
         }
         print(f'  {name}: {img_w}x{img_h}  anchorY={meta[name]["anchorY"]}')
 
-    # 隐藏站名时用：只有圆点的小图
-    im = Image.new('RGBA', (DOT_D * SCALE, DOT_D * SCALE), (0, 0, 0, 0))
-    d = ImageDraw.Draw(im)
-    r = DOT_D * SCALE / 2
-    d.ellipse([0, 0, DOT_D * SCALE - 1, DOT_D * SCALE - 1], fill=DOT_RING)
-    r2 = r - 1 * SCALE
-    d.ellipse([r - r2, r - r2, r + r2, r + r2], fill=DOT_FILL)
+    # 不带站名时仍用同一张画布高度、同一个 paint_dot。
+    # 画布必须是正方形：微信 map 按 marker 的 width、height 分别缩放图片，
+    # 若画布是 7×25 的细长条，圆点会被拉成椭圆。正方形配合相等的宽高，缩放比例才和站名图一致。
+    dot_side = sample_h + GAP + DOT_D
+    im = Image.new('RGBA', (dot_side * SCALE, dot_side * SCALE), (0, 0, 0, 0))
+    paint_dot(ImageDraw.Draw(im), dot_side, sample_h)
     im.save(os.path.join(OUT_DIR, '_dot-only.png'))
+    dot_anchor = round(1 - (DOT_D / 2) / dot_side, 4)
+    print(f'  纯圆点: {dot_side}x{dot_side}  anchorY={dot_anchor}')
 
     # 把尺寸表写成 TS，运行期直接查表，不必在 JS 里重复计算排版
     ts = ['// 由 scripts/gen_station_markers.py 自动生成，勿手改',
@@ -139,6 +144,9 @@ def main():
     for name, m in meta.items():
         ts.append(f"  '{name}': {{ width: {m['width']}, height: {m['height']}, anchorY: {m['anchorY']} }},")
     ts.append('}')
+    ts.append('')
+    ts.append('/** 不带站名的圆点。宽高必须相等，且高度与站名图相同，圆才不会被压扁。 */')
+    ts.append(f'export const STATION_DOT_MARKER: StationMarkerMeta = {{ width: {dot_side}, height: {dot_side}, anchorY: {dot_anchor} }}')
     ts.append('')
     ts_path = os.path.join(ROOT, 'src', 'utils', 'station_marker_meta.ts')
     with open(ts_path, 'w', encoding='utf-8', newline='\n') as f:

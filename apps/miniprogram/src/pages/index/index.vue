@@ -384,6 +384,32 @@ function rideOf(item: ArrivalItem): RideInfo | null {
   }
 }
 
+/**
+ * 列表按整分钟决定收谁，文案按真实秒数。
+ * 超过 5 分钟时文案会变成空字符串（表示该移除），但整分钟还没翻过去，
+ * 横条会留下、状态字消失。这里用和文案同一个倒计时再滤一次，两边一起消失。
+ */
+const visibleNearby = computed(() => {
+  void secondsNow.value
+  return nearbySections.value
+    .map(section => ({
+      ...section,
+      arrivals: section.arrivals.filter(item => arrivalEta(item).label),
+    }))
+    .filter(section => section.arrivals.length > 0)
+})
+const visibleDest = computed(() => {
+  void secondsNow.value
+  return destArrivals.value.filter(item => {
+    const ride = rideOf(item)
+    return ride ? !!ride.boardLabel : !!arrivalEta(item).label
+  })
+})
+const visibleDeparting = computed(() => {
+  void secondsNow.value
+  return departingSoon.value.filter(item => departingEta(item).label)
+})
+
 // ─── 折叠控制 ───
 const showAllArrivals = ref(false)
 const showAllDeparting = ref(false)
@@ -477,7 +503,7 @@ function departingCardKey(recordId: string) { return `dep-${recordId}` }
 
     <!-- 附近站（默认视图） -->
     <template v-if="!selectedStop">
-      <view v-for="section in nearbySections" :key="section.stopName" class="section">
+      <view v-for="section in visibleNearby" :key="section.stopName" class="section">
         <view class="section-title">「{{ section.stopName }}」 {{ section.walkLabel }}</view>
         <view
           v-for="(item, idx) in section.arrivals" :key="item.departure.recordId + '-' + item.destSeq"
@@ -514,7 +540,7 @@ function departingCardKey(recordId: string) { return `dep-${recordId}` }
       <view v-if="outOfCampus" class="hint-card">
         <text>你当前不在校园附近，已隐藏步行赶车建议；可从上方列表手动选择站点查看该站到站时刻</text>
       </view>
-      <view v-else-if="hasLocation && !noServiceToday && nearbySections.length === 0" class="hint-card">
+      <view v-else-if="hasLocation && !noServiceToday && visibleNearby.length === 0" class="hint-card">
         <text>当前时段附近暂无到站车次，可从上方列表手动选择站点</text>
       </view>
     </template>
@@ -522,9 +548,9 @@ function departingCardKey(recordId: string) { return `dep-${recordId}` }
     <!-- 目的地推荐 -->
     <view v-if="selectedStop" class="section">
       <view class="section-title">「{{ selectedStop }}」</view>
-      <view v-if="destArrivals.length === 0" class="empty">当前时段暂无经过此站的车次</view>
+      <view v-if="visibleDest.length === 0" class="empty">当前时段暂无经过此站的车次</view>
       <view
-        v-for="item in (showAllArrivals ? destArrivals : destArrivals.slice(0, 5))"
+        v-for="item in (showAllArrivals ? visibleDest : visibleDest.slice(0, 5))"
         :key="item.departure.recordId"
       >
           <ArrivalCard
@@ -549,8 +575,8 @@ function departingCardKey(recordId: string) { return `dep-${recordId}` }
           </template>
         </ArrivalCard>
       </view>
-      <view v-if="destArrivals.length > 5" class="show-more" @tap="showAllArrivals = !showAllArrivals">
-        <text>{{ showAllArrivals ? '收起' : `展开更多 ${destArrivals.length - 5} 趟车次` }}</text>
+      <view v-if="visibleDest.length > 5" class="show-more" @tap="showAllArrivals = !showAllArrivals">
+        <text>{{ showAllArrivals ? '收起' : `展开更多 ${visibleDest.length - 5} 趟车次` }}</text>
         <image
           class="chevron" :class="{ rotated: showAllArrivals }"
           src="/static/icons/ui/chevron-down.png" mode="aspectFit"
@@ -559,10 +585,10 @@ function departingCardKey(recordId: string) { return `dep-${recordId}` }
     </view>
 
     <!-- 即将发车 -->
-    <view v-if="departingSoon.length > 0" class="section">
+    <view v-if="visibleDeparting.length > 0" class="section">
       <view class="section-title">即将发车</view>
       <view
-        v-for="item in (showAllDeparting ? departingSoon : departingSoon.slice(0, 5))"
+        v-for="item in (showAllDeparting ? visibleDeparting : visibleDeparting.slice(0, 5))"
         :key="item.departure.recordId"
       >
         <ArrivalCard
@@ -582,8 +608,8 @@ function departingCardKey(recordId: string) { return `dep-${recordId}` }
           </template>
         </ArrivalCard>
       </view>
-      <view v-if="departingSoon.length > 5" class="show-more" @tap="showAllDeparting = !showAllDeparting">
-        <text>{{ showAllDeparting ? '收起' : `展开更多 ${departingSoon.length - 5} 趟车次` }}</text>
+      <view v-if="visibleDeparting.length > 5" class="show-more" @tap="showAllDeparting = !showAllDeparting">
+        <text>{{ showAllDeparting ? '收起' : `展开更多 ${visibleDeparting.length - 5} 趟车次` }}</text>
         <image
           class="chevron" :class="{ rotated: showAllDeparting }"
           src="/static/icons/ui/chevron-down.png" mode="aspectFit"
